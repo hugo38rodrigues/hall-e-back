@@ -1,11 +1,13 @@
 const axios = require('axios');
+require('dotenv').config()
+const TOKEN_API = process.env.TOKEN_API_PANDASCORE
 
 const options = {
   method: 'GET',
   url: 'https://api.pandascore.co/lol/matches/upcoming',
   headers: {
     'Accept': 'application/json',
-    'Authorization': 'Bearer d4IuV4C2nQrDTvlPjKSXIoJqNP6B4ySOwqoqcVORoGlEk7wmBo0'
+    'Authorization': `Bearer ${TOKEN_API}`
   }
 };
 
