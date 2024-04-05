@@ -1,0 +1,17 @@
+body{
+  background-color:  var(--primary-color);
+}
+
+.ctn {
+ display: flex;
+ justify-content: center;
+}
+
+.form{
+  width: 865px;
+  height: 560px;
+  border-radius: 50px;
+  border: solid var(--secondary-color);
+  box-shadow: 14px 14px 14px 14px black;
+  margin: 200px
+}
