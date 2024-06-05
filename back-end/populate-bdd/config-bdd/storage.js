@@ -1,4 +1,4 @@
-class Storage {
+export class Storage {
   async saveLolMatch(data) {
     throw new Error('save method must be implement')
   }
@@ -9,4 +9,3 @@ class Storage {
     throw new Error('save method must be implement')
   }
 }
-export default Storage

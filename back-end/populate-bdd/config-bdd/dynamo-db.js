@@ -1,25 +1,30 @@
-// dynamoDBStorage.js
-import { AWS } from 'aws-sdk';
-import { Storage } from '../storage';
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"; // ES Modules import
+import { Storage } from './storage.js';
 
-class DynamoDBStorage extends Storage {
+export class DynamoDBStorage extends Storage {
   constructor(config) {
     super();
-    _this.docClient = new AWS.DynamoDB.DocumentClient(config);
-    _this.LolTable = 'lol_match'
-    _this.ValorantTable = 'valorant_match'
-    _this.CsGoTable = 'csgo_match'
+    this.client = new DynamoDBClient(config);
+    this.LolTable = 'LolMatches';
+    this.ValorantTable = 'ValorantMatches';
+    this.CsGoTable = 'CsGoMatches';
   }
 
   async saveLolMatch(data) {
+
     const params = {
       TableName: this.LolTable,
-
-      Item: data
+      Item: {
+        id: { 'N': data[0].id },
+        date: { "S": data[0].date },
+        teamNames: { "SS": data[0].teamNames },
+        leagueName: { "S": data[0].leagueName }
+      }
     };
     try {
-      const data = await this.docClient.put(params).promise();
-      console.log('Item saved successfully:', JSON.stringify(data, null, 2));
+      const command = new PutItemCommand(params);
+      const response = await this.client.send(command);
+      console.log('Item saved successfully:', JSON.stringify(respo444nse, null, 2));
     } catch (error) {
       console.error('Unable to add item:', error);
       throw error;
@@ -40,9 +45,9 @@ class DynamoDBStorage extends Storage {
     }
   }
 
-  async saveValorantMatchMatch(data) {
+  async saveValorantMatch(data) {
     const params = {
-      TableName: this.ValorantTable,
+      TableName: this.CsGoTable,
       Item: data
     };
     try {
@@ -54,5 +59,3 @@ class DynamoDBStorage extends Storage {
     }
   }
 }
-
-export default DynamoDBStorage;
