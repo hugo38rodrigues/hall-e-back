@@ -5,17 +5,16 @@ export class GetData {
         this.option = option;
     }
 
-    verifyData = () => {
-
-    }
-
     getDatas = async () => {
         try {
             const response = await axios(this.option);
-            const arrayData = response.data;
-            
+            if(response.status === 200) {
+               return  response.data;
+            }
+            else {
+                console.log(`Error while retrieving data from api ${response}`)
+            }
 
-            return this.verifyData(arrayData)
         } catch (error) {
             console.error('Error:', error);
         }
