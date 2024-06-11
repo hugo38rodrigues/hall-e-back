@@ -44,11 +44,23 @@ const getCsData = new GetData(optionCs)
 const getValorantData = new GetData(optionValorant)
 const matches = new Match()
 const savingMatches = new SavingMatches(dynamoDBConfig)
-
+const targetBdd = "dynamoDB"
 
 const main = async () => {
   if (modDev) {
-    const createTables = CreateTables()
+    switch (targetBdd) {
+      case 'dynamoDB':
+        const dynamoDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
+        dynamoDb.ge
+        break;
+      case 'SQL':
+        console.log('Mangoes and papayas are $2.79 a pound.');
+        break;
+      case ''
+      default:
+        console.log(`Sorry, we are out of ${expr}.`);
+    }
+    targetBdd === "dynamoDB" ?  : CreateTablesSQL()
   }
   const lolData = await getLolData.getDatas()
   const csData = await getCsData.getDatas()

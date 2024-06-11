@@ -1,5 +1,5 @@
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"; // ES Modules import
-import { Storage } from './storage.js';
+import { Storage } from '../interface/storage.js';
 
 export class DynamoDBStorage extends Storage {
   constructor(config) {
