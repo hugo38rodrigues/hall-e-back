@@ -1,7 +1,6 @@
 .env
 */node_modules
 */package-lock.json
-*/package.json
 .vscode/*
 !.vscode/extensions.json
 .idea
