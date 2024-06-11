@@ -47,20 +47,30 @@ const savingMatches = new SavingMatches(dynamoDBConfig)
 const targetBdd = "dynamoDB"
 
 const main = async () => {
-  if (modDev) {
-    switch (targetBdd) {
-      case 'dynamoDB':
+
+  switch (targetBdd) {
+    case 'dynamoDB':
+      if (modDev) {
         const dynamoDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
         dynamoDb.ge
-        break;
-      case 'SQL':
-        console.log('Mangoes and papayas are $2.79 a pound.');
-        break;
-      case ''
-      default:
-        console.log(`Sorry, we are out of ${expr}.`);
-    }
-    targetBdd === "dynamoDB" ?  : CreateTablesSQL()
+      }
+      break;
+    case 'SQL':
+      if (modDev) {
+        const SqlDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
+        SqlDb.ge
+      }
+      console.log('Target bdd SQL');
+      break;
+    case 'MangoDb':
+      if (modDev) {
+        const mangoDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
+        mangoDb.ge
+      }
+      console.log('Target bdd MangoDb');
+      break
+    default:
+      console.log(`Sorry, we are out of ${targetBdd}.`);
   }
   const lolData = await getLolData.getDatas()
   const csData = await getCsData.getDatas()
