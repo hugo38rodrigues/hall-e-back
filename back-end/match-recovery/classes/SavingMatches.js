@@ -2,8 +2,7 @@ import { DynamoDBStorage } from './bdd/dynamo-db';
 
 export class SavingMatches {
     constructor( configDynamoDb) {
-        this.configDynamoDb = configDynamoDb;
-        this.dynamoDb = new DynamoDBStorage(this.configDynamoDb)
+        this.dynamoDb = new DynamoDBStorage(configDynamoDb)
     }
 
     saveMatches = async (matches, nameTable) => {
