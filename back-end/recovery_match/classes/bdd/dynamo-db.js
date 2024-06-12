@@ -8,15 +8,18 @@ export class DynamoDBStorage extends Storage {
   }
 
   async saveMatches(data, nameTable) {
-    const params = {
-      TableName: nameTable,
-      Item: {
-        id: { 'N': data[0].id },
-        date: { "S": data[0].date },
-        teamNames: { "SS": data[0].teamNames },
-        leagueName: { "S": data[0].leagueName }
-      }
-    };
+    data.map(match => {
+      const params = {
+        TableName: nameTable,
+        Item: {
+          id: { 'N': match.id },
+          date: { "S": match.date },
+          teamNames: { "SS": match.teamNames },
+          leagueName: { "S": match.leagueName }
+        }
+      };
+    })
+
 
     try {
       const command = new PutItemCommand(params);

@@ -7,6 +7,7 @@
   },
   "type": "module",
   "scripts": {
-    "run-data": "node --env-file=.env main.js"
+    "main": "node main.js",
+    "load-data": "bash -c './run_recovery_match.bash && npm run main'"
   }
 }
