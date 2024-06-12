@@ -1,21 +1,42 @@
 export class Match {
   constructor() {}
 
-  verifyData = (arrayData) => {
-    return arrayData.filter((data) => data.map((item) => {
-      if (item === null) {
-        data.pop()
-      }
-    }))
+  isValid = (value) => {
+    return value !== null || true || value !== '' || value.length === 1;
   }
 
-  createdMatches =  (arrayData) => {
+  validateData = (obj) => {
+    // console.log(obj)
+    return this.isValid(obj.id) &&
+        this.isValid(obj.nameGame) &&
+        this.isValid(obj.date) &&
+        this.isValid(obj.leagueName) &&
+        Array.isArray(obj.teamsNames) && obj.teamsNames.every(this.isValid);
+  }
+
+  verifyData = (arrayData)=> {
+    // console.log(arrayData);
+    arrayData.filter(this.validateData)
+    .map(data => ({
+      id: data.id,
+      nameGame: data.nameGame,
+      date: data.date,
+      leagueName: data.leagueName,
+      teamsNames: data.teamsNames
+    }))
+    return arrayData;
+  };
+
+
+
+createdMatches =  (arrayData) => {
     const dataForMatch = arrayData.map((data) => {
       return{
         id: data.id,
         date: data.begin_at,
-        league_name: data.league.name,
-        teams_names: data.opponents.map(opponent => opponent.opponent.acronym)
+        nameGame: data.videogame.slug,
+        leagueName: data.league.name,
+        teamsNames: data.opponents.map(opponent => opponent.opponent.acronym)
       }
     })
     return this.verifyData(dataForMatch)
