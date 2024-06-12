@@ -1,4 +1,4 @@
-import { DynamoDBStorage } from './bdd/dynamo-db';
+import { DynamoDBStorage } from './bdd/dynamo-db.js';
 
 export class SavingMatches {
     constructor( configDynamoDb) {
