@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+
 for param in "$@"
 do
   case $param in
@@ -8,11 +9,23 @@ do
       case $bdd_name in
         dynamoDb)
           echo "Loading environment for DynamoDB"
-          source "./config/dynamoDb.env"
+          if [ -f "./config/dynamoDb.env" ]; then
+            source "./config/dynamoDb.env"
+            npm run load-data
+          else
+            echo "Environment file for DynamoDB not found!"
+            exit 1
+          fi
           ;;
         mysql)
           echo "Loading environment for MySQL"
-          source "./config/sql.env"
+          if [ -f "./config/sql.env" ]; then
+            source "./config/sql.env"
+            npm run load-data
+          else
+            echo "Environment file for MySQL not found!"
+            exit 1
+          fi
           ;;
         *)
           echo "Unknown configuration value: $bdd_name"
@@ -26,5 +39,3 @@ do
       ;;
   esac
 done
-
-# Rest of your script can use the loaded environment variables

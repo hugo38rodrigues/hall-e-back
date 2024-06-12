@@ -7,7 +7,6 @@
   },
   "type": "module",
   "scripts": {
-    "main": "node main.js",
-    "load-data": "bash -c './run_recovery_match.bash && npm run main'"
+    "load-data": "node main.js"
   }
 }
