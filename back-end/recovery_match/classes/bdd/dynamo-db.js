@@ -4,10 +4,11 @@ import { Storage } from '../interface/storage.js';
 export class DynamoDBStorage extends Storage {
   constructor(config) {
     super();
+    this.config = config;
     this.client = new DynamoDBClient(config);
   }
 
-  async saveMatches(data, nameTable) {
+  async saveMatches(data) {
     data.map(match => {
       const params = {
         TableName: nameTable,
