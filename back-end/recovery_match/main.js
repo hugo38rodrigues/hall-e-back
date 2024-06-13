@@ -72,7 +72,7 @@ switch (BDD_TARGET) {
     await valorant.CreatedMatchesCs()
     break;
   default:
-    console.log(`Sorry, we are out of ${BDD_TARGET}.`);
+    console.log(`Config is not acceptable ${BDD_TARGET}.`);
     break;
 }
 
