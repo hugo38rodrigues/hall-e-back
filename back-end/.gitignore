@@ -1,4 +1,5 @@
 *.env
+sql.env
 */node_modules
 */package-lock.json
 .vscode/*
