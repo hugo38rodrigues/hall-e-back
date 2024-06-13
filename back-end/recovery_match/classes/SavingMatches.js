@@ -1,20 +1,23 @@
-import { DynamoDBStorage } from './bdd/dynamo-db.js';
-import {BDD_NAME} from "../utils/saving-matches.util.js";
+import { DynamoDB} from './bdd/dynamo-db.js';
+import {BDD_NAME, TABLES_NAME} from "../utils/saving-matches.util.js";
+import {MysqlDB} from "./bdd/mysql-db.js";
+
 
 export class SavingMatches {
-    constructor( configDb, bddTarget) {
-        this.configDb = configDb
+    constructor(bddTarget) {
         this.bddTarget = bddTarget
+
     }
+
 
     saveMatches = async (matches) => {
         if(this.bddTarget === BDD_NAME.dynamodb) {
-            const dynamoDb = new DynamoDBStorage(this.configDb)
-            await dynamoDb.saveMatches(matches);
+            const dynamoDb = new DynamoDB()
+            await dynamoDb.saveMatches(matches, this.bddTarget, TABLES_NAME);
         }
         else if (this.bddTarget === BDD_NAME.mysql) {
-            const mysqlDb = new DynamoDBStorage(this.configDb)
-            await mysqlDb.saveMatches(matches);
+            const mysqlDb = new MysqlDB()
+            await mysqlDb.saveMatches(matches, TABLES_NAME);
         }
     }
 }

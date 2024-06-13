@@ -1,8 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
 
-
-for param in "$@"
-do
+for param in "$@"; do
   case $param in
     --config=*)
       bdd_name="${param#*=}"
@@ -33,9 +31,4 @@ do
           ;;
       esac
       ;;
-    *)
-      echo "Unknown parameter: $param"
-      exit 1
-      ;;
-  esac
 done
