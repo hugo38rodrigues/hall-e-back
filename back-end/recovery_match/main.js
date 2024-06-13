@@ -1,17 +1,14 @@
-import { Match } from "./classes/Match.js";
 // import { CreateTables } from "./bdd-config/create-tables.js";
-import { GetData } from "./classes/GetData.js";
-import { SavingMatches } from "./classes/SavingMatches.js";
+import {Index} from "./classes/index.js";
 
-const TOKEN_API = process.env.TOKEN_API
+const TOKEN_API = process.env.TOKEN_API_PANDASCORE
 const BDD_TARGET = process.env.BDD_TARGET
-
-const dynamoDBConfig = {
-  region: 'ap-euw-2',
-  endpoint: "http://localhost:8000",
-  accessKeyId: 'fakeMyAccessKeyId',
-  secretAccessKey: 'fakeSecretAccessKe'
-};
+const configBDD = {
+  region: process.env.BDD_REGION,
+  endpoint: process.env.ENDPOINT,
+  accessKeyId: process.env.ACCESS_KEY_ID,
+  secretAccessKey: process.env.SECRET_ACCESS_KEY
+}
 const optionLol = {
   method: 'GET',
   url: 'https://api.pandascore.co/lol/matches/upcoming',
@@ -38,50 +35,41 @@ const optionValorant = {
 }
 
 const modDev = true
-const getLolData = new GetData(optionLol)
-const getCsData = new GetData(optionCs)
-const getValorantData = new GetData(optionValorant)
-const matches = new Match()
-const savingMatches = new SavingMatches(dynamoDBConfig)
+const lol = new Index(optionLol,BDD_TARGET, configBDD)
+const cs = new Index( optionCs,BDD_TARGET, configBDD)
+const valorant = new Index( optionValorant,BDD_TARGET, configBDD)
 
-
-const main = async () => {
-  const lolData = await getLolData.getDatas()
-  const csData = await getCsData.getDatas()
-  const valorantData = await getValorantData.getDatas()
-
-  const lolMatches = matches.createdMatches(lolData)
-  const csMatches = matches.createdMatches(csData)
-  const valorantMatches = matches.createdMatches(valorantData)
-
-  await savingMatches.saveMatches(lolMatches, "lol_match")
-  await savingMatches.saveMatches(csMatches, "cs_match")
-  await savingMatches.saveMatches(valorantMatches, "valorant_match")
-}
+console.log(BDD_TARGET)
 
 switch (BDD_TARGET) {
-  case 'dynamoDb':
+  case 'dynamodb':
     if (modDev) {
       // const dynamoDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
       // dynamoDb.ge
       console.log("ouais")
-      await main()
     }
+    await lol.createdMatchesLol()
+    await cs.createdMatchesValorant()
+    await valorant.CreatedMatchesCs()
     break;
   case 'mysql':
     if (modDev) {
       // const sqlDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
       // sqlDb.ge
       console.log("sql")
-      await main()
     }
+    await lol.createdMatchesLol()
+    await cs.createdMatchesValorant()
+    await valorant.CreatedMatchesCs()
     break;
-  case 'MangoDb':
+  case 'Mangodb':
     if (modDev) {
       const mangoDb = CreateTables(dynamoDBConfig, ['lol_tables', 'cs_table', 'valorant_table'])
       mangoDb.ge
-      await main()
     }
+    await lol.createdMatchesLol()
+    await cs.createdMatchesValorant()
+    await valorant.CreatedMatchesCs()
     break;
   default:
     console.log(`Sorry, we are out of ${BDD_TARGET}.`);
