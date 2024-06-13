@@ -7,7 +7,7 @@ export class Match {
 
   validateData = (obj) => {
     // console.log(obj)
-    return this.isValid(obj.id) &&
+    return this.isValid(obj.idMatch) &&
         this.isValid(obj.nameGame) &&
         this.isValid(obj.date) &&
         this.isValid(obj.leagueName) &&
@@ -18,7 +18,7 @@ export class Match {
     // console.log(arrayData);
     arrayData.filter(this.validateData)
     .map(data => ({
-      id: data.id,
+      idMath: data.id,
       nameGame: data.nameGame,
       date: data.date,
       leagueName: data.leagueName,
@@ -32,7 +32,7 @@ export class Match {
 createdMatches =  (arrayData) => {
     const dataForMatch = arrayData.map((data) => {
       return{
-        id: data.id,
+        idMatch: data.id,
         date: data.begin_at,
         nameGame: data.videogame.slug,
         leagueName: data.league.name,
