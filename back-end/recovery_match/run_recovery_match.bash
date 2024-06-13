@@ -9,8 +9,8 @@ do
       case $bdd_name in
         dynamoDb)
           echo "Loading environment for DynamoDB"
-          if [ -f "./config/dynamoDb.env" ]; then
-            source "./config/dynamoDb.env"
+          if [ -f "./config/.env.dynamodb.sh" ]; then
+            source "./config/.env.dynamodb.sh"
             npm run load-data
           else
             echo "Environment file for DynamoDB not found!"
@@ -19,8 +19,8 @@ do
           ;;
         mysql)
           echo "Loading environment for MySQL"
-          if [ -f "./config/sql.env" ]; then
-            source "./config/sql.env"
+          if [ -f "./config/.env.sql.sh" ]; then
+            source "./config/.env.sql.sh"
             npm run load-data
           else
             echo "Environment file for MySQL not found!"
