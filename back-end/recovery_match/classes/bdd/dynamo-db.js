@@ -1,10 +1,10 @@
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"; // ES Modules import
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb"; // ES Modules import
 import { Storage } from '../interface/storage.js';
 
 export class DynamoDB extends Storage {
   constructor() {
     super();
-    this.config= {
+    this.config = {
       region: process.env.BDD_REGION,
       endpoint: process.env.ENDPOINT,
       accessKeyId: process.env.ACCESS_KEY_ID,
@@ -12,6 +12,7 @@ export class DynamoDB extends Storage {
     }
     this.client = new DynamoDBClient(this.config);
   }
+
   //
   // async saveMatches(data) {
   //   data.map(match => {
@@ -27,13 +28,13 @@ export class DynamoDB extends Storage {
   //   })
 
 
-    // try {
-    //   const command = new PutItemCommand(params);
-    //   const response = await this.client.send(command);
-    //   console.log('Item saved successfully:', JSON.stringify(response, null, 2));
-    // } catch (error) {
-    //   console.error('Unable to add item:', error);
-    //   throw error;
-    // }
-  }
+  // try {
+  //   const command = new PutItemCommand(params);
+  //   const response = await this.client.send(command);
+  //   console.log('Item saved successfully:', JSON.stringify(response, null, 2));
+  // } catch (error) {
+  //   console.error('Unable to add item:', error);
+  //   throw error;
+  // }
+  // }
 }

@@ -1,8 +1,8 @@
-import {GetData} from "./GetData.js";
-import {Match} from "./Match.js";
-import {SavingMatches} from "./SavingMatches.js";
+import { GetData } from "./GetData.js";
+import { Match } from "./Match.js";
+import { SavingMatches } from "./SavingMatches.js";
 
-export class Index {
+export class Dispatcher {
     constructor(configApi, BDD_TARGET) {
         this.lolData = new GetData(configApi)
         this.csData = new GetData(configApi)

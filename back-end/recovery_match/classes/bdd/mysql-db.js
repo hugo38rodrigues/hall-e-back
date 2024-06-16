@@ -1,5 +1,5 @@
-import {Storage} from "../interface/storage.js";
-import mysql from 'mysql'
+import { Storage } from "../interface/storage.js";
+import mysql from 'mysql';
 
 export class MysqlDB extends Storage {
     constructor() {
@@ -7,7 +7,7 @@ export class MysqlDB extends Storage {
         this.con = mysql.createConnection({
             host: process.env.HOST,
             user: process.env.USER,
-            password: process.env.PASSWORD
+            password: process.env.MYSQL_ROOT_PASSWORD
         });
     }
 

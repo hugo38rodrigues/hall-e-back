@@ -1,5 +1,5 @@
 // import { CreateTables } from "./bdd-config/create-tables.js";
-import {Index} from "./classes/index.js";
+import { Dispatcher } from './classes/Dispatcher.js'
 
 const TOKEN_API = process.env.TOKEN_API_PANDASCORE
 const BDD_TARGET = process.env.BDD_TARGET
@@ -27,10 +27,11 @@ const optionValorant = {
     'Authorization': `Bearer ${TOKEN_API}`
   }
 }
-
-const lol = new Index(optionLol,BDD_TARGET, configBDD)
-const cs = new Index( optionCs,BDD_TARGET, configBDD)
-const valorant = new Index( optionValorant,BDD_TARGET, configBDD)
+console.log(TOKEN_API)
+console.log(BDD_TARGET)
+const lol = new Dispatcher(optionLol, BDD_TARGET)
+const cs = new Dispatcher(optionCs, BDD_TARGET)
+const valorant = new Dispatcher(optionValorant, BDD_TARGET)
 
 
 if (process.env.MODE_DEV) {

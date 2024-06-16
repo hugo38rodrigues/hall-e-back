@@ -31,4 +31,9 @@ for param in "$@"; do
           ;;
       esac
       ;;
+    *)
+      echo "Unknown parameter: $param"
+      exit 1
+      ;;
+  esac
 done
