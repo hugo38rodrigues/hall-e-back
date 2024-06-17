@@ -14,22 +14,22 @@ export class Dispatcher {
     createdMatchesLol = async () => {
         const lolData = await this.lolData.getDatas()
         const lolMatches = this.matches.createdMatches(lolData)
-        await this.savingMatches.saveMatches(lolMatches)
-        console.log("Success")
+        // await this.savingMatches.saveMatches(lolMatches)
+        console.log(lolMatches)
 
 
     }
-    createdMatchesCs = async () => {
-        const csData = await this.csData.getDatas()
-        const matchesCs = this.matches.createdMatches(csData)
-        await this.savingMatches.saveMatches(matchesCs)
-        console.log("Success")
-    }
-
-    createdMatchesValorant = async () => {
-        const valorantData = await this.valorantData.getDatas()
-        const matchesValorant = this.matches.createdMatches(valorantData)
-        await this.savingMatches.saveMatches(matchesValorant)
-        console.log("Success")
-    }
+    // createdMatchesCs = async () => {
+    //     const csData = await this.csData.getDatas()
+    //     const matchesCs = this.matches.createdMatches(csData)
+    //     await this.savingMatches.saveMatches(matchesCs)
+    //     console.log("Success")
+    // }
+    //
+    // createdMatchesValorant = async () => {
+    //     const valorantData = await this.valorantData.getDatas()
+    //     const matchesValorant = this.matches.createdMatches(valorantData)
+    //     await this.savingMatches.saveMatches(matchesValorant)
+    //     console.log("Success")
+    // }
 }

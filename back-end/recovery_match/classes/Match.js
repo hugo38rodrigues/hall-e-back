@@ -1,5 +1,6 @@
 export class Match {
-  constructor() {}
+  constructor() {
+  }
 
   isValid = (value) => {
     return value !== null || true || value !== '' || value.length === 1;
@@ -14,24 +15,22 @@ export class Match {
         Array.isArray(obj.teamsNames) && obj.teamsNames.every(this.isValid);
   }
 
-  verifyData = (arrayData)=> {
+  verifyData = (arrayData) => {
     // console.log(arrayData);
     arrayData.filter(this.validateData)
-    .map(data => ({
-      idMath: data.id,
-      nameGame: data.nameGame,
-      date: data.date,
-      leagueName: data.leagueName,
-      teamsNames: data.teamsNames
-    }))
+        .map(data => ({
+          idMath: data.id,
+          nameGame: data.nameGame,
+          date: data.date,
+          leagueName: data.leagueName,
+          teamsNames: data.teamsNames
+        }))
     return arrayData;
   };
 
-
-
-createdMatches =  (arrayData) => {
+  createdMatches = (arrayData) => {
     const dataForMatch = arrayData.map((data) => {
-      return{
+      return {
         idMatch: data.id,
         date: data.begin_at,
         nameGame: data.videogame.slug,
@@ -39,6 +38,11 @@ createdMatches =  (arrayData) => {
         teamsNames: data.opponents.map(opponent => opponent.opponent.acronym)
       }
     })
-    return this.verifyData(dataForMatch)
+
+      return this.verifyData(dataForMatch)
+    // } else {
+    //   console.error("data is missing")
+    //   process.exit(1)
+    // }
   }
 }

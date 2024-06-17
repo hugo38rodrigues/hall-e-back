@@ -1,0 +1,7 @@
+export TOKEN_API_PANDASCORE=""
+export BDD_TARGET=""
+export BDD_REGION=""
+export ENDPOINT=""
+export ACCESS_KEY_ID=""
+export SECRET_ACCESS_KEY=""
+export MODE_DEV=""

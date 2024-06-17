@@ -1,0 +1,2 @@
+# run docker
+docker run --name hall_e -e MYSQL_ROOT_PASSWORD=your_password -p 3306:3306 -d mysql:tag
