@@ -1,7 +1,11 @@
-export const BDD_NAME= {
-    mysql: 'mysql',
-    mangodb: 'mangodb',
-    dynamodb: 'dynamodb',
+export const BDD_NAME = {
+  mysql: 'mysql',
+  mangodb: 'mangodb',
+  dynamodb: 'dynamodb',
 }
 
-export const TABLES_NAME = ['Lol_Match', 'CS_Match', 'Valorant_Match']
+export const TABLES_NAME = {
+  lol: 'Lol_Match',
+  cs: 'Cs_Match',
+  valorant: 'Valorant_Match'
+} 
