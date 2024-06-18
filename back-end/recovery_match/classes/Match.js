@@ -7,24 +7,22 @@ export class Match {
   }
 
   validateData = (obj) => {
-    // console.log(obj)
     return this.isValid(obj.idMatch) &&
-        this.isValid(obj.nameGame) &&
-        this.isValid(obj.date) &&
-        this.isValid(obj.leagueName) &&
-        Array.isArray(obj.teamsNames) && obj.teamsNames.every(this.isValid);
+      this.isValid(obj.nameGame) &&
+      this.isValid(obj.date) &&
+      this.isValid(obj.leagueName) &&
+      Array.isArray(obj.teamsNames) && obj.teamsNames.every(this.isValid);
   }
 
   verifyData = (arrayData) => {
-    // console.log(arrayData);
     arrayData.filter(this.validateData)
-        .map(data => ({
-          idMath: data.id,
-          nameGame: data.nameGame,
-          date: data.date,
-          leagueName: data.leagueName,
-          teamsNames: data.teamsNames
-        }))
+      .map(data => ({
+        idMath: data.id,
+        nameGame: data.nameGame,
+        date: data.date,
+        leagueName: data.leagueName,
+        teamsNames: data.teamsNames
+      }))
     return arrayData;
   };
 
@@ -38,8 +36,7 @@ export class Match {
         teamsNames: data.opponents.map(opponent => opponent.opponent.acronym)
       }
     })
-
-      return this.verifyData(dataForMatch)
+    return this.verifyData(dataForMatch)
     // } else {
     //   console.error("data is missing")
     //   process.exit(1)

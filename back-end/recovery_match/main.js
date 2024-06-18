@@ -27,8 +27,7 @@ const optionValorant = {
     'Authorization': `Bearer ${TOKEN_API}`
   }
 }
-console.log(TOKEN_API)
-console.log(BDD_TARGET)
+
 const lol = new Dispatcher(optionLol, BDD_TARGET)
 const cs = new Dispatcher(optionCs, BDD_TARGET)
 const valorant = new Dispatcher(optionValorant, BDD_TARGET)
@@ -38,8 +37,8 @@ if (process.env.MODE_DEV) {
   console.log("Mode dev")
 }
 await lol.createdMatchesLol()
-await cs.createdMatchesValorant()
-await valorant.createdMatchesCs()
+await valorant.createdMatchesValorant()
+await cs.createdMatchesCs()
 
 
 
