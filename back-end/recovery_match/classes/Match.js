@@ -3,43 +3,38 @@ export class Match {
   }
 
   isValid = (value) => {
-    return value !== null || true || value !== '' || value.length === 1;
+    return value !== null && value !== '' && value !== undefined;
   }
-
-  validateData = (obj) => {
-    return this.isValid(obj.idMatch) &&
-      this.isValid(obj.nameGame) &&
-      this.isValid(obj.date) &&
-      this.isValid(obj.leagueName) &&
-      Array.isArray(obj.teamsNames) && obj.teamsNames.every(this.isValid);
-  }
-
-  verifyData = (arrayData) => {
-    arrayData.filter(this.validateData)
-      .map(data => ({
-        idMath: data.id,
-        nameGame: data.nameGame,
-        date: data.date,
-        leagueName: data.leagueName,
-        teamsNames: data.teamsNames
-      }))
-    return arrayData;
-  };
 
   createdMatches = (arrayData) => {
     const dataForMatch = arrayData.map((data) => {
-      return {
-        idMatch: data.id,
-        date: data.begin_at,
-        nameGame: data.videogame.slug,
-        leagueName: data.league.name,
-        teamsNames: data.opponents.map(opponent => opponent.opponent.acronym)
+      const idMatch = data.id;
+      const date = data.begin_at;
+      const nameGame = data.videogame?.slug;
+      const leagueName = data.league?.name;
+      const teamsNames = data.opponents?.map(opponent => opponent.opponent?.acronym) || [];
+
+      // Vérification spécifique pour teamsNames
+      if (teamsNames.length !== 2) {
+        return null;
       }
-    })
-    return this.verifyData(dataForMatch)
-    // } else {
-    //   console.error("data is missing")
-    //   process.exit(1)
-    // }
+
+      if (this.isValid(idMatch) && this.isValid(date) && this.isValid(nameGame) && this.isValid(leagueName) && teamsNames.every(this.isValid)) {
+        return {
+          idMatch,
+          date,
+          nameGame,
+          leagueName,
+          teamsNames
+        };
+      } else {
+        return null; // ou toute autre valeur par défaut indiquant une validation échouée
+      }
+    });
+
+    // Filtrer les éléments nuls si nécessaire
+    return dataForMatch.filter(item => item !== null);
   }
+
+
 }
