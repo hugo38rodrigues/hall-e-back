@@ -1,3 +1,5 @@
+import {format} from 'date-fns'
+
 export class Match {
   constructor() {
   }
@@ -9,30 +11,29 @@ export class Match {
   createdMatches = (arrayData) => {
     const dataForMatch = arrayData.map((data) => {
       const idMatch = data.id;
-      const date = data.begin_at;
-      const nameGame = data.videogame?.slug;
+      const date = format(new Date(data.begin_at), 'yyyy-MM-dd HH:mm:ss');
+      const gameName = data.videogame?.slug;
       const leagueName = data.league?.name;
-      const teamsNames = data.opponents?.map(opponent => opponent.opponent?.acronym) || [];
+      const teamsName = data.opponents?.map(opponent => opponent.opponent?.acronym) || [];
 
       // Vérification spécifique pour teamsNames
-      if (teamsNames.length !== 2) {
+      if (teamsName.length !== 2) {
         return null;
       }
 
-      if (this.isValid(idMatch) && this.isValid(date) && this.isValid(nameGame) && this.isValid(leagueName) && teamsNames.every(this.isValid)) {
+      if (this.isValid(idMatch) && this.isValid(date) && this.isValid(gameName) && this.isValid(leagueName) && teamsName.every(this.isValid)) {
         return {
           idMatch,
           date,
-          nameGame,
+          gameName,
           leagueName,
-          teamsNames
+          teamsName
         };
       } else {
-        return null; // ou toute autre valeur par défaut indiquant une validation échouée
+        return null;
       }
     });
 
-    // Filtrer les éléments nuls si nécessaire
     return dataForMatch.filter(item => item !== null);
   }
 

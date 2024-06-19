@@ -3,6 +3,7 @@
     "@aws-sdk/client-dynamodb": "^3.577.0",
     "aws-sdk": "^2.1622.0",
     "axios": "^1.6.8",
+    "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "mysql2": "^3.10.1"
   },
