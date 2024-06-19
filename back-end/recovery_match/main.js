@@ -7,7 +7,7 @@ const cs = new Dispatcher(optionCs, BDD_TARGET)
 const valorant = new Dispatcher(optionValorant, BDD_TARGET)
 
 
-if (process.env.MODE_DEV) {
+if (process.env.MODE_DEV === 'true') {
   console.log("############ START PROCESS FOR TABLES CREATION ############")
   await createTableSQl()
   console.log("############ END PROCESS FOR TABLES CREATION ############")
