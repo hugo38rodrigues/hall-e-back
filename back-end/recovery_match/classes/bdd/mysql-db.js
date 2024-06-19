@@ -1,45 +1,55 @@
 import dotenv from 'dotenv';
-import mysql from 'mysql2';
-import { Storage } from '../interface/storage.js';
+import {Storage} from '../interface/storage.js';
+import {connectionMysql} from "../../bdd-config/db.config.js";
 
 dotenv.config();
 
 export class MysqlDB extends Storage {
     constructor() {
         super();
-        this.db = mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            port: process.env.DB_PORT
-        })
     }
-    checkData = async (match, tableName) => {
-        const checkQuery = `SELECT COUNT(*) AS count FROM ${tableName} WHERE id_match = ${match.idMatch}`;
-        const rows = await this.db.execute(checkQuery);
-        console.log(rows)
-        return rows
-    }
-    async
 
-    async saveMatches(matches, tableName) {
+    checkData = async (match, tableName, db) => {
+        const checkQuery = `SELECT COUNT(*) AS count FROM ${tableName} WHERE id_match = ?`;
+        try {
+            const [rows] = await db.execute(checkQuery, [match.idMatch]);
+            return rows[0].count > 0;
+        } catch (error) {
+            console.error('Erreur lors de la vérification des données :', error);
+            throw error;
+        }
+    }
+
+    writeMatchesInDb = async (matches, tableName, db) => {
         for (const match of matches) {
-            try {
-                if (this.checkData(match, tableName).count > 0) {
-                    console.log(`id_match ${match.idMatch} already exists in ${tableName}`);
-                } else {
-                    const insertQuery = `INSERT INTO ${tableName} (id_match, name_game, league_name, teams_names) VALUES (?, ?, ?, ?)`;
-                    const values = [match.idMatch, match.nameGame, match.leagueName, match.teamsNames];
-                    const result = await this.db.execute(insertQuery, values);
-                    console.log("Inserted Result: ", result);
+           const exists= await this.checkData(match, tableName, db);
+            if (exists) {
+                console.log(`Match with id ${match.idMatch} already exists in ${tableName}.`);
+            } else {
+                const insertQuery = `INSERT INTO ${tableName} (id_match, date, game_name, league_name, teams_name) VALUES (?, ?, ?, ?, ?)`
+                const values = [match.idMatch, match.date, match.gameName, match.leagueName, match.teamsName]
+                try{
+                    await db.execute(insertQuery, values)
+                }catch(error){
+                    console.log(error)
                 }
-            } catch (err) {
-                console.error("Error: ", err);
-                throw err;
+            }
+        }
+    }
+
+    saveMatches = async (matches, tableName) => {
+        const db = await connectionMysql();
+        try {
+            await this.writeMatchesInDb(matches, tableName, db);
+        } catch (error) {
+            console.error('Erreur lors de l\'insertion :', error);
+        } finally {
+            try {
+                await db.end();
+                console.log('Connexion à la base de données fermée');
+            } catch (endError) {
+                console.error('Erreur lors de la fermeture de la connexion :', endError);
             }
         }
     }
 }
-
-
