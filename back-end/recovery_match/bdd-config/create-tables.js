@@ -2,7 +2,8 @@ import {TABLES_NAME} from "../utils/saving-matches.util.js";
 import { connectionMysql } from "./db.config.js";
 
 export const createTableSQl = async ()=> {
-  const db = await connectionMysql
+
+  const db = await connectionMysql();
   const lolTable = `CREATE TABLE IF NOT EXISTS ${TABLES_NAME.lol}(
       id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
       id_match INTEGER NOT NULL,
@@ -27,20 +28,20 @@ export const createTableSQl = async ()=> {
       league_name VARCHAR(255) NOT NULL,
       teams_name VARCHAR(255) NOT NULL
   )`
-
-  db.connect((err) => {
-    if (err) {
-      console.error('Erreur de connexion :', err);
-      return;
-    }
-    console.log('Connecté à la base de données MySQL');
-    try {
-      db.query(lolTable)
-      db.query(csTable)
-      db.query(valorantTable)
-      console.log("Successfully Creation tables")
-    }catch (e) {
+  try {
+    await db.execute(lolTable)
+    await db.execute(csTable)
+    await db.execute(valorantTable)
+    console.log("Successfully Creation tables")
+    } catch (e) {
       console.log(`Error in creation tables ${e}`)
-    }
-  })
+    }finally {
+      try {
+        await db.end();
+        console.log("############ END CONNEXION FOR DB  ############")
+      } catch (endError) {
+        console.error('Erreur lors de la fermeture de la connexion :', endError);
+      }
+  }
+
 }
