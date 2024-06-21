@@ -1,6 +1,7 @@
 export const BDD_NAME = {
   mysql: 'mysql',
   mangodb: 'mangodb',
+  mariadb: 'mariadb',
   dynamodb: 'dynamodb',
 }
 

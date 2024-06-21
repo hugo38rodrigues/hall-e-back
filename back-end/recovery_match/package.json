@@ -5,7 +5,8 @@
     "axios": "^1.6.8",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
-    "mysql2": "^3.10.1"
+    "mysql2": "^3.10.1",
+    "@aws-sdk/lib-dynamodb": "^3.602.0"
   },
   "type": "module",
   "scripts": {

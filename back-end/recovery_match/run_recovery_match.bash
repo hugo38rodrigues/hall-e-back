@@ -5,7 +5,7 @@ for param in "$@"; do
     --config=*)
       bdd_name="${param#*=}"
       case $bdd_name in
-        dynamoDb)
+        dynamodb)
           echo "Loading environment for DynamoDB"
           if [ -f "./config/.env.dynamodb.sh" ]; then
             source "./config/.env.dynamodb.sh"
@@ -15,7 +15,7 @@ for param in "$@"; do
             exit 1
           fi
           ;;
-        mysql)
+        sql)
           echo "Loading environment for MySQL"
           if [ -f "./config/.env.sql.sh" ]; then
             source "./config/.env.sql.sh"

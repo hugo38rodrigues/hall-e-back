@@ -11,9 +11,9 @@ export class SavingMatches {
     saveMatches = async (matches,table) => {
         if (this.bddTarget === BDD_NAME.dynamodb) {
             const dynamoDb = new DynamoDB()
-            await dynamoDb.saveMatches(matchesLol, this.bddTarget, TABLES_NAME);
+            await dynamoDb.saveMatches(matches,  table);
         }
-        else if (this.bddTarget === BDD_NAME.mysql) {
+        else if (this.bddTarget === BDD_NAME.mysql || BDD_NAME.mariadb) {
             const mysqlDb = new MysqlDB()
             await mysqlDb.saveMatches(matches, table);
 

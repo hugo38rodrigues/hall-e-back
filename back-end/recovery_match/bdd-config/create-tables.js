@@ -1,5 +1,6 @@
 import {TABLES_NAME} from "../utils/saving-matches.util.js";
-import { connectionMysql } from "./db.config.js";
+import {connectionDynamoDb, connectionMysql} from "./db.config.js";
+import {BillingMode, CreateTableCommand } from "@aws-sdk/client-dynamodb";
 
 export const createTableSQl = async ()=> {
 
@@ -42,6 +43,39 @@ export const createTableSQl = async ()=> {
       } catch (endError) {
         console.error('Erreur lors de la fermeture de la connexion :', endError);
       }
+    }
   }
+
+export const createTablesDynamo = async () => {
+  const client = await connectionDynamoDb()
+  const lolTable = new CreateTableCommand({
+    TableName: TABLES_NAME.lol,
+    // This example performs a large write to the database.
+    // Set the billing mode to PAY_PER_REQUEST to
+    // avoid throttling the large write.
+    BillingMode: BillingMode.PAY_PER_REQUEST,
+    // Define the attributes that are necessary for the key schema.
+    AttributeDefinitions: [
+      {
+        AttributeName: "id_match",
+        // 'N' is a data type descriptor that represents a number type.
+        // For a list of all data type descriptors, see the following link.
+        // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html#Programming.LowLevelAPI.DataTypeDescriptors
+        AttributeType: "N",
+      },
+    ],
+    // The KeySchema defines the primary key. The primary key can be
+    // a partition key, or a combination of a partition key and a sort key.
+    // Key schema design is important. For more info, see
+    // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html
+    KeySchema: [
+      // The way your data is accessed determines how you structure your keys.
+      // The movies table will be queried for movies by year. It makes sense
+      // to make year our partition (HASH) key.
+      { AttributeName: "id_match", KeyType: "HASH" },
+    ],
+  });
+  const response = await client.send(lolTable);
+  console.log(response);
 
 }
