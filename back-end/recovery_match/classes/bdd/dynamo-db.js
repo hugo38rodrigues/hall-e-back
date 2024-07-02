@@ -1,4 +1,4 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb"; // ES Modules import
+import {DynamoDBClient, GetItemCommand} from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { Storage } from '../interface/storage.js';
 import {connectionDynamoDb} from "../../bdd-config/db.config.js";
@@ -8,25 +8,24 @@ export class DynamoDB extends Storage {
     super();
   }
 
-  checkData = async (match, tableName, docClient) => {
-
-    const command = new GetCommand({
+  checkData = async (match, tableName, db) => {
+    const item = new GetItemCommand({
       TableName: tableName,
       Key: {
-        id_match: match.idMatch,
+        id_match: {N: match.idMatch},
       },
     });
-    const response = await docClient.send(command)
-    return response
 
+    const response = await db.send(item);
+    console.log(response);
+    return response;
   }
 
 
   writeMatchesInDb = async (matches, tableName) => {
     const db = await connectionDynamoDb();
-    const docClient = DynamoDBDocumentClient.from(db);
     for (const match of matches) {
-      const exists = await this.checkData(match, tableName, docClient);
+      const exists = await this.checkData(match, tableName, db);
       console.log(exists.$metadata.httpStatusCode)
       if (exists.$metadata.httpStatusCode === 400) {
         console.log(`Match with id ${match.idMatch} already exists in ${tableName}.`);
