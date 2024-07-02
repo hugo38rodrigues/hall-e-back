@@ -12,13 +12,19 @@ export const connectionMysql = async () => {
         })
 }
 
-export  const connectionDynamoDb = async () => {
-  console.log("############ DATABASE CONNECTION ESTABLISHED ############")
-  return new DynamoDBClient({
-    region: process.env.BDD_REGION,
-    endpoint: process.env.ENDPOINT,
-    access_key_id: process.env.ACCESS_KEY_ID,
-    secret_key_id: process.env.SECRET_ACCESS_KEY
-  })
+export const connectionDynamoDb = async () => {
+    console.log("############ DATABASE CONNECTION ESTABLISHED ############");
+    console.log("BDD_REGION:", process.env.BDD_REGION);
+    console.log("ENDPOINT:", process.env.ENDPOINT);
+    console.log("ACCESS_KEY_ID:", process.env.ACCESS_KEY_ID);
+    console.log("SECRET_ACCESS_KEY:", process.env.SECRET_ACCESS_KEY);
 
-}
+    return new DynamoDBClient({
+        region: process.env.BDD_REGION,
+        endpoint: process.env.ENDPOINT,
+        credentials: {
+            accessKeyId: process.env.ACCESS_KEY_ID,
+            secretAccessKey: process.env.SECRET_ACCESS_KEY
+        }
+    });
+};

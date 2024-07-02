@@ -1,6 +1,6 @@
-import {TABLES_NAME} from "../utils/saving-matches.util.js";
-import {connectionDynamoDb, connectionMysql} from "./db.config.js";
-import {BillingMode, CreateTableCommand } from "@aws-sdk/client-dynamodb";
+import { TABLES_NAME } from "../utils/saving-matches.util.js";
+import { connectionDynamoDb, connectionMysql } from "./db.config.js";
+import {CreateTableCommand, ListTablesCommand} from "@aws-sdk/client-dynamodb";
 
 export const createTableSQl = async ()=> {
 
@@ -47,35 +47,40 @@ export const createTableSQl = async ()=> {
   }
 
 export const createTablesDynamo = async () => {
-  const client = await connectionDynamoDb()
-  const lolTable = new CreateTableCommand({
-    TableName: TABLES_NAME.lol,
-    // This example performs a large write to the database.
-    // Set the billing mode to PAY_PER_REQUEST to
-    // avoid throttling the large write.
-    BillingMode: BillingMode.PAY_PER_REQUEST,
-    // Define the attributes that are necessary for the key schema.
-    AttributeDefinitions: [
-      {
-        AttributeName: "id_match",
-        // 'N' is a data type descriptor that represents a number type.
-        // For a list of all data type descriptors, see the following link.
-        // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.LowLevelAPI.html#Programming.LowLevelAPI.DataTypeDescriptors
-        AttributeType: "N",
-      },
-    ],
-    // The KeySchema defines the primary key. The primary key can be
-    // a partition key, or a combination of a partition key and a sort key.
-    // Key schema design is important. For more info, see
-    // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html
-    KeySchema: [
-      // The way your data is accessed determines how you structure your keys.
-      // The movies table will be queried for movies by year. It makes sense
-      // to make year our partition (HASH) key.
-      { AttributeName: "id_match", KeyType: "HASH" },
-    ],
-  });
-  const response = await client.send(lolTable);
-  console.log(response);
+    const client = await connectionDynamoDb();
 
+
+  const listTablesCommand = new ListTablesCommand({});
+  try {
+    const tablesResponse = await client.send(listTablesCommand);
+    console.log("Tables existantes :", tablesResponse.TableNames);
+  } catch (error) {
+    console.error("Erreur lors de l'exécution de la commande :", error);
+  }
+
+    //
+    // // Créer la table si elle n'existe pas
+    // const lolTable = new CreateTableCommand({
+    //   TableName: "Lol_Match",
+    //   AttributeDefinitions: [
+    //     {
+    //       AttributeName: "id_match",
+    //       AttributeType: "N", // Type numérique pour l'attribut
+    //     },
+    //   ],
+    //   KeySchema: [
+    //     {AttributeName: "id_match", KeyType: "HASH"},
+    //   ],
+    //   ProvisionedThroughput: {
+    //     ReadCapacityUnits: 1,
+    //     WriteCapacityUnits: 1,
+    //   },
+    // });
+    //
+    // try {
+    //   const response = await client.send(lolTable);
+    //   console.log("Table créée avec succès:", response);
+    // } catch (error) {
+    //   console.error("Erreur lors de la création de la table:", error);
+    // }
 }

@@ -21,7 +21,8 @@ if (process.env.MODE_DEV === 'true') {
 }
 
 console.log("############ START GET DATA ############")
-await lol.createdMatchesLol()
+// await lol.createdMatchesLol()
+
 // await cs.createdMatchesCs()
 // await valorant.createdMatchesValorant()
 console.log("############ END GET DATA ############")
