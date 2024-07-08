@@ -1,7 +1,6 @@
-import {DynamoDBClient, GetItemCommand} from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { GetItemCommand, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { connectionDynamoDb } from "../../bdd-config/config-connection.js";
 import { Storage } from '../interface/storage.js';
-import {connectionDynamoDb} from "../../bdd-config/db.config.js";
 
 export class DynamoDB extends Storage {
   constructor() {
@@ -9,37 +8,59 @@ export class DynamoDB extends Storage {
   }
 
   checkData = async (match, tableName, db) => {
-    const item = new GetItemCommand({
+    const params = {
       TableName: tableName,
       Key: {
-        id_match: {N: match.idMatch},
+        id_match: { N: match },
       },
-    });
+    };
 
-    const response = await db.send(item);
-    console.log(response);
-    return response;
+    try {
+      const data = await db.send(new GetItemCommand(params));
+      return data.Item !== undefined;
+    } catch (error) {
+      console.error(`Erreur lors de la vérification du match ${match} dans la table ${tableName}:`, error);
+      throw error;
+    }
   }
 
 
-  writeMatchesInDb = async (matches, tableName) => {
-    const db = await connectionDynamoDb();
-    for (const match of matches) {
-      const exists = await this.checkData(match, tableName, db);
-      console.log(exists.$metadata.httpStatusCode)
-      if (exists.$metadata.httpStatusCode === 400) {
-        console.log(`Match with id ${match.idMatch} already exists in ${tableName}.`);
-      } else {
-        console.log("Ça arrive")
+  insertInDB = async (match, tableName, db) => {
+    const params = {
+      TableName: tableName,
+      Item: {
+        id_match: { N: match.idMatch },
+        date: { S: match.date.toString() },
+        game_name: { S: match.gameName },
+        league_name: { S: match.leagueName },
+        teams_name: { SS: match.teamsName }
       }
+    };
+
+    try {
+      const data = await db.send(new PutItemCommand(params));
+      return data;
+    } catch (error) {
+      console.error(`Erreur lors de l'insertion du match ${match.idMatch} dans la table ${tableName}:`, error);
+      throw error;
     }
   }
 
   saveMatches = async (matches, tableName) => {
+    const db = connectionDynamoDb();
     try {
-      await this.writeMatchesInDb(matches, tableName);
+      for (const match of matches) {
+        const matchIsFound = await this.checkData(match.idMatch, tableName, db);
+        if (!matchIsFound) {
+          this.insertInDB(match, tableName, db)
+        } else {
+          console.log(`This ${match.idMatch} found in db`)
+        }
+      }
+      console.log("################## SucessFull Insert Data ##################")
     } catch (error) {
-      console.error('Erreur lors de l\'insertion :', error);
+      console.log(error)
+      process.exit()
     }
   }
 

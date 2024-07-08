@@ -1,7 +1,7 @@
 import { GetData } from "./GetData.js";
 import { Match } from "./Match.js";
 import { SavingMatches } from "./SavingMatches.js";
-import {TABLES_NAME} from "../utils/saving-matches.util.js";
+import { TABLES_NAME } from "../utils/saving-matches.util.js";
 
 export class Dispatcher {
     constructor(configApi, BDD_TARGET) {
@@ -16,22 +16,22 @@ export class Dispatcher {
     createdMatchesLol = async () => {
         const lolData = await this.lolData.getDatas()
         const lolMatches = this.matches.createdMatches(lolData)
-        try{
-            await this.savingMatches.saveMatches(lolMatches,TABLES_NAME.lol)
-            console.log("############ SUCCESSFUL DATA INSERTION FOR LOL MATCHES ############")
-        } catch(err){
+        try {
+            await this.savingMatches.saveMatches(lolMatches, TABLES_NAME.lol)
+        } catch (err) {
             console.log("Error", err)
+            process.exit()
         }
     }
 
     createdMatchesCs = async () => {
         const csData = await this.csData.getDatas()
         const csMatches = this.matches.createdMatches(csData)
-        try{
-            await this.savingMatches.saveMatches(csMatches,TABLES_NAME.cs)
-            console.log("############ SUCCESSFUL DATA INSERTION FOR CS MATCHES ############")
-        } catch(err){
+        try {
+            await this.savingMatches.saveMatches(csMatches, TABLES_NAME.cs)
+        } catch (err) {
             console.log("Error", err)
+            process.exit()
         }
 
     }
@@ -39,11 +39,11 @@ export class Dispatcher {
     createdMatchesValorant = async () => {
         const valorantData = await this.valorantData.getDatas()
         const valorantMatches = this.matches.createdMatches(valorantData)
-        try{
-            await this.savingMatches.saveMatches(valorantMatches,TABLES_NAME.valorant)
-            console.log("############ SUCCESSFUL DATA INSERTION FOR VALORANT MATCHES ############")
-        } catch(err){
+        try {
+            await this.savingMatches.saveMatches(valorantMatches, TABLES_NAME.valorant)
+        } catch (err) {
             console.log("Error", err)
+            process.exit()
         }
     }
 }
