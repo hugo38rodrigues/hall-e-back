@@ -15,7 +15,7 @@ export class MysqlDB extends Storage {
             const [rows] = await db.execute(checkQuery, [match.idMatch]);
             return rows[0].count > 0;
         } catch (error) {
-            console.error('Erreur lors de la vérification des données :', error);
+            console.error(`Error verifying data for table ${tableName} : `, error);
             throw error;
         }
     }
@@ -42,13 +42,13 @@ export class MysqlDB extends Storage {
         try {
             await this.writeMatchesInDb(matches, tableName, db);
         } catch (error) {
-            console.error('Erreur lors de l\'insertion :', error);
+            console.error('Insertion error :', error);
         } finally {
             try {
                 await db.end();
-                console.log('Connexion à la base de données fermée');
+                console.log('Closed database connection');
             } catch (endError) {
-                console.error('Erreur lors de la fermeture de la connexion :', endError);
+                console.error('Error closing connection :', endError);
             }
         }
     }
