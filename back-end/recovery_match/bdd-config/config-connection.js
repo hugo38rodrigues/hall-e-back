@@ -14,6 +14,7 @@ export const connectionMysql = async () => {
 }
 
 export const connectionDynamoDb = () => {
+    console.log("############ DATABASE CONNECTION ESTABLISHED ############")
     return new DynamoDBClient({
         endpoint: process.env.ENDPOINT,
         credentials: {

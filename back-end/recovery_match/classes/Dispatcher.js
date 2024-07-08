@@ -1,7 +1,7 @@
+import { TABLES_NAME } from "../utils/saving-matches.util.js";
 import { GetData } from "./GetData.js";
 import { Match } from "./Match.js";
 import { SavingMatches } from "./SavingMatches.js";
-import { TABLES_NAME } from "../utils/saving-matches.util.js";
 
 export class Dispatcher {
     constructor(configApi, BDD_TARGET) {
@@ -19,7 +19,7 @@ export class Dispatcher {
         try {
             await this.savingMatches.saveMatches(lolMatches, TABLES_NAME.lol)
         } catch (err) {
-            console.log("Error", err)
+            console.log(`Error inserting Data Into Table ${TABLES_NAME.lol}`, err)
             process.exit()
         }
     }
@@ -30,7 +30,7 @@ export class Dispatcher {
         try {
             await this.savingMatches.saveMatches(csMatches, TABLES_NAME.cs)
         } catch (err) {
-            console.log("Error", err)
+            console.log(`Error inserting Data Into Table ${TABLES_NAME.cs}`, err)
             process.exit()
         }
 
@@ -42,7 +42,7 @@ export class Dispatcher {
         try {
             await this.savingMatches.saveMatches(valorantMatches, TABLES_NAME.valorant)
         } catch (err) {
-            console.log("Error", err)
+            console.log(`Error inserting Data Into Table ${TABLES_NAME.valorant}`, err)
             process.exit()
         }
     }

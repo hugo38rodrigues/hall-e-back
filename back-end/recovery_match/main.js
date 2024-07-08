@@ -8,7 +8,6 @@ const lol = new Dispatcher(optionLol, BDD_TARGET)
 const cs = new Dispatcher(optionCs, BDD_TARGET)
 const valorant = new Dispatcher(optionValorant, BDD_TARGET)
 
-console.log(process.env.MODE_DEV)
 
 if (process.env.MODE_DEV === 'true') {
   if (BDD_TARGET === 'sql') {

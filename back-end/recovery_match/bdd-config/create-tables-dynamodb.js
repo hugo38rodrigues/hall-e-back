@@ -46,33 +46,27 @@ const tablesToCreate = [
 ];
 
 export const createTablesDynamo = async () => {
-  const client = connectionDynamoDb();
-  console.log(client)
+  const client = connectionDynamoDb()
   if (!(client instanceof DynamoDBClient)) {
     console.error("############ DATABASE CONNECTION NOT ESTABLISHED ############");
     return;
   }
 
-  console.log("############ DATABASE CONNECTION ESTABLISHED ############");
-
   for (const tableParams of tablesToCreate) {
     try {
-      // Vérifier si la table existe
       await client.send(new DescribeTableCommand({ TableName: tableParams.TableName }));
-      console.log(`La table ${tableParams.TableName} existe déjà.`);
+      console.log(`The ${tableParams.TableName} table already exists.`);
     } catch (err) {
       if (err.name === 'ResourceNotFoundException') {
-        // La table n'existe pas, donc nous la créons
         try {
           const data = await client.send(new CreateTableCommand(tableParams));
-          console.log(`Table ${tableParams.TableName} créée avec succès.`, data);
+          console.log(`Table ${tableParams.TableName} created successfully.`, data);
 
         } catch (createErr) {
-          console.error(`Impossible de créer la table ${tableParams.TableName}. Erreur:`, createErr);
+          console.error(`Unable to create table ${tableParams.TableName}. Error:`, createErr);
         }
       } else {
-        // Une autre erreur s'est produite
-        console.error(`Erreur lors de la vérification de la table ${tableParams.TableName}. Erreur:`, err);
+        console.error(`Error when checking table ${tableParams.TableName}. Error:`, err);
       }
     }
   }

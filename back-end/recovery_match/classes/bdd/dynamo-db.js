@@ -19,7 +19,7 @@ export class DynamoDB extends Storage {
       const data = await db.send(new GetItemCommand(params));
       return data.Item !== undefined;
     } catch (error) {
-      console.error(`Erreur lors de la vérification du match ${match} dans la table ${tableName}:`, error);
+      console.error(`Error checking match ${match} in table ${tableName}:`, error);
       throw error;
     }
   }
@@ -41,7 +41,7 @@ export class DynamoDB extends Storage {
       const data = await db.send(new PutItemCommand(params));
       return data;
     } catch (error) {
-      console.error(`Erreur lors de l'insertion du match ${match.idMatch} dans la table ${tableName}:`, error);
+      console.error(`Error inserting match ${match.idMatch} into table ${tableName}:`, error);
       throw error;
     }
   }
@@ -57,7 +57,7 @@ export class DynamoDB extends Storage {
           console.log(`This ${match.idMatch} found in db`)
         }
       }
-      console.log("################## SucessFull Insert Data ##################")
+      console.log(`################## Data insertion successful for ${tableName} ##################`)
     } catch (error) {
       console.log(error)
       process.exit()
