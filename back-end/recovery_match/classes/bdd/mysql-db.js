@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
-import {Storage} from '../interface/storage.js';
-import {connectionMysql} from "../../bdd-config/db.config.js";
+import { connectionMysql } from "../../bdd-config/config-connection.js";
+import { Storage } from '../interface/storage.js';
 
 dotenv.config();
 
@@ -22,15 +22,15 @@ export class MysqlDB extends Storage {
 
     writeMatchesInDb = async (matches, tableName, db) => {
         for (const match of matches) {
-           const exists= await this.checkData(match, tableName, db);
+            const exists = await this.checkData(match, tableName, db);
             if (exists) {
                 console.log(`Match with id ${match.idMatch} already exists in ${tableName}.`);
             } else {
                 const insertQuery = `INSERT INTO ${tableName} (id_match, date, game_name, league_name, teams_name) VALUES (?, ?, ?, ?, ?)`
                 const values = [match.idMatch, match.date, match.gameName, match.leagueName, match.teamsName]
-                try{
+                try {
                     await db.execute(insertQuery, values)
-                }catch(error){
+                } catch (error) {
                     console.log(error)
                 }
             }
