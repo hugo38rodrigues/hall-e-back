@@ -1,45 +1,53 @@
-import { connectionMysql } from "./config-connection.js";
+import mysql from "mysql2/promise";
+import { Table } from '../classes/interface/table.js';
 
-export const createTablesSQl = async () => {
+export class SqlDbTables extends Table {
+  #connexion
+  #table
 
-  const db = await connectionMysql();
-  const lolTable = `CREATE TABLE IF NOT EXISTS ${TABLES_NAME.lol}(
+  constructor() {
+    super()
+    this.#connexion = null
+    this.#table = `CREATE TABLE IF NOT EXISTS matches(
       id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
       id_match INTEGER NOT NULL,
       date DATETIME NOT NULL,
       game_name VARCHAR(255) NOT NULL,
       league_name VARCHAR(255) NOT NULL,
       teams_name VARCHAR(255) NOT NULL
-  )`
-  const csTable = `CREATE TABLE IF NOT EXISTS ${TABLES_NAME.cs}(
-      id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-      id_match INT NOT NULL,
-      date DATETIME NOT NULL,
-      game_name VARCHAR(255) NOT NULL,
-      league_name VARCHAR(255) NOT NULL,
-      teams_name VARCHAR(255) NOT NULL
-  )`
-  const valorantTable = `CREATE TABLE IF NOT EXISTS ${TABLES_NAME.valorant}(
-      id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-      id_match INT NOT NULL,
-      date DATETIME NOT NULL,
-      game_name VARCHAR(255) NOT NULL,
-      league_name VARCHAR(255) NOT NULL,
-      teams_name VARCHAR(255) NOT NULL
-  )`
-  try {
-    await db.execute(lolTable)
-    await db.execute(csTable)
-    await db.execute(valorantTable)
-    console.log("Successfully Creation tables")
-  } catch (e) {
-    console.log(`Error in creation tables ${e}`)
-  } finally {
+    )`
+  }
+  #initConnection = async () => {
     try {
-      await db.end();
-      console.log("############ END CONNEXION FOR DB  ############")
-    } catch (endError) {
-      console.error('Erreur lors de la fermeture de la connexion :', endError);
+      this.#connexion = await mysql.createConnection({
+        host: process.env.DB_HOST, user:
+          process.env.DB_USER, password:
+          process.env.DB_PASSWORD, database:
+          process.env.DB_NAME, port:
+          process.env.DB_PORT
+      })
+    } catch (error) {
+      console.log('Error Connexion', error)
+    }
+  }
+
+  createdTables = async () => {
+    if (!this.#connexion) {
+      await this.#initConnection()
+    }
+
+    try {
+      await this.#connexion.execute(this.#table)
+      console.log("Successfully Creation tables")
+    } catch (e) {
+      console.log(`Error in creation tables ${e}`)
+    } finally {
+      try {
+        await this.#connexion.end();
+        console.log("############ END CONNEXION FOR DB  ############")
+      } catch (endError) {
+        console.error('Erreur lors de la fermeture de la connexion :', endError);
+      }
     }
   }
 }

@@ -1,51 +1,85 @@
 import dotenv from 'dotenv';
-import { connectionMysql } from "../../bdd-config/config-connection.js";
+import mysql from "mysql2/promise";
 import { Storage } from '../interface/storage.js';
 
 dotenv.config();
 
 export class MysqlDB extends Storage {
+    #connectionBdd
+
     constructor() {
         super();
+        this.#connectionBdd = null
     }
 
-    checkData = async (match, tableName, db) => {
-        const checkQuery = `SELECT COUNT(*) AS count FROM ${tableName} WHERE id_match = ?`;
+    #initConnexion = async () => {
         try {
-            const [rows] = await db.execute(checkQuery, [match.idMatch]);
+            this.#connectionBdd = await mysql.createConnection({
+                host: process.env.DB_HOST, user:
+                    process.env.DB_USER, password:
+                    process.env.DB_PASSWORD, database:
+                    process.env.DB_NAME, port:
+                    process.env.DB_PORT
+            })
+        } catch (error) {
+            console.log('Error Connexion', error)
+            process.exit()
+        }
+    }
+
+    #checkedData = async (match) => {
+        if (!this.#connectionBdd) {
+            await this.#initConnexion()
+        }
+
+        const checkQuery = `SELECT COUNT(*) AS count FROM matches WHERE id_match = ?`;
+        try {
+            const [rows] = await this.#connectionBdd.execute(checkQuery, [match.idMatch]);
             return rows[0].count > 0;
         } catch (error) {
-            console.error(`Error verifying data for table ${tableName} : `, error);
+            console.error(`Error verifying data for table Match : `, error);
             throw error;
         }
     }
 
-    writeMatchesInDb = async (matches, tableName, db) => {
+    #insertMatchInDb = async (matches) => {
         for (const match of matches) {
-            const exists = await this.checkData(match, tableName, db);
+            const exists = await this.#checkedData(match);
             if (exists) {
-                console.log(`Match with id ${match.idMatch} already exists in ${tableName}.`);
+                console.log(`Match with id ${match.idMatch} already exists in matches.`);
             } else {
-                const insertQuery = `INSERT INTO ${tableName} (id_match, date, game_name, league_name, teams_name) VALUES (?, ?, ?, ?, ?)`
+                const insertQuery = `INSERT INTO matches (id_match, date, game_name, league_name, teams_name) VALUES (?, ?, ?, ?, ?)`
                 const values = [match.idMatch, match.date, match.gameName, match.leagueName, match.teamsName]
                 try {
-                    await db.execute(insertQuery, values)
+                    await this.#connectionBdd.execute(insertQuery, values)
                 } catch (error) {
                     console.log(error)
                 }
             }
         }
     }
+    #closeConnection = async () => {
+        if (this.#connectionBdd) {
+            try {
+                await this.#connectionBdd.end();
+                console.log("############ END CONNEXION FOR DB  ############");
+            } catch (endError) {
+                console.error('Erreur lors de la fermeture de la connexion :', endError);
+            } finally {
+                this.#connectionBdd = null; // Réinitialisation de la connexion
+            }
+        }
+    }
 
-    saveMatches = async (matches, tableName) => {
-        const db = await connectionMysql();
+
+    savingMatches = async (matches) => {
         try {
-            await this.writeMatchesInDb(matches, tableName, db);
+            await this.#insertMatchInDb(matches);
         } catch (error) {
             console.error('Insertion error :', error);
         } finally {
             try {
-                await db.end();
+                await this.#closeConnection()
                 console.log('Closed database connection');
             } catch (endError) {
                 console.error('Error closing connection :', endError);

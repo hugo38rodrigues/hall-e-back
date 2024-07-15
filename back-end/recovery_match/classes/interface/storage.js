@@ -1,7 +1,16 @@
 export class Storage {
 
-  async saveMatches(matches, tablesName) {
+  async savingMatches(matches) {
     throw new Error('save method must be implement')
   }
+
+  async checkedData(match) {
+    throw new Error('save method must be implement')
+  }
+
+  async insertMatchInDb(match) {
+    throw new Error('save method must be implement')
+  }
+
 
 }

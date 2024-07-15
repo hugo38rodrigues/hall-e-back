@@ -1,17 +1,51 @@
-import {format} from 'date-fns'
+import axios from "axios"
+import { format } from 'date-fns'
 
 export class Match {
-  constructor() {
+
+  #urlConnection
+
+  constructor(urlConnection) {
+    this.#urlConnection = urlConnection
   }
 
-  isValid = (value) => {
-    return value !== null && value !== '' && value !== undefined;
+  #checkedData = (match) => {
+    return match !== null && match !== '' && match !== undefined;
   }
 
-  createdMatches = (arrayData) => {
-    const dataForMatch = arrayData.map((data) => {
+  #formatedDate = (date) => {
+    const curentYears = new Date().getFullYear()
+    const formatedDate = format(new Date(date), 'yyyy-MM-dd HH:mm:ss')
+    const dateObj = new Date(formatedDate.replace(' ', 'T'));
+    if (dateObj.getFullYear() === curentYears) {
+      return formatedDate
+    } else {
+      return null
+    }
+  }
+
+  #getData = async (urlConnection) => {
+    try {
+      const response = await axios(urlConnection);
+      if (response.status === 200) {
+        return response.data;
+      }
+      else {
+        console.log(`Error while retrieving data from api ${response}`)
+        process.exit()
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      process.exit()
+    }
+  }
+
+  createdMatch = async () => {
+    const responseData = await this.#getData(this.#urlConnection)
+    const matches = responseData.map((data) => {
       const idMatch = data.id;
-      const date = format(new Date(data.begin_at), 'yyyy-MM-dd HH:mm:ss');
+      const date = this.#formatedDate(data.begin_at)
       const gameName = data.videogame?.slug;
       const leagueName = data.league?.name;
       const teamsName = data.opponents?.map(opponent => opponent.opponent?.acronym) || [];
@@ -21,7 +55,7 @@ export class Match {
         return null;
       }
 
-      if (this.isValid(idMatch) && this.isValid(date) && this.isValid(gameName) && this.isValid(leagueName) && teamsName.every(this.isValid)) {
+      if (this.#checkedData(idMatch) && this.#checkedData(date) && this.#checkedData(gameName) && this.#checkedData(leagueName) && teamsName.every(this.#checkedData)) {
         return {
           idMatch,
           date,
@@ -34,8 +68,6 @@ export class Match {
       }
     });
 
-    return dataForMatch.filter(item => item !== null);
+    return matches.filter(item => item !== null);
   }
-
-
 }
