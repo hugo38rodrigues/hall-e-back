@@ -1,9 +1,9 @@
 import { DataTypes } from 'sequelize';
-import { DB } from '../config/db-config.js';
+import { DB } from '../../config/db-config.js';
 const db = new DB()
 
-export const Consumer = db.connexion.define(
-  'Consumer',
+export const Match = db.connexion.define(
+  'Matches',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -11,26 +11,26 @@ export const Consumer = db.connexion.define(
       primaryKey: true,
       allowNull: false
     },
-    firstName: {
+    id_match: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    game_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    lastName: {
+    league_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    email: {
+    teams_name: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    password: {
-      type: DataTypes.STRING(1234),
-      allowNull: false
-    },
-    role: {
-      type: DataTypes.STRING,
-      defaultValue: 'consumer',
-      allowNull: false
-    }
   },
 );

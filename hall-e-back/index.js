@@ -1,8 +1,10 @@
 import cors from 'cors';
 import express from 'express';
-import { DB } from './config/db-config.js'
+import { DB } from './config/db-config.js';
+import { Bar } from './models/sql/bar.model.js';
+import { Comment } from './models/sql/comment.model.js';
+import { Consumer } from './models/sql/consumer.model.js';
 import userRoutes from './routes/user.route.js';
-import { Consumer } from './models/consumer.model.js'
 // import consumerRoutes from './routes/userRoute.js';
 // import barRoutes from './routes/animalRoute.js';
 // import adminRoutes from './routes/alertRoute.js';
@@ -19,6 +21,10 @@ if (process.env.MODE_DEV === 'true') {
       const db = new DB()
       if (await db.testConnexion()) {
         await Consumer.sync({ alter: true })
+        await Bar.sync({ alter: true })
+        await Comment.sync({ alter: true })
+        Bar.belongsToMany(Consumer, { through: Comment });
+        Consumer.belongsToMany(Bar, { through: Comment });
       } else {
         console.log("Error")
       }
