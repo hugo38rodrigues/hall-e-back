@@ -23,7 +23,7 @@ export class UserController {
         password: req.body.password,
         role: req.body.role
       }
-
+      console.log(params)
       const user = new User(params)
       const userFound = await user.findUser()
 

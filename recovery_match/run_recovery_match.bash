@@ -2,13 +2,13 @@
 
 for param in "$@"; do
   case $param in
-    --config=*)
+    --env=*)
       bdd_name="${param#*=}"
       case $bdd_name in
         dynamodb)
           echo "Loading environment for DynamoDB"
-          if [ -f "./config/.env.dynamodb.sh" ]; then
-            source "./config/.env.dynamodb.sh"
+          if [ -f "./env/.env.dynamodb.sh" ]; then
+            source "./env/.env.dynamodb.sh"
             npm run load-data
           else
             echo "Environment file for DynamoDB not found!"
@@ -17,8 +17,8 @@ for param in "$@"; do
           ;;
         sql)
           echo "Loading environment for MySQL"
-          if [ -f "./config/.env.sql.sh" ]; then
-            source "./config/.env.sql.sh"
+          if [ -f "./env/.env.sql.sh" ]; then
+            source "./env/.env.sql.sh"
             npm run load-data
           else
             echo "Environment file for MySQL not found!"
@@ -27,8 +27,8 @@ for param in "$@"; do
           ;;
         mongodb)
           echo "Loading environment for MySQL"
-          if [ -f "./config/.env.sql.sh" ]; then
-            source "./config/.env.sql.sh"
+          if [ -f "./env/.env.sql.sh" ]; then
+            source "./env/.env.sql.sh"
             npm run load-data
           else
             echo "Environment file for MySQL not found!"

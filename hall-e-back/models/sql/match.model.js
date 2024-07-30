@@ -1,36 +1,52 @@
-import { DataTypes } from 'sequelize';
-import { DB } from '../../config/db-config.js';
-const db = new DB()
+import {DataTypes} from 'sequelize';
+import {game} from "./game.model.js";
+import {league} from "./league.model.js";
+import {team} from "./team.model.js";
 
-export const Match = db.connexion.define(
-  'Matches',
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-      allowNull: false
-    },
-    id_match: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false
-    },
-    game_name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    league_name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    teams_name: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-  },
-);
+export const match = (sequelize) => {
+    return sequelize.define(
+        'Matches',
+        {
+            id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+                allowNull: false
+            },
+            id_match: {
+                type: DataTypes.INTEGER,
+                allowNull: false
+            },
+            date: {
+                type: DataTypes.DATE
+            },
+            gameId: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: game,
+                    key: 'id'
+                }
+            },
+            leagueId: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: league,
+                    key: 'id'
+                }
+            },
+            team_1_id: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: team,
+                    key: 'id'
+                }
+            },
+            team_2_id: {
+                type: DataTypes.INTEGER,
+                references: {
+                    model: team,
+                    key: 'id'
+                }
+            }
+        })
+}

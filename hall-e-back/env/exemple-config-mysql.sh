@@ -1,0 +1,6 @@
+export BDD_TARGET=""
+export MODE_DEV=""
+export DB_USER=""
+export DB_PASSWORD=""
+export DB_NAME=""
+export DB_HOST=""
