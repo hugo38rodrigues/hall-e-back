@@ -35,6 +35,9 @@ export const Bar = (sequelize) => {
                 type: DataTypes.STRING(1234),
                 allowNull: false
             },
+            like_consumer: {
+                type: DataTypes.INTEGER
+            },
             role: {
                 type: DataTypes.STRING,
                 allowNull: false

@@ -3,34 +3,29 @@ import { Bar } from '../models/sql/bar.model.js'
 import { DB } from '../config/db-config.js'
 
 export class User {
-  constructor (params) {
-    this.id = params.id
-    this.firstName = params.firstName
-    this.lastName = params.lastName
-    this.email = params.email
-    this.password = params.password
-    this.role = params.role
+  constructor () {
     this.db = new DB()
   }
 
-  findUser = async () => {
-    if (this.role === 'consumer') {
-      return await Consumer(this.db.connexion).findAll({
-        attributes: ['email', 'password', 'role'],
+  findUser = async (params) => {
+    if (params.role === 'consumer') {
+      const consumer =  await Consumer(this.db.connexion).findAll({
+        attributes: ['email', 'lastName', 'firstName', 'favoris_match', 'like_bar', 'role'],
         where: {
-          email: this.email,
-          password: this.password,
-          role: this.role
+          email: params.email,
+          password: params.password,
+          role: params.role
         }
       })
+      console.log(consumer)
     }
-    else if (this.role === 'bar') {
+    else if (params.role === 'bar') {
       return await Bar(this.db.connexion).findAll({
-        attributes: ['email', 'lastName', 'firstName', 'role'],
+        attributes: ['id','adress', 'name','email', 'price','description','photo','password', 'like_consumer','role'],
         where: {
-          email: this.email,
-          password: this.password,
-          role: this.role
+          email: params.email,
+          password: params.password,
+          role: params.role
         }
       })
     } else {
@@ -39,20 +34,20 @@ export class User {
 
   }
 
-  findUserById = async () => {
-    if (this.role === 'consumer') {
+  findUserById = async (params) => {
+    if (params.role === 'consumer') {
      return await Consumer(this.db.connexion).findAll({
-        attributes: ['id', 'email', 'password', 'role'],
+        attributes: ['id'],
         where: {
-          id: this.id
+          id: params.id
         }
       })
     }
-    else if (this.role === 'bar') {
+    else if (params.role === 'bar') {
       return await Bar(this.db.connexion).findAll({
-        attributes: ['id', 'email', 'password', 'role', 'lastName', 'firstName'],
+        attributes: ['id'],
         where: {
-          id: this.id
+          id: params.id
         }
       })
     } else {
@@ -60,50 +55,51 @@ export class User {
     }
   }
 
-  createUser = async () => {
-    if (this.role === 'consumer') {
+  createUser = async (params) => {
+    if (params.role === 'consumer') {
       try {
-        await Consumer(this.db.connexion).create({
-          'firstName': this.firstName,
-          'lastName': this.lastName,
-          'email': this.email,
-          'password': this.password
+        return await Consumer(this.db.connexion).create({
+          'firstName': params.firstName,
+          'lastName': params.lastName,
+          'email': params.email,
+          'password': params.password
         })
       } catch (error) {
-        console.log(error)
+        return error
       }
     }
-    else if (this.role === 'bar') {
+    else if (params.role === 'bar') {
       try {
-        await Bar(this.db.connexion).create({
-          'firstName': this.firstName,
-          'lastName': this.lastName,
-          'email': this.email,
-          'password': this.password
+        return await Bar(this.db.connexion).create({
+          'name': params.name,
+          'adress': params.adress,
+          'email': params.email,
+          'password': params.password,
+          'role': params.role
         })
       } catch (error) {
-        console.log(`Error creation bar ${error}`)
+        return error
       }
     }
   }
 
-  deleteUser = async () => {
-    if (this.role === 'consumer') {
+  deleteUser = async (params) => {
+    if (params.role === 'consumer') {
       try {
         await Consumer(this.db.connexion).destroy({
           where: {
-            'id': this.id
+            'id': params.id
           },
         })
       } catch (error) {
         console.log(error)
       }
     }
-    else if (this.role === 'bar') {
+    else if (params.role === 'bar') {
       try {
         await Bar(this.db.connexion).destroy({
           where: {
-            'id': this.id
+            'id': params.id
           },
         })
       } catch (error) {

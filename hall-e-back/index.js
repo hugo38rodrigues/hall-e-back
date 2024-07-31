@@ -2,7 +2,6 @@ import cors from 'cors'
 import express from 'express'
 import { DB } from './config/db-config.js'
 import userRoutes from './routes/user.route.js'
-
 // import consumerRoutes from './routes/userRoute.js';
 // import barRoutes from './routes/animalRoute.js';
 // import adminRoutes from './routes/alertRoute.js';

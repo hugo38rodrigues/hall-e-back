@@ -1,44 +1,69 @@
 import { User } from '../services/user.service.js'
+
 export class UserController {
 
   createAccount = async (req, res) => {
     try {
       if (!req.body) {
-        return res.status(500).json({ message: 'Missing params' })
+        return res.status(500).json({message: 'Missing params'})
       }
       else if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ message: 'Missing email or password' })
+        return res.status(400).json({message: 'Missing email or password'})
       }
-      else if (!req.body.lastName || !req.body.firstName) {
-        return res.status(400).json({ message: 'Missing first name or last name' })
+      else if (req.body.role === 'consumer') {
+        if (!req.body.lastName || !req.body.firstName) {
+          return res.status(400).json({message: 'Missing first name or last name'})
+        }
+        const params = {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          email: req.body.email,
+          password: req.body.password,
+          role: req.body.role
+        }
+        const consumer = new User(params)
+        const consumerFound = await consumer.findUser()
+        if (consumerFound.length !== 0) {
+          return res.status(400).json({message: 'The consumer already exists'})
+        } else if (params.role !== 'consumer' && params.role !== 'bar') {
+          return res.status(400).json({message: 'Role is not defined'})
+        } else {
+          await consumer.createUser()
+          return res.status(201).json({message: 'Sign in success'})
+        }
       }
-      else if (!req.body.role) {
-        return res.status(400).json({ message: 'Missing role' })
-      }
-
-      const params = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        password: req.body.password,
-        role: req.body.role
-      }
-      console.log(params)
-      const user = new User(params)
-      const userFound = await user.findUser()
-
-      if (userFound.length !== 0) {
-        return res.status(400).json({ message: 'The user already exists' })
-      }
-      else if (params.role !== 'consumer' && params.role !== 'bar') {
-        return res.status(400).json({ message: 'Role is not defined' })
+      else if (req.body.role === 'bar' ){
+         if (!req.body.name) {
+          return res.status(400).json({message: 'Missing name'})
+        }
+         else if (!req.body.adress){
+           return res.status(400).json({message: 'Missing adress'})
+         }
+        const params = {
+          name: req.body.name,
+          adress: req.body.adress,
+          email: req.body.email,
+          password: req.body.password,
+          role: req.body.role,
+          price: req.body.price,
+          description: req.body.description,
+          photo: req.body.photo
+        }
+        const bar = new User()
+        const barFound = await bar.findUser(params)
+        if (barFound.length !== 0) {
+          return res.status(400).json({message: 'The bar already exists'})
+        }else {
+          await bar.createUser(params)
+          return res.status(201).json({message: 'Sign in success'})
+        }
       }
       else {
-        await user.createUser()
-        return res.status(201).json({ message: 'Sign in success' })
+        return res.status(400).json({message: 'Missing role'})
       }
-    } catch  {
-      res.status(500).json({ message: 'Internal server' })
+    }
+    catch {
+      res.status(500).json({message: 'Internal server'})
     }
   }
 
