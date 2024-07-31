@@ -1,17 +1,17 @@
-import {Sequelize} from 'sequelize';
-import {bar} from "../models/sql/bar.model.js";
-import {comment} from "../models/sql/comment.model.js";
-import {consumer} from "../models/sql/consumer.model.js";
-import {like} from "../models/sql/like.model.js";
-import {favoris} from "../models/sql/favoris.model.js";
-import {match} from "../models/sql/match.model.js";
-import {game} from "../models/sql/game.model.js";
-import {league} from "../models/sql/league.model.js";
-import {team} from "../models/sql/team.model.js";
+import { Sequelize } from 'sequelize';
+import { Bar } from '../models/sql/bar.model.js';
+import { Comment } from '../models/sql/comment.model.js';
+import { Consumer } from '../models/sql/consumer.model.js';
+import { Like } from '../models/sql/like.model.js';
+import { Favoris } from '../models/sql/favoris.model.js';
+import { Game } from '../models/sql/game.model.js';
+import { League } from '../models/sql/league.model.js';
+import { Team } from '../models/sql/team.model.js';
+import { Match } from '../models/sql/match.model.js';
 
 
 export class DB {
-    constructor() {
+    constructor () {
         this.connexion = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
             host: process.env.DB_HOST,
             dialect: 'mysql',
@@ -31,32 +31,32 @@ export class DB {
 
 
     synchronizationDb = async () => {
-        const Bar = bar(this.connexion);
-        const Comment = comment(this.connexion);
-        const Consumer = consumer(this.connexion);
-        const Like = like(this.connexion);
-        const Favoris = favoris(this.connexion);
-        const Match = match(this.connexion);
-        const Game = game(this.connexion);
-        const League = league(this.connexion);
-        const TeamName = team(this.connexion);
+        const bar = Bar(this.connexion);
+        const comment = Comment(this.connexion);
+        const consumer = Consumer(this.connexion);
+        const like = Like(this.connexion);
+        const favoris = Favoris(this.connexion);
+        const match = Match(this.connexion);
+        const game = Game(this.connexion);
+        const league = League(this.connexion);
+        const teamName = Team(this.connexion);
 
         if (await this.testConnexion()) {
-            Bar.hasMany(Comment);
-            Consumer.hasMany(Comment);
-            Consumer.hasMany(Like, { foreignKey: 'consumerId' });
-            Like.belongsTo(Consumer, { foreignKey: 'consumerId' });
-            Bar.hasMany(Like, { foreignKey: 'barId' });
-            Like.belongsTo(Bar, { foreignKey: 'barId' });
+            bar.hasMany(comment);
+            consumer.hasMany(comment);
+            consumer.hasMany(like, { foreignKey: 'consumerId' });
+            like.belongsTo(consumer, { foreignKey: 'consumerId' });
+            bar.hasMany(like, { foreignKey: 'barId' });
+            like.belongsTo(bar, { foreignKey: 'barId' });
 
-            Comment.belongsTo(Consumer, {
+            comment.belongsTo(consumer, {
                 foreignKey: {
                     allowNull: false
                 },
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE'
             });
-            Comment.belongsTo(Bar, {
+            comment.belongsTo(bar, {
                 foreignKey: {
                     allowNull: false
                 },
@@ -64,40 +64,40 @@ export class DB {
                 onUpdate: 'CASCADE'
             });
 
-            Match.belongsTo(Game, {
+            match.belongsTo(game, {
                 foreignKey: 'gameId',
                 onDelete: 'NO ACTION',
                 onUpdate: 'CASCADE'
             });
-            Match.belongsTo(League, {
+            match.belongsTo(league, {
                 foreignKey: 'leagueId',
                 onDelete: 'NO ACTION',
                 onUpdate: 'CASCADE'
             });
-            Match.belongsTo(TeamName, {
+            match.belongsTo(teamName, {
                 as: 'Team1',
                 foreignKey: 'team_1_id',
                 onDelete: 'NO ACTION',
                 onUpdate: 'CASCADE'
             });
-            Match.belongsTo(TeamName, {
+            match.belongsTo(teamName, {
                 as: 'Team2',
                 foreignKey: 'team_2_id',
                 onDelete: 'NO ACTION',
                 onUpdate: 'CASCADE'
             });
 
-            Consumer.hasMany(Favoris, { foreignKey: 'consumer_id' });
-            Favoris.belongsTo(Consumer, { foreignKey: 'consumer_id' });
+            consumer.hasMany(favoris, { foreignKey: 'consumer_id' });
+            favoris.belongsTo(consumer, { foreignKey: 'consumer_id' });
 
-            Favoris.belongsTo(Game, {
+            favoris.belongsTo(game, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
                     favoriteable_type: 'game'
                 }
             });
-            Game.hasMany(Favoris, {
+            game.hasMany(favoris, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
@@ -105,14 +105,14 @@ export class DB {
                 }
             });
 
-            Favoris.belongsTo(League, {
+            favoris.belongsTo(league, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
                     favoriteable_type: 'league'
                 }
             });
-            League.hasMany(Favoris, {
+            league.hasMany(favoris, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
@@ -120,14 +120,14 @@ export class DB {
                 }
             });
 
-            Favoris.belongsTo(TeamName, {
+            favoris.belongsTo(teamName, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
                     favoriteable_type: 'team'
                 }
             });
-            TeamName.hasMany(Favoris, {
+            teamName.hasMany(favoris, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
@@ -136,7 +136,7 @@ export class DB {
             });
 
         } else {
-            console.log("Error");
+            console.log('Error');
         }
 
     }

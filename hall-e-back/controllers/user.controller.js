@@ -4,16 +4,16 @@ export class UserController {
   createAccount = async (req, res) => {
     try {
       if (!req.body) {
-        return res.status(500).json({ message: "Missing params" });
+        return res.status(500).json({ message: 'Missing params' });
       }
       else if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ message: "Missing email or password" });
+        return res.status(400).json({ message: 'Missing email or password' });
       }
       else if (!req.body.lastName || !req.body.firstName) {
-        return res.status(400).json({ message: "Missing first name or last name" });
+        return res.status(400).json({ message: 'Missing first name or last name' });
       }
       else if (!req.body.role) {
-        return res.status(400).json({ message: "Missing role" });
+        return res.status(400).json({ message: 'Missing role' });
       }
 
       const params = {
@@ -37,23 +37,23 @@ export class UserController {
         await user.createUser()
         return res.status(201).json({ message: 'Sign in success' })
       }
-    } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+    } catch  {
+      res.status(500).json({ message: 'Internal server' });
     }
   }
 
-  updateAccount = async (req, res) => { res.status(200).json({ message: "Update  account" }) }
+  updateAccount = async (req, res) => { res.status(200).json({ message: 'Update  account' }) }
 
   connexion = async (req, res) => {
     try {
       if (!req.body) {
-        return res.status(500).json({ message: "Missing params" })
+        return res.status(500).json({ message: 'Missing params' })
       }
       else if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ message: "Missing email or password" });
+        return res.status(400).json({ message: 'Missing email or password' });
       }
       else if (!req.body.role) {
-        return res.status(400).json({ message: "Missing role" });
+        return res.status(400).json({ message: 'Missing role' });
       }
 
       const params = {
@@ -71,7 +71,7 @@ export class UserController {
       else {
         res.status(400).json({ message: 'User is not found' })
       }
-    } catch (error) {
+    } catch  {
       res.status(500).json({ message: 'Internal server error' });
     }
   }

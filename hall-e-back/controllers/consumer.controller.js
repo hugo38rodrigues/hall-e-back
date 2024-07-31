@@ -1,7 +1,7 @@
-import { User } from "./user";
+import { User } from './user';
 
 export class Consumer extends User {
-  constructor() {
+  constructor () {
     super()
     this.role = role
   }

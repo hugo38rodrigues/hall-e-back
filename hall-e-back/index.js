@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import {DB} from './config/db-config.js';
+import { DB } from './config/db-config.js';
 import userRoutes from './routes/user.route.js'
 
 // import consumerRoutes from './routes/userRoute.js';
@@ -19,8 +19,13 @@ if (process.env.MODE_DEV === 'true') {
             const db = new DB()
             await db.synchronizationDb()
             break
+
         case 'dynamoDb':
             console.log('dynamo')
+            break
+
+        default:
+            console.log('No such database')
             break
     }
 }

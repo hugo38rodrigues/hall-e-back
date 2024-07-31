@@ -1,9 +1,9 @@
-import {consumer} from '../models/sql/consumer.model.js'
-import {bar} from '../models/sql/bar.model.js'
-import {DB} from "../config/db-config.js";
+import { Consumer } from '../models/sql/consumer.model.js'
+import { Bar } from '../models/sql/bar.model.js'
+import { DB } from '../config/db-config.js';
 
 export class User {
-  constructor(params) {
+  constructor (params) {
     this.id = params.id
     this.firstName = params.firstName
     this.lastName = params.lastName
@@ -15,7 +15,7 @@ export class User {
 
   findUser = async () => {
     if (this.role === 'consumer') {
-      return await consumer(this.db.connexion).findAll({
+      return await Consumer(this.db.connexion).findAll({
         attributes: ['email', 'password', 'role'],
         where: {
           email: this.email,
@@ -25,7 +25,7 @@ export class User {
       })
     }
     else if (this.role === 'bar') {
-      return await bar(this.db.connexion).findAll({
+      return await Bar(this.db.connexion).findAll({
         attributes: ['email', 'lastName', 'firstName', 'role'],
         where: {
           email: this.email,
@@ -41,7 +41,7 @@ export class User {
 
   findUserById = async () => {
     if (this.role === 'consumer') {
-     return await consumer(this.db.connexion).findAll({
+     return await Consumer(this.db.connexion).findAll({
         attributes: ['id', 'email', 'password', 'role'],
         where: {
           id: this.id
@@ -49,7 +49,7 @@ export class User {
       })
     }
     else if (this.role === 'bar') {
-      return await bar(this.db.connexion).findAll({
+      return await Bar(this.db.connexion).findAll({
         attributes: ['id', 'email', 'password', 'role', 'lastName', 'firstName'],
         where: {
           id: this.id
@@ -63,7 +63,7 @@ export class User {
   createUser = async () => {
     if (this.role === 'consumer') {
       try {
-        await consumer(this.db.connexion).create({
+        await Consumer(this.db.connexion).create({
           'firstName': this.firstName,
           'lastName': this.lastName,
           'email': this.email,
@@ -75,7 +75,7 @@ export class User {
     }
     else if (this.role === 'bar') {
       try {
-        await bar(this.db.connexion).create({
+        await Bar(this.db.connexion).create({
           'firstName': this.firstName,
           'lastName': this.lastName,
           'email': this.email,
@@ -90,7 +90,7 @@ export class User {
   deleteUser = async () => {
     if (this.role === 'consumer') {
       try {
-        await consumer(this.db.connexion).destroy({
+        await Consumer(this.db.connexion).destroy({
           where: {
             'id': this.id
           },
@@ -101,7 +101,7 @@ export class User {
     }
     else if (this.role === 'bar') {
       try {
-        await bar(this.db.connexion).destroy({
+        await Bar(this.db.connexion).destroy({
           where: {
             'id': this.id
           },
