@@ -1,4 +1,4 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize'
 
 export const Bar = (sequelize) => {
     return sequelize.define(
@@ -40,5 +40,5 @@ export const Bar = (sequelize) => {
                 allowNull: false
             }
         }
-    );
-};
+    )
+}

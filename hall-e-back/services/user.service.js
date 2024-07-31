@@ -1,6 +1,6 @@
 import { Consumer } from '../models/sql/consumer.model.js'
 import { Bar } from '../models/sql/bar.model.js'
-import { DB } from '../config/db-config.js';
+import { DB } from '../config/db-config.js'
 
 export class User {
   constructor (params) {
@@ -94,7 +94,7 @@ export class User {
           where: {
             'id': this.id
           },
-        });
+        })
       } catch (error) {
         console.log(error)
       }
@@ -105,7 +105,7 @@ export class User {
           where: {
             'id': this.id
           },
-        });
+        })
       } catch (error) {
         console.log(error)
       }

@@ -1,5 +1,5 @@
-import { router } from 'express';
-import { Consumer } from '../classes/consumer';
+import { router } from 'express'
+import { Consumer } from '../classes/consumer'
 
 const consumer = new Consumer()
 

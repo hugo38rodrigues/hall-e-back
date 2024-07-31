@@ -3,11 +3,14 @@ import pluginJs from '@eslint/js'
 
 export default [
     {
-        languageOptions: { globals: globals.node },
+        languageOptions: { globals: globals.node, ecmaVersion: 2024,
+            sourceType: 'module', },
         files: ['**/*.js'],
         ignores: ['node_modules/**/*'],
         rules: {
             'no-unused-vars': 'error',
+            'semi': ['error', 'never'],
+            'no-case-declarations': 'off',
             'no-undef': 'warn',
             'no-duplicate-imports': 'warn',
             'no-irregular-whitespace': ['error', { 'skipStrings': true, 'skipTemplates': true }],
@@ -24,4 +27,4 @@ export default [
     },
     pluginJs.configs.recommended,
 
-];
+]

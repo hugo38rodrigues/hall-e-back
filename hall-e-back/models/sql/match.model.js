@@ -1,7 +1,7 @@
-import { DataTypes } from 'sequelize';
-import { Game } from './game.model.js';
-import { League } from './league.model.js';
-import { Team } from './team.model.js';
+import { DataTypes } from 'sequelize'
+import { Game } from './game.model.js'
+import { League } from './league.model.js'
+import { Team } from './team.model.js'
 
 export const Match = (sequelize) => {
     return sequelize.define(

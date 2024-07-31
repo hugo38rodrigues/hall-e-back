@@ -1,19 +1,19 @@
-import { User } from '../services/user.service.js';
+import { User } from '../services/user.service.js'
 export class UserController {
 
   createAccount = async (req, res) => {
     try {
       if (!req.body) {
-        return res.status(500).json({ message: 'Missing params' });
+        return res.status(500).json({ message: 'Missing params' })
       }
       else if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ message: 'Missing email or password' });
+        return res.status(400).json({ message: 'Missing email or password' })
       }
       else if (!req.body.lastName || !req.body.firstName) {
-        return res.status(400).json({ message: 'Missing first name or last name' });
+        return res.status(400).json({ message: 'Missing first name or last name' })
       }
       else if (!req.body.role) {
-        return res.status(400).json({ message: 'Missing role' });
+        return res.status(400).json({ message: 'Missing role' })
       }
 
       const params = {
@@ -38,7 +38,7 @@ export class UserController {
         return res.status(201).json({ message: 'Sign in success' })
       }
     } catch  {
-      res.status(500).json({ message: 'Internal server' });
+      res.status(500).json({ message: 'Internal server' })
     }
   }
 
@@ -50,10 +50,10 @@ export class UserController {
         return res.status(500).json({ message: 'Missing params' })
       }
       else if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ message: 'Missing email or password' });
+        return res.status(400).json({ message: 'Missing email or password' })
       }
       else if (!req.body.role) {
-        return res.status(400).json({ message: 'Missing role' });
+        return res.status(400).json({ message: 'Missing role' })
       }
 
       const params = {
@@ -72,7 +72,7 @@ export class UserController {
         res.status(400).json({ message: 'User is not found' })
       }
     } catch  {
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ message: 'Internal server error' })
     }
   }
 
@@ -94,7 +94,7 @@ export class UserController {
       // }
     } catch (error) {
       console.log(error)
-      return res.status(500).json({ message: 'Internal server error' });
+      return res.status(500).json({ message: 'Internal server error' })
     }
   }
 
