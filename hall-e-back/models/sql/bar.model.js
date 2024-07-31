@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 
-export const bar = (sequelize) => {
+export const Bar = (sequelize) => {
     return sequelize.define(
         'Bars',
         {

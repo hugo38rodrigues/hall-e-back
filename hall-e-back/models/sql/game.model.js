@@ -1,6 +1,6 @@
-import {DataTypes} from 'sequelize';
+import { DataTypes } from 'sequelize';
 
-export const game = (sequelize) => {
+export const Game = (sequelize) => {
     return sequelize.define(
         'Game', {
             name: {

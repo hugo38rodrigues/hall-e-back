@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 
-export const comment = (sequelize) => {
+export const Comment = (sequelize) => {
   return sequelize.define(
   'Comments', {
   id: {

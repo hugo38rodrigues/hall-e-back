@@ -1,9 +1,9 @@
-import {DataTypes} from 'sequelize';
-import {game} from "./game.model.js";
-import {league} from "./league.model.js";
-import {team} from "./team.model.js";
+import { DataTypes } from 'sequelize';
+import { Game } from './game.model.js';
+import { League } from './league.model.js';
+import { Team } from './team.model.js';
 
-export const match = (sequelize) => {
+export const Match = (sequelize) => {
     return sequelize.define(
         'Matches',
         {
@@ -23,28 +23,28 @@ export const match = (sequelize) => {
             gameId: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: game,
+                    model: Game,
                     key: 'id'
                 }
             },
             leagueId: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: league,
+                    model: League,
                     key: 'id'
                 }
             },
             team_1_id: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: team,
+                    model: Team,
                     key: 'id'
                 }
             },
             team_2_id: {
                 type: DataTypes.INTEGER,
                 references: {
-                    model: team,
+                    model: Team,
                     key: 'id'
                 }
             }

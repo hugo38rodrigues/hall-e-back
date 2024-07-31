@@ -1,6 +1,6 @@
-import {DataTypes} from 'sequelize';
+import { DataTypes } from 'sequelize';
 
-export const team = (sequelize) => {
+export const Team = (sequelize) => {
     return sequelize.define('TeamsName', {
         name: {
             type: DataTypes.STRING,

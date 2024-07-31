@@ -1,6 +1,6 @@
-import {DataTypes} from 'sequelize';
+import { DataTypes } from 'sequelize';
 
-export const consumer = (sequelize) => {
+export const Consumer = (sequelize) => {
     return sequelize.define(
         'Consumers',
         {
