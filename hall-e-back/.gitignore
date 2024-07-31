@@ -1,9 +1,9 @@
 .env.*
 */node_modules
-*/package-lock.json
+package-lock.json
 .vscode/*
 !.vscode/extensions.json
-.idea
+*.idea
 .DS_Store
 *.suo
 *.ntvs*
@@ -11,4 +11,3 @@
 *.sln
 *.sw?
 docker
-.idea
