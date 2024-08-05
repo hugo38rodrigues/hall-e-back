@@ -2,7 +2,6 @@
 .vscode/*
 !.vscode/extensions.json
 node_modules/*
-.idea
 .DS_Store
 *.suo
 *.ntvs*
