@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $# -eq 0 ]; then
+  echo "No parameters provided. Please specify an environment using --env=<environment>."
+  exit 1
+fi
+
 for param in "$@"; do
   case $param in
     --env=*)
@@ -15,10 +20,10 @@ for param in "$@"; do
             exit 1
           fi
           ;;
-        sql)
+        mysql)
           echo "Loading environment for MySQL"
-          if [ -f "./env/.env.sql.sh" ]; then
-            source "./env/.env.sql.sh"
+          if [ -f "./env/.env.mysql.sh" ]; then
+            source "./env/.env.mysql.sh"
             npm run load-data
           else
             echo "Environment file for MySQL not found!"
@@ -26,12 +31,12 @@ for param in "$@"; do
           fi
           ;;
         mongodb)
-          echo "Loading environment for MySQL"
-          if [ -f "./env/.env.sql.sh" ]; then
-            source "./env/.env.sql.sh"
+          echo "Loading environment for MongoDB"
+          if [ -f "./env/.env.mongodb.sh" ]; then
+            source "./env/.env.mongodb.sh"
             npm run load-data
           else
-            echo "Environment file for MySQL not found!"
+            echo "Environment file for MongoDB not found!"
             exit 1
           fi
           ;;

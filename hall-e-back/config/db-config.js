@@ -29,7 +29,6 @@ export class DB {
         }
     }
 
-
     synchronizationDb = async () => {
         const bar = Bar(this.connexion)
         const comment = Comment(this.connexion)
@@ -42,33 +41,41 @@ export class DB {
         const teamName = Team(this.connexion)
 
         if (await this.testConnexion()) {
-            bar.hasMany(comment)
-            consumer.hasMany(comment)
-            consumer.hasMany(like, { foreignKey: 'consumerId' })
-            like.belongsTo(consumer, { foreignKey: 'consumerId' })
-            bar.hasMany(like, { foreignKey: 'barId' })
-            like.belongsTo(bar, { foreignKey: 'barId' })
+            // Relations for Bar
+            bar.hasMany(comment);
+            bar.hasMany(like, { foreignKey: 'barId' });
 
+            // Relations for Consumer
+            consumer.hasMany(comment);
+            consumer.hasMany(like, { foreignKey: 'consumerId' });
+            consumer.hasMany(favoris, { foreignKey: 'consumer_id' });
+
+            // Relations for Like
+            like.belongsTo(consumer, { foreignKey: 'consumerId' });
+            like.belongsTo(bar, { foreignKey: 'barId' });
+
+            // Relations for Comment
             comment.belongsTo(consumer, {
                 foreignKey: {
                     allowNull: false
                 },
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE'
-            })
+            });
             comment.belongsTo(bar, {
                 foreignKey: {
                     allowNull: false
                 },
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE'
-            })
+            });
 
+            // Relations for Match
             match.belongsTo(game, {
                 foreignKey: 'gameId',
                 onDelete: 'NO ACTION',
                 onUpdate: 'CASCADE'
-            })
+            });
             match.belongsTo(league, {
                 foreignKey: 'leagueId',
                 onDelete: 'NO ACTION',
@@ -85,10 +92,10 @@ export class DB {
                 foreignKey: 'team_2_id',
                 onDelete: 'NO ACTION',
                 onUpdate: 'CASCADE'
-            })
+            });
 
-            consumer.hasMany(favoris, { foreignKey: 'consumer_id' })
-            favoris.belongsTo(consumer, { foreignKey: 'consumer_id' })
+            // Relations for Favoris
+            favoris.belongsTo(consumer, { foreignKey: 'consumer_id' });
 
             favoris.belongsTo(game, {
                 foreignKey: 'favoriteable_id',
@@ -96,14 +103,14 @@ export class DB {
                 scope: {
                     favoriteable_type: 'game'
                 }
-            })
+            });
             game.hasMany(favoris, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
                     favoriteable_type: 'game'
                 }
-            })
+            });
 
             favoris.belongsTo(league, {
                 foreignKey: 'favoriteable_id',
@@ -111,14 +118,14 @@ export class DB {
                 scope: {
                     favoriteable_type: 'league'
                 }
-            })
+            });
             league.hasMany(favoris, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
                     favoriteable_type: 'league'
                 }
-            })
+            });
 
             favoris.belongsTo(teamName, {
                 foreignKey: 'favoriteable_id',
@@ -133,7 +140,8 @@ export class DB {
                 scope: {
                     favoriteable_type: 'team'
                 }
-            })
+            });
+
 
         } else {
             console.log('Error')

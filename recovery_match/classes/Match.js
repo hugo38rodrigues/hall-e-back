@@ -46,28 +46,23 @@ export class Match {
     const matches = responseData.map((data) => {
       const idMatch = data.id;
       const date = this.#formatedDate(data.begin_at)
-      const gameName = data.videogame?.slug;
-      const leagueName = data.league?.name;
-      const teamsName = data.opponents?.map(opponent => opponent.opponent?.acronym) || [];
+      const gameName = data.videogame.slug;
+      const leagueName = data.league.name;
+      let [team1, team2] = data.opponents.map(opponent => opponent.opponent.acronym) || []
+      const isNotEmptyData = this.#checkedData(idMatch) && this.#checkedData(date) && this.#checkedData(gameName) && this.#checkedData(leagueName) && this.#checkedData(team1) && this.#checkedData(team2)
 
-      // Vérification spécifique pour teamsNames
-      if (teamsName.length !== 2) {
-        return null;
-      }
-
-      if (this.#checkedData(idMatch) && this.#checkedData(date) && this.#checkedData(gameName) && this.#checkedData(leagueName) && teamsName.every(this.#checkedData)) {
+      if (isNotEmptyData ) {
         return {
           idMatch,
           date,
           gameName,
-          leagueName,
-          teamsName
+          team1,
+          team2
         };
       } else {
         return null;
       }
     });
-
     return matches.filter(item => item !== null);
   }
 }

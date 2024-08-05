@@ -1,6 +1,6 @@
-import { Consumer } from '../models/sql/consumer.model.js'
-import { Bar } from '../models/sql/bar.model.js'
-import { DB } from '../config/db-config.js'
+import {consumer} from '../models/sql/consumer.model.js'
+import {bar} from '../models/sql/bar.model.js'
+import {DB} from '../config/db-config.js'
 
 export class User {
   constructor () {
@@ -9,7 +9,7 @@ export class User {
 
   findUser = async (params) => {
     if (params.role === 'consumer') {
-      const consumer =  await Consumer(this.db.connexion).findAll({
+      return await consumer(this.db.connexion).findAll({
         attributes: ['email', 'lastName', 'firstName', 'favoris_match', 'like_bar', 'role'],
         where: {
           email: params.email,
@@ -17,26 +17,22 @@ export class User {
           role: params.role
         }
       })
-      console.log(consumer)
     }
     else if (params.role === 'bar') {
-      return await Bar(this.db.connexion).findAll({
-        attributes: ['id','adress', 'name','email', 'price','description','photo','password', 'like_consumer','role'],
+      return await bar(this.db.connexion).findAll({
+        attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'like_consumer', 'role'],
         where: {
           email: params.email,
           password: params.password,
           role: params.role
         }
       })
-    } else {
-      return null
     }
-
   }
 
   findUserById = async (params) => {
     if (params.role === 'consumer') {
-     return await Consumer(this.db.connexion).findAll({
+     return await consumer(this.db.connexion).findAll({
         attributes: ['id'],
         where: {
           id: params.id
@@ -44,7 +40,7 @@ export class User {
       })
     }
     else if (params.role === 'bar') {
-      return await Bar(this.db.connexion).findAll({
+      return await bar(this.db.connexion).findAll({
         attributes: ['id'],
         where: {
           id: params.id
@@ -58,7 +54,7 @@ export class User {
   createUser = async (params) => {
     if (params.role === 'consumer') {
       try {
-        return await Consumer(this.db.connexion).create({
+        return await consumer(this.db.connexion).create({
           'firstName': params.firstName,
           'lastName': params.lastName,
           'email': params.email,
@@ -70,9 +66,9 @@ export class User {
     }
     else if (params.role === 'bar') {
       try {
-        return await Bar(this.db.connexion).create({
+        return await bar(this.db.connexion).create({
           'name': params.name,
-          'adress': params.adress,
+          'address': params.address,
           'email': params.email,
           'password': params.password,
           'role': params.role
@@ -86,7 +82,7 @@ export class User {
   deleteUser = async (params) => {
     if (params.role === 'consumer') {
       try {
-        await Consumer(this.db.connexion).destroy({
+        await consumer(this.db.connexion).destroy({
           where: {
             'id': params.id
           },
@@ -97,7 +93,7 @@ export class User {
     }
     else if (params.role === 'bar') {
       try {
-        await Bar(this.db.connexion).destroy({
+        await bar(this.db.connexion).destroy({
           where: {
             'id': params.id
           },

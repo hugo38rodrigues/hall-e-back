@@ -10,7 +10,7 @@ export const Bar = (sequelize) => {
                 primaryKey: true,
                 allowNull: false
             },
-            adress: {
+            address: {
                 type: DataTypes.STRING,
                 allowNull: false
             },

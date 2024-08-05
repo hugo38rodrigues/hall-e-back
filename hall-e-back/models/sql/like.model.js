@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize'
 
-export const Like = (sequelize) => {
+export const like = (sequelize) => {
     return sequelize.define(
         'Likes',
         {
