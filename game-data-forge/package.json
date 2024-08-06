@@ -1,0 +1,17 @@
+{
+  "name": "game-data-forge",
+  "version": "1.0.0",
+  "description": "This service is responsible for creating the database linked to the hall-e application.",
+  "main": "main.js",
+  "scripts": {
+    "creation-database": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Xwdrblue",
+  "type": "module",
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3"
+  }
+}
