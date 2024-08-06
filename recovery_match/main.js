@@ -11,26 +11,6 @@ import {
 } from "./utils/api.utils.js"
 
 
-if (process.env.MODE_DEV === 'true') {
-  if (BDD_TARGET === 'mysql') {
-    console.log("############ START PROCESS FOR TABLES CREATION ############")
-    const mysql = new MysqlDB()
-    await mysql.createTables()
-    console.log("############ END PROCESS FOR TABLES CREATION ############")
-  }
-
-  else if (BDD_TARGET === 'dynamodb') {
-    console.log("############ START PROCESS FOR TABLES CREATION ############")
-    const dynamodbTable = new DynamoDbTables()
-    await dynamodbTable.createdTables()
-    console.log("############ END PROCESS FOR TABLES CREATION ############")
-  }
-  else {
-    console.log(`############ ${BDD_TARGET} IS NOT FOUND ############`)
-    process.exit()
-  }
-}
-
 console.log("############ START GET DATA ############")
 const lol = new Match(optionLol)
 // const cs = new Match(optionCs)
@@ -52,11 +32,11 @@ console.log("############ START SAVING MATCH ############")
 //     await dynamodb.savingMatches(csMatch)
 //     await dynamodb.savingMatches(valorantMatch)
 //     break;
-//   case 'mysql':
+//   case 'sql':
     const mysql = new MysqlDB()
     await mysql.savingMatches(lolMatch)
-//     await mysql.savingMatches(csMatch)
-//     await mysql.savingMatches(valorantMatch)
+//     await sql.savingMatches(csMatch)
+//     await sql.savingMatches(valorantMatch)
 //     break;
 //   case 'mongodb':
 //     const mongodb = new MongoDb()

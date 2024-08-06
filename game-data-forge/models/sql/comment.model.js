@@ -1,9 +1,7 @@
 import { DataTypes } from 'sequelize'
-import {MysqlDB} from "../../config/sql/mysql.config.js";
-const db = new MysqlDB()
-const connection = db.connection
 
-export const Comment = connection.define(
+export const Comment = (sequelize) => {
+  return sequelize.define(
   'Comments', {
   id: {
     type: DataTypes.INTEGER,
@@ -20,4 +18,4 @@ export const Comment = connection.define(
     type: DataTypes.STRING,
     allowNull: false
   }
-})
+})}

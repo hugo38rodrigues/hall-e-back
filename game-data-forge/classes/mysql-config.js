@@ -9,8 +9,7 @@ import { League } from '../models/sql/league.model.js'
 import { Team } from '../models/sql/team.model.js'
 import { Match } from '../models/sql/match.model.js'
 
-
-export class DB {
+export class Mysql {
     constructor () {
         this.connexion = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
             host: process.env.DB_HOST,

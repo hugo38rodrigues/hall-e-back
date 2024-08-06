@@ -1,5 +1,5 @@
 import { router } from 'express'
-import { Consumer } from '../classes/consumer'
+import { Consumer } from '../controllers/consumer.controller.js'
 
 const consumer = new Consumer()
 
