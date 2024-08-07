@@ -1,4 +1,7 @@
 import {Sequelize} from "sequelize";
+import {UserMysqlService} from "../services/user/user.mysql.service.js";
+import {UserDynamoService} from "../services/user/user.dynamo.service.js";
+import {UserMangoService} from "../services/user/user.mango.service.js";
 
 const BDD_TARGET = process.env.BDD_TARGET
 
@@ -21,6 +24,35 @@ export const connectionDb = async () => {
     }
 }
 
-export const controller = () => {
+export const userInstance = (bddTarget) => {
+    switch(bddTarget){
+        case 'mysql':
+            return new UserMysqlService()
+        case 'mangodb':
+            return new UserMangoService()
+        case 'dynamodb':
+            return new UserDynamoService()
+    }
+}
 
+export const barInstance = (bddTarget) => {
+    switch(bddTarget){
+        case 'mysql':
+            return new BarMysqlService()
+        case 'mangodb':
+            return new BarMangoService()
+        case 'dynamodb':
+            return new BarDynamoService()
+    }
+}
+
+export const consumerInstance = (bddTarget) => {
+    switch(bddTarget){
+        case 'mysql':
+            return new ConsumerMysqlService()
+        case 'mangodb':
+            return new ConsumerMangoService()
+        case 'dynamodb':
+            return new ConsumerDynamoService()
+    }
 }

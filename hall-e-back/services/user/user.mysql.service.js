@@ -1,13 +1,13 @@
-import { Consumer } from '../models/sql/consumer.model.js'
-import { Bar } from '../models/sql/bar.model.js'
+import { Consumer } from '../../models/sql/consumer.model.js'
+import { Bar } from '../../models/sql/bar.model.js'
+import {UserService} from "./user.service.js";
 
-
-export class User {
-  constructor () {
-
+export class UserMysqlService extends UserService{
+  constructor() {
+    super();
   }
 
-  findUser = async (params) => {
+  getUser = async (params) => {
     if (params.role === 'consumer') {
       return await Consumer.findAll({
         attributes: ['email', 'lastName', 'firstName', 'favoris_match', 'like_bar', 'role'],
@@ -17,8 +17,7 @@ export class User {
           role: params.role
         }
       })
-    }
-    else if (params.role === 'bar') {
+    } else if (params.role === 'bar') {
       return await Bar.findAll({
         attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'like_consumer', 'role'],
         where: {
@@ -30,20 +29,19 @@ export class User {
     }
   }
 
-  findUserById = async (params) => {
-    if (params.role === 'consumer') {
-     return await Consumer.findAll({
+  getUserById = async (id, role) => {
+    if (role === 'consumer') {
+      return await Consumer.findAll({
         attributes: ['id'],
         where: {
-          id: params.id
+          id: id
         }
       })
-    }
-    else if (params.role === 'bar') {
+    } else if (role === 'bar') {
       return await Bar.findAll({
         attributes: ['id'],
         where: {
-          id: params.id
+          id: id
         }
       })
     } else {
@@ -51,7 +49,7 @@ export class User {
     }
   }
 
-  createUser = async (params) => {
+  addUser = async (params) => {
     if (params.role === 'consumer') {
       try {
         return await Consumer.create({
@@ -63,8 +61,7 @@ export class User {
       } catch (error) {
         return error
       }
-    }
-    else if (params.role === 'bar') {
+    } else if (params.role === 'bar') {
       try {
         return await Bar.create({
           'name': params.name,
@@ -78,5 +75,6 @@ export class User {
       }
     }
   }
-
 }
+
+
