@@ -2,12 +2,9 @@ import {DataTypes} from 'sequelize'
 import {Game} from './game.model.js'
 import {League} from './league.model.js'
 import {Team} from './team.model.js'
-import {MysqlDB} from "../../config/sql/mysql.config.js";
+import {connectionDb} from '../../config/db.config.js'
 
-const db = new MysqlDB()
-const connection = db.connectionBdd
-
-export const Match = connection.define(
+export const Match = await connectionDb.define(
     'Matches',
     {
         id: {

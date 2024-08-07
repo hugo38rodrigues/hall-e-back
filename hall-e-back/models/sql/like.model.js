@@ -1,5 +1,5 @@
 import {DataTypes} from 'sequelize'
-import {MysqlDB} from "../../config/sql/mysql.config.js";
+import {MysqlDB} from "../../config/db.config.js";
 import {Bar} from "./bar.model.js";
 import {Consumer} from "./consumer.model.js";
 

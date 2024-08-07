@@ -22,7 +22,8 @@ export class UserController {
           password: req.body.password,
           role: req.body.role
         }
-      } else if (req.body.role === 'bar') {
+      }
+      if (req.body.role === 'bar') {
         params = {
           name: req.body.name,
           address: req.body.adress,
@@ -33,7 +34,8 @@ export class UserController {
           description: req.body.description,
           photo: req.body.photo
         }
-      } else {
+      }
+      else {
         res.status(400).json({ message: 'Missing role' })
         return
       }

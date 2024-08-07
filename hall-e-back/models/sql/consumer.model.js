@@ -1,11 +1,7 @@
 import {DataTypes} from 'sequelize'
-import {MysqlDB} from "../../config/sql/mysql.config.js";
+import { connectionDb } from '../../config/db.config.js'
 
-
-const db = new MysqlDB()
-const connection = db.connection
-
-export const Consumer = connection.define(
+export const Consumer = connectionDb.define(
     'Consumers',
     {
         id: {

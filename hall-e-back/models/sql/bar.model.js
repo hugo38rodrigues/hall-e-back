@@ -1,5 +1,5 @@
 import {DataTypes} from 'sequelize'
-import {MysqlDB} from "../../config/sql/mysql.config.js";
+import {MysqlDB} from "../../config/db.config.js";
 
 const db = new MysqlDB()
 const connection = db.connection
