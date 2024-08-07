@@ -17,7 +17,7 @@ export class MysqlDB extends Storage {
     }
 
 
-    initConnexion = async () => {
+    getConnexion = async () => {
         try {
             this.connectionBdd = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
                 host: process.env.DB_HOST,
@@ -32,7 +32,7 @@ export class MysqlDB extends Storage {
 
     #checkedData = async (match) => {
         if (!this.connectionBdd) {
-            await this.initConnexion()
+            await this.getConnexion()
         }
 
         const checkQuery = `SELECT COUNT(*) AS count FROM matches WHERE id_match = ?`;
@@ -72,7 +72,7 @@ export class MysqlDB extends Storage {
                     console.log(error)
                 }
             }
-            }
+        }
     }
 
 
