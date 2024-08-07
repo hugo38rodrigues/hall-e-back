@@ -4,8 +4,8 @@ import {MysqlDB} from "../../config/db.config.js";
 const db = new MysqlDB()
 const connection = db.connection
 
-export const Favori = connection.define(
-    'Favoris',
+export const Favorite = connection.define(
+    'Favorites',
     {
         favoriteable_id: {
             type: DataTypes.INTEGER,
