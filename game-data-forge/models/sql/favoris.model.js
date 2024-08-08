@@ -1,8 +1,8 @@
 import { DataTypes } from 'sequelize'
 
-export const Favoris = (sequelize) => {
+export const Favorite = (sequelize) => {
     return sequelize.define(
-        'Favoris',
+        'Favorites',
         {
             favoriteable_id: {
                 type: DataTypes.INTEGER,

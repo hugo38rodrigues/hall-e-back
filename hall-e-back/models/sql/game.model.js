@@ -1,10 +1,7 @@
 import {DataTypes} from 'sequelize'
-import {MysqlDB} from "../../config/db.config.js";
+import {connectionDb} from "../../config/db.config.js";
 
-const db = new MysqlDB()
-const connection = db.connectionBdd
-
-export const Game = connection.define(
+export const Game = connectionDb.define(
     'Game', {
         name: {
             type: DataTypes.STRING,

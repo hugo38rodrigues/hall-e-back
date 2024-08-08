@@ -1,12 +1,10 @@
 import {DataTypes} from 'sequelize'
-import {MysqlDB} from "../../config/db.config.js";
+import {connectionDb} from "../../config/db.config.js";
 import {Bar} from "./bar.model.js";
 import {Consumer} from "./consumer.model.js";
 
-const db = new MysqlDB()
-const connection = db.connection
 
-export const Like = connection.define(
+export const Like = connectionDb.define(
     'Likes',
     {
         id: {

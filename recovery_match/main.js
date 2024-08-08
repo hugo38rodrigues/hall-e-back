@@ -1,15 +1,12 @@
 import { Match } from './classes/Match.js'
-import { DynamoDB } from "./classes/bdd/dynamo-db.js"
 import { MysqlDB } from "./classes/bdd/mysql-db.js"
-import { MongoDb } from './classes/bdd/mongo-db.js'
-import { DynamoDbTables } from './bdd-config/create-tables-dynamodb.js'
+
 import {
   BDD_TARGET,
   optionCs,
   optionLol,
   optionValorant
 } from "./utils/api.utils.js"
-
 
 console.log("############ START GET DATA ############")
 const lol = new Match(optionLol)
@@ -32,7 +29,7 @@ switch (BDD_TARGET) {
   //   await dynamodb.savingMatches(csMatch)
   //   await dynamodb.savingMatches(valorantMatch)
   //   break;
-  case 'sql':
+  case 'mysql':
     const mysql = new MysqlDB()
     await mysql.savingMatches(lolMatch)
     // await mysql.savingMatches(csMatch)

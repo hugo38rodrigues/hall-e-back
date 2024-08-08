@@ -9,8 +9,8 @@ export class Match {
     this.#urlConnection = urlConnection
   }
 
-  #checkedData = (match) => {
-    return match !== null && match !== '' && match !== undefined;
+  #checkedData = (value) => {
+    return value === null || value === '' || value === undefined;
   }
 
   #formatedDate = (date) => {
@@ -52,17 +52,18 @@ export class Match {
       const isNotEmptyData = this.#checkedData(idMatch) && this.#checkedData(date) && this.#checkedData(gameName) && this.#checkedData(leagueName) && this.#checkedData(team1) && this.#checkedData(team2)
 
       if (isNotEmptyData ) {
-        return {
-          idMatch,
-          date,
-          gameName,
-          team1,
-          team2
-        };
-      } else {
         return null;
       }
+
+      return {
+        idMatch,
+        date,
+        gameName,
+        team1,
+        team2
+      };
     });
+
     return matches.filter(item => item !== null);
   }
 }

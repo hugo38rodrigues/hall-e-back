@@ -1,10 +1,7 @@
 import {DataTypes} from 'sequelize'
-import {MysqlDB} from "../../config/db.config.js";
+import {connectionDb} from "../../config/db.config.js";
 
-const db = new MysqlDB()
-const connection = db.connection
-
-export const Favorite = connection.define(
+export const Favorite = connectionDb.define(
     'Favorites',
     {
         favoriteable_id: {

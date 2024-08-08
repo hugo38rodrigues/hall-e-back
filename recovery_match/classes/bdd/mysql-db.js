@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import {Storage} from '../interface/storage.js'
-import {Sequelize } from "sequelize"
 import {League} from "../../models/sql/league.model.js"
 import {Team} from "../../models/sql/team.model.js"
 import {Game} from "../../models/sql/game.model.js"
@@ -13,35 +12,24 @@ export class MysqlDB extends Storage {
 
     constructor() {
         super();
-        this.connectionBdd = null
     }
 
-
-    getConnexion = async () => {
+    #checkedData = async (idMatch) => {
         try {
-            this.connectionBdd = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-                host: process.env.DB_HOST,
-                dialect: 'mysql',
-                port: process.env.DB_PORT
+            const match = await Match.findOne({
+                where: { id_match: idMatch }
             });
-        } catch (error) {
-            console.log('Error Connexion', error)
-            process.exit()
-        }
-    }
 
-    #checkedData = async (match) => {
-        if (!this.connectionBdd) {
-            await this.getConnexion()
-        }
+            if (match) {
+                console.log(`Match with id_match ${idMatch} already exists.`);
+                return true;
+            }
+            console.log(`Match with id_match ${idMatch} does not exist.`);
+            return false;
 
-        const checkQuery = `SELECT COUNT(*) AS count FROM matches WHERE id_match = ?`;
-        try {
-            const [rows] = await this.connectionBdd.execute(checkQuery, [match.idMatch]);
-            return rows[0].count > 0;
         } catch (error) {
-            console.error(`Error verifying data for table Match : `, error);
-            throw error;
+            console.error('Error checking if match exists:', error);
+            throw error; // Lancer l'erreur pour la gérer plus haut
         }
     }
 
@@ -59,19 +47,12 @@ export class MysqlDB extends Storage {
                 team_1_id: team1.team_1_id,
                 team_2_id: team2.team_1_id,
             });
-
-            const exists = await this.#checkedData(match);
+            const exists = await this.#checkedData(match.id_match)
             if (exists) {
                 console.log(`Match with id ${match.idMatch} already exists in matches.`);
-            } else {
-                const insertQuery = `INSERT INTO matches (id_match, date, game_name, league_name, teams_name) VALUES (?, ?, ?, ?, ?)`
-                const values = [match.idMatch, match.date, match.gameName, match.leagueName, match.teamsName]
-                try {
-                    await this.connectionBdd.execute(insertQuery, values)
-                } catch (error) {
-                    console.log(error)
-                }
+                return
             }
+            await Match.create(match)
         }
     }
 

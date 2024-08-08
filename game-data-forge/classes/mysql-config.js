@@ -1,9 +1,9 @@
-import { Sequelize } from 'sequelize'
+import { Sequelize} from 'sequelize'
 import { Bar } from '../models/sql/bar.model.js'
 import { Comment } from '../models/sql/comment.model.js'
 import { Consumer } from '../models/sql/consumer.model.js'
 import { Like } from '../models/sql/like.model.js'
-import { Favoris } from '../models/sql/favoris.model.js'
+import { Favorite } from '../models/sql/favoris.model.js'
 import { Game } from '../models/sql/game.model.js'
 import { League } from '../models/sql/league.model.js'
 import { Team } from '../models/sql/team.model.js'
@@ -29,39 +29,40 @@ export class Mysql {
     }
 
     synchronizationDb = async () => {
-        const bar = Bar(this.connexion)
-        const comment = Comment(this.connexion)
-        const consumer = Consumer(this.connexion)
-        const like = Like(this.connexion)
-        const favoris = Favoris(this.connexion)
-        const match = Match(this.connexion)
-        const game = Game(this.connexion)
-        const league = League(this.connexion)
-        const teamName = Team(this.connexion)
+        const BarModel = Bar(this.connexion);
+        const CommentModel = Comment(this.connexion);
+        const ConsumerModel = Consumer(this.connexion);
+        const LikeModel = Like(this.connexion);
+        const FavoriteModel = Favorite(this.connexion);
+        const GameModel = Game(this.connexion);
+        const LeagueModel = League(this.connexion);
+        const TeamModel = Team(this.connexion);
+        const MatchModel = Match(this.connexion);
+
 
         if (await this.testConnexion()) {
             // Relations for Bar
-            bar.hasMany(comment);
-            bar.hasMany(like, { foreignKey: 'barId' });
+            BarModel.hasMany(CommentModel);
+            BarModel.hasMany(LikeModel, {foreignKey: 'barId'});
 
             // Relations for Consumer
-            consumer.hasMany(comment);
-            consumer.hasMany(like, { foreignKey: 'consumerId' });
-            consumer.hasMany(favoris, { foreignKey: 'consumer_id' });
+            ConsumerModel.hasMany(CommentModel);
+            ConsumerModel.hasMany(LikeModel, { foreignKey: 'consumerId' });
+            ConsumerModel.hasMany(FavoriteModel, { foreignKey: 'consumer_id' });
 
             // Relations for Like
-            like.belongsTo(consumer, { foreignKey: 'consumerId' });
-            like.belongsTo(bar, { foreignKey: 'barId' });
+            LikeModel.belongsTo(ConsumerModel, {foreignKey: 'ConsumerModelId'});
+            LikeModel.belongsTo(BarModel, {foreignKey: 'barId'});
 
             // Relations for Comment
-            comment.belongsTo(consumer, {
+            CommentModel.belongsTo(ConsumerModel, {
                 foreignKey: {
                     allowNull: false
                 },
                 onDelete: 'CASCADE',
                 onUpdate: 'CASCADE'
             });
-            comment.belongsTo(bar, {
+            CommentModel.belongsTo(BarModel, {
                 foreignKey: {
                     allowNull: false
                 },
@@ -70,70 +71,58 @@ export class Mysql {
             });
 
             // Relations for Match
-            match.belongsTo(game, {
-                foreignKey: 'gameId',
-                onDelete: 'NO ACTION',
-                onUpdate: 'CASCADE'
-            });
-            match.belongsTo(league, {
-                foreignKey: 'leagueId',
-                onDelete: 'NO ACTION',
-                onUpdate: 'CASCADE'
-            })
-            match.belongsTo(teamName, {
-                as: 'Team1',
-                foreignKey: 'team_1_id',
-                onDelete: 'NO ACTION',
-                onUpdate: 'CASCADE'
-            })
-            match.belongsTo(teamName, {
-                as: 'Team2',
-                foreignKey: 'team_2_id',
-                onDelete: 'NO ACTION',
-                onUpdate: 'CASCADE'
-            });
+            LeagueModel.hasMany(MatchModel, { foreignKey: 'leagueId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+            MatchModel.belongsTo(LeagueModel, { foreignKey: 'leagueId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
-            // Relations for Favoris
-            favoris.belongsTo(consumer, { foreignKey: 'consumer_id' });
+            GameModel.hasMany(MatchModel, { foreignKey: 'gameId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+            MatchModel.belongsTo(GameModel, { foreignKey: 'gameId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
-            favoris.belongsTo(game, {
+            TeamModel.hasMany(MatchModel, { foreignKey: 'team_1_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+            TeamModel.hasMany(MatchModel, { foreignKey: 'team_2_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+            MatchModel.belongsTo(TeamModel, { foreignKey: 'team_1_id', as: 'Team1', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+            MatchModel.belongsTo(TeamModel, { foreignKey: 'team_2_id', as: 'Team2', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+
+            // Relations for Favorite
+            FavoriteModel.belongsTo(ConsumerModel, {foreignKey: 'consumer_id'});
+
+            FavoriteModel.belongsTo(GameModel, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
-                    favoriteable_type: 'game'
+                    favoriteable_type: 'GameModel'
                 }
             });
-            game.hasMany(favoris, {
+            GameModel.hasMany(FavoriteModel, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
-                    favoriteable_type: 'game'
+                    favoriteable_type: 'GameModel'
                 }
             });
 
-            favoris.belongsTo(league, {
+            FavoriteModel.belongsTo(LeagueModel, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
-                    favoriteable_type: 'league'
+                    favoriteable_type: 'LeagueModel'
                 }
             });
-            league.hasMany(favoris, {
+            LeagueModel.hasMany(FavoriteModel, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
-                    favoriteable_type: 'league'
+                    favoriteable_type: 'LeagueModel'
                 }
             });
 
-            favoris.belongsTo(teamName, {
+            FavoriteModel.belongsTo(TeamModel, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
                     favoriteable_type: 'team'
                 }
-            })
-            teamName.hasMany(favoris, {
+            });
+            TeamModel.hasMany(FavoriteModel, {
                 foreignKey: 'favoriteable_id',
                 constraints: false,
                 scope: {
@@ -141,10 +130,15 @@ export class Mysql {
                 }
             });
 
-
-        } else {
-            console.log('Error')
+            await BarModel.sync({alter: true})
+            await ConsumerModel.sync({alter: true})
+            await GameModel.sync({alter: true})
+            await TeamModel.sync({alter: true})
+            await FavoriteModel.sync({alter: true})
+            await LeagueModel.sync({alter: true})
+            await LikeModel.sync({alter: true})
+            await CommentModel.sync({alter: true})
+            await MatchModel.sync({alter: true})
         }
-
     }
 }

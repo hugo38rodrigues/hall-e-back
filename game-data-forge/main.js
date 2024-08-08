@@ -8,6 +8,7 @@ switch(BDD_TARGET){
         const mysql = new Mysql()
         await mysql.synchronizationDb()
         console.log("############ END PROCESS FOR TABLES CREATION ############")
+        process.exit()
         break
     case 'dynamodb':
         // console.log("############ START PROCESS FOR TABLES CREATION ############")

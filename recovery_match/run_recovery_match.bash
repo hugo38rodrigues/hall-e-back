@@ -57,7 +57,7 @@ case $bdd_name in
       exit 1
     fi
     ;;
-  sql)
+  mysql)
     echo "Loading environment for MySQL"
     if [ -f "./env/.env.mysql.sh" ]; then
       source "./env/.env.mysql.sh"

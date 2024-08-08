@@ -2,11 +2,11 @@ import {DataTypes} from 'sequelize'
 import {Game} from './game.model.js'
 import {League} from './league.model.js'
 import {Team} from './team.model.js'
-import {MysqlDB} from "../../classes/bdd/mysql-db.js";
+import {connectionDb} from "../../config/db-config.js";
 
-const db = new MysqlDB()
-const connection = db.connectionBdd
-export const Match = connection.define(
+const db = await connectionDb();
+
+export const Match = db.define(
     'Matches',
     {
         id: {
@@ -22,32 +22,4 @@ export const Match = connection.define(
         date: {
             type: DataTypes.DATE
         },
-        gameId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: Game,
-                key: 'id'
-            }
-        },
-        leagueId: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: League,
-                key: 'id'
-            }
-        },
-        team_1_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: Team,
-                key: 'id'
-            }
-        },
-        team_2_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: Team,
-                key: 'id'
-            }
-        }
     })
