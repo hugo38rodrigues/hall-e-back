@@ -1,12 +1,11 @@
 import { Match } from './classes/Match.js'
 import { MysqlDB } from './classes/bdd/mysql-db.js'
-
 import {
-  BDD_TARGET,
   optionCs,
   optionLol,
   optionValorant
 } from './utils/api.utils.js'
+import { BDD_TARGET } from './utils/constants.utils.js'
 
 console.log('############ START GET DATA ############')
 const lol = new Match(optionLol)
@@ -48,6 +47,7 @@ default:
   break
 }
 console.log('############ END SAVING MATCH ############')
+process.exit(1)
 
 
 
