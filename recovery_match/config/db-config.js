@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
-import { BDD_TARGET } from '../utils/api.utils.js'
+import { BDD_TARGET } from '../utils/constants.utils.js'
 
 export const connectionDb = async () => {
   switch (BDD_TARGET) {

@@ -48,16 +48,16 @@ export class Match {
       const date = this.#formatedDate(data.begin_at)
       const gameName = data.videogame.slug
       const leagueName = data.league.name
-      let [team1, team2] = data.opponents.map(opponent => opponent.opponent.acronym) || []
-      const isNotEmptyData = this.#checkedData(idMatch) && this.#checkedData(date) && this.#checkedData(gameName) && this.#checkedData(leagueName) && this.#checkedData(team1) && this.#checkedData(team2)
-
-      if (isNotEmptyData ) {
+      const [team1, team2] = data.opponents.map(opponent => opponent.opponent.acronym) || []
+      const isEmptyData = this.#checkedData(idMatch) || this.#checkedData(date) || this.#checkedData(gameName) || this.#checkedData(leagueName) || this.#checkedData(team1) || this.#checkedData(team2)
+      if (isEmptyData ) {
         return null
       }
 
       return {
         idMatch,
         date,
+        leagueName,
         gameName,
         team1,
         team2
