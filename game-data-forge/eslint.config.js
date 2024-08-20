@@ -21,7 +21,8 @@ export default [
             'keyword-spacing': ['error', { 'before': true, 'after': true }],
             'no-extra-semi': 'error',
             'object-curly-spacing': ['error', 'always', { 'objectsInObjects': false }],
-            'comma-spacing': ['error', { 'before': false, 'after': true }]
+            'comma-spacing': ['error', { 'before': false, 'after': true }],
+            'indent': ['error', 2]
 
         }
     },

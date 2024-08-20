@@ -9,7 +9,7 @@
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.606.0",
     "@aws-sdk/lib-dynamodb": "^3.606.0",
-    "@eslint/js": "^9.8.0",
+    "@eslint/js": "^9.9.0",
     "@stylistic/eslint-plugin-js": "^2.6.4",
     "aws-sdk": "^2.1622.0",
     "axios": "^1.6.8",
