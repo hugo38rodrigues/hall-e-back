@@ -1,9 +1,9 @@
-import { Storage } from '../interface/storage.js';
+import { Storage } from '../interface/storage.js'
 
 export class MongoDb extends Storage {
   #connectionBdd
 
-  constructor() {
+  constructor () {
     super()
     this.#connectionBdd = {}
   }

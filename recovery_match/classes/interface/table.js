@@ -1,8 +1,7 @@
 export class Table {
-  async initConnexion() {
-
+  async initConnexion () {
   }
-  async createdTables() {
+  async createdTables () {
     throw new Error('save method must be implement')
   }
 }
