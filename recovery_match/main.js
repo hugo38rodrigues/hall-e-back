@@ -1,11 +1,14 @@
 import { Match } from './classes/Match.js'
 import { MysqlDB } from './classes/bdd/mysql-db.js'
+import { setupAssociations } from './game-data-forge/db/mysql/association.js'
+import { db } from './game-data-forge/db/mysql/index.js'
 import {
   optionCs,
   optionLol,
   optionValorant
 } from './utils/api.utils.js'
-import { BDD_TARGET } from './utils/constants.utils.js'
+
+import { BDD_TARGET, DEV_MODE } from './utils/constants.utils.js'
 
 console.log('############ START GET DATA ############')
 const lol = new Match(optionLol)
@@ -30,6 +33,13 @@ switch (BDD_TARGET) {
 //   break;
 // }
 case 'mysql': {
+
+  setupAssociations()
+
+  if (DEV_MODE === 'true'){
+    db.sequelize.sync({ force: true })
+  }
+
   const mysql = new MysqlDB()
   await mysql.savingMatches(lolMatch)
   // await mysql.savingMatches(csMatch)

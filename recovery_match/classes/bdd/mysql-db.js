@@ -1,89 +1,99 @@
-import dotenv from 'dotenv';
-import {Storage} from '../interface/storage.js'
-import {League} from "../../models/sql/league.model.js"
-import {Team} from "../../models/sql/team.model.js"
-import {Game} from "../../models/sql/game.model.js"
-import {Match} from "../../models/sql/match.model.js"
+import dotenv from 'dotenv'
+import { Storage } from '../interface/storage.js'
+import { db } from '../../game-data-forge/db/mysql/index.js'
 
-dotenv.config();
+dotenv.config()
 
 export class MysqlDB extends Storage {
-    connectionBdd
 
-    constructor() {
-        super();
+  constructor () {
+    super()
+  }
+
+  #insertGame = async (name) => {
+    try {
+      const [game, created] = await db.Game.findOrCreate({
+        where: { name: name },
+      })
+
+      return game.dataValues.id
+      
+      
+    } catch (error) {
+      console.error('Error checking if game exists:', error)
+      throw error
     }
+  }
 
-    #checkedData = async (idMatch) => {
-        try {
-            const match = await Match.findOne({
-                where: { id_match: idMatch }
-            });
+  #insertLeague = async (name) => {
+    try {
+      const [league, created] = await db.League.findOrCreate({
+        where: { name: name },
+        defaults: { name: name },
+      })
+      return league.dataValues.id
 
-            if (match) {
-                console.log(`Match with id_match ${idMatch} already exists.`);
-                return true;
-            }
-            console.log(`Match with id_match ${idMatch} does not exist.`);
-            return false;
+    } catch (error) {
+      console.error('Error checking if league exists:', error)
+      throw error
+    }
+  }
 
-        } catch (error) {
-            console.error('Error checking if match exists:', error);
-            throw error; // Lancer l'erreur pour la gérer plus haut
+  #insertTeams = async (name1, name2) => {
+    try {
+      // Récupérer ou créer les deux équipes en une seule requête
+      const teams = await Promise.all([
+        db.Team.findOrCreate({ where: { name: name1 }, defaults: { name: name1 }}),
+        db.Team.findOrCreate({ where: { name: name2 }, defaults: { name: name2 }}),
+      ])
+      
+      const [team1, team2] = teams.map((team) => team[0].dataValues.id)
+      
+      if (team1 && team2){
+        return [team1, team2]
+      }
+    } catch (error) {
+      console.error('Error inserting teams:', error)
+      throw error
+    }
+  }
+
+  #insertMatch = async (matches) => {
+    for (const value of matches) {
+      try {
+        const leagueId = await this.#insertLeague(value.leagueName)
+        const gameId = await this.#insertGame(value.gameName)
+        const [team1Id, team2Id] = await this.#insertTeams(value.team1, value.team2)
+
+        const [match, create] = await db.Match.findOrCreate({
+          where:{ 
+            id_match: value.idMatch
+          },
+          defaults:{
+            id_match: value.idMatch,
+            date: value.date,
+            gameId: gameId,
+            leagueId: leagueId,
+            team1Id: team1Id,
+            team2Id: team2Id,
+          }
+        })
+
+        if (match){
+          console.log(match)
         }
+        
+      } catch (error) {
+        console.error(`Error inserting match with id ${value.idMatch}:`, error)
+      }
     }
+  }
 
-    #insertMatchInDb = async (matches) => {
-        for (const value of matches) {
-            const game = await Game.create({name: value.gameName});
-            const league = await League.create({name: value.leagueName});
-            const team1 = await Team.create({name: value.team1});
-            const team2 = await Team.create({name: value.team2});
-            const match = await Match.create({
-                id_match: value.idMatch,
-                date: value.date,
-                gameId: game.gameId,
-                leagueId: league.leagueId,
-                team_1_id: team1.team_1_id,
-                team_2_id: team2.team_1_id,
-            });
-            const exists = await this.#checkedData(match.id_match)
-            if (exists) {
-                console.log(`Match with id ${match.idMatch} already exists in matches.`);
-                return
-            }
-            await Match.create(match)
-        }
+  savingMatches = async (matches) => {
+    try {
+      await this.#insertMatch(matches)
+    } catch (error) {
+      console.error('Insertion error :', error)
     }
-
-
-    #closeConnection = async () => {
-        if (this.connectionBdd) {
-            try {
-                await this.connectionBdd.end();
-                console.log("############ END CONNEXION FOR DB  ############");
-            } catch (endError) {
-                console.error('Erreur lors de la fermeture de la connexion :', endError);
-            } finally {
-                this.connectionBdd = null; // Réinitialisation de la connexion
-            }
-        }
-    }
-
-
-    savingMatches = async (matches) => {
-        try {
-            await this.#insertMatchInDb(matches);
-        } catch (error) {
-            console.error('Insertion error :', error);
-            // } finally {
-            //     try {
-            //         await this.#closeConnection()
-            //         console.log('Closed database connection');
-            //     } catch (endError) {
-            //         console.error('Error closing connection :', endError);
-            //     }
-            // }
-        }
-    }
+  }
 }
