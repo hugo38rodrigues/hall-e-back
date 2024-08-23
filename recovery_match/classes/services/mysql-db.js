@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
+import { db } from '../../db/mysql/index.js'
 import { Storage } from '../interface/storage.js'
-import { db } from '../../game-data-forge/db/mysql/index.js'
 
 dotenv.config()
 

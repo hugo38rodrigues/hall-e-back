@@ -1,1 +1,0 @@
-./creation-tables.sh --bdd=<NAME_OF_DATABASE>

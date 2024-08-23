@@ -1,11 +1,9 @@
 import { Match } from './classes/Match.js'
-import { MysqlDB } from './classes/bdd/mysql-db.js'
-import { setupAssociations } from './game-data-forge/db/mysql/association.js'
-import { db } from './game-data-forge/db/mysql/index.js'
+import { MysqlDB } from './classes/services/mysql-db.js'
+import { setupAssociations } from './db/mysql/association.js'
+import { db } from './db/mysql/index.js'
 import {
-  optionCs,
-  optionLol,
-  optionValorant
+  optionLol
 } from './utils/api.utils.js'
 
 import { BDD_TARGET, DEV_MODE } from './utils/constants.utils.js'
@@ -32,6 +30,7 @@ switch (BDD_TARGET) {
 //   await dynamodb.savingMatches(valorantMatch)
 //   break;
 // }
+
 case 'mysql': {
 
   setupAssociations()
@@ -52,6 +51,7 @@ case 'mysql': {
   //   await mongodb.savingMatches(valorant)
   break
 }
+
 default:
   console.log('Error bdd target is empty')
   break

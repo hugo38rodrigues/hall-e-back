@@ -1,6 +1,6 @@
 import { setupAssociations } from './db/mysql/association.js'
 import { db } from './db/mysql/index.js'
-import { BDD_TARGET, DEV_MODE } from '../utils/constants.utils.js'
+import { BDD_TARGET, DEV_MODE } from './utils/constants.utils.js'
 export const createdTables = async () => {
   
 
