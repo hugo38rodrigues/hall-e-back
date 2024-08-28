@@ -10,5 +10,5 @@ package-lock.json
 *.sln
 *.sw?
 .idea/*
-env/.env*
+env/.env.*
 *.plantuml
