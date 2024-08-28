@@ -1,0 +1,7 @@
+export BDD_TARGET="mongo"
+export DB_PORT="27017"
+export MONGO_INITDB_ROOT_USERNAME=""
+export MONGO_INITDB_ROOT_PASSWORD=""
+export DB_NAME="hall-e"
+export DB_HOST="mongodb://127.0.0.1:27017/hall-e"
+export DEV_MODE=""
