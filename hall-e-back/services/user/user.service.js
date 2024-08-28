@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 export class UserService {
-    constructor() {
+    constructor () {
     }
-
+    
     getUser = async (params) => {}
 
     getUserById = async (id, role) => {}

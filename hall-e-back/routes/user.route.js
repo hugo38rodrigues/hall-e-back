@@ -7,7 +7,7 @@ const user = new UserController()
 router.post('/sign-in', user.createAccount)
 router.post('/connexion', user.connexion)
 router.delete('/', user.deleteUser)
-router.put ('/',user.updateProfile)
+router.put ('/', user.updateProfile)
 
 
 export default router
