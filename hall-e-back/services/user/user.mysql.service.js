@@ -1,16 +1,19 @@
-import { Consumer } from '../../models/sql/consumer.model.js'
-import { Bar } from '../../models/sql/bar.model.js'
-import {UserService} from "./user.service.js";
+import { UserService } from './user.service.js'
+import { db } from '../../db/mysql/index.js'
 
 export class UserMysqlService extends UserService{
-  constructor() {
-    super();
+  
+  constructor () {
+    super()
+    this.db = db
   }
 
+  
   getUser = async (params) => {
     if (params.role === 'consumer') {
-      return await Consumer.findAll({
-        attributes: ['email', 'lastName', 'firstName', 'favoris_match', 'like_bar', 'role'],
+      this.db.Consumer.getFavori
+      return await this.db.Consumer.findOne({
+        attributes: ['email', 'lastName', 'firstName', 'role'],
         where: {
           email: params.email,
           password: params.password,
@@ -18,8 +21,8 @@ export class UserMysqlService extends UserService{
         }
       })
     } else if (params.role === 'bar') {
-      return await Bar.findAll({
-        attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'like_consumer', 'role'],
+      return await this.db.Bar.findOne({
+        attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'role'],
         where: {
           email: params.email,
           password: params.password,
@@ -31,14 +34,14 @@ export class UserMysqlService extends UserService{
 
   getUserById = async (id, role) => {
     if (role === 'consumer') {
-      return await Consumer.findAll({
+      return await this.db.Consumer.findOne({
         attributes: ['id'],
         where: {
           id: id
         }
       })
     } else if (role === 'bar') {
-      return await Bar.findAll({
+      return await this.db.Bar.findOne({
         attributes: ['id'],
         where: {
           id: id
@@ -52,29 +55,59 @@ export class UserMysqlService extends UserService{
   addUser = async (params) => {
     if (params.role === 'consumer') {
       try {
-        return await Consumer.create({
-          'firstName': params.firstName,
-          'lastName': params.lastName,
-          'email': params.email,
-          'password': params.password
-        })
+        return await this.db.Consumer.create(params)
       } catch (error) {
         return error
       }
-    } else if (params.role === 'bar') {
+    } 
+
+    if (params.role === 'bar') {
       try {
-        return await Bar.create({
-          'name': params.name,
-          'address': params.address,
-          'email': params.email,
-          'password': params.password,
-          'role': params.role
-        })
+        return await this.db.Bar.create(params)
       } catch (error) {
         return error
       }
     }
   }
+
+  updateUser = async (id, params) => {
+    if (params.role === 'consumer') {
+      try {
+        return await db.Consumer.update(params, {
+          where: { id: id },
+        }
+        )
+      } catch (error){
+        return error
+      }
+    }
+
+    if (params.role === 'bar') {
+      try {
+        return await db.Bar.update(params, {
+          where: { id: id },
+        })
+      } catch (error){
+        return error
+      }
+    }
+  }
+
+  deleteUser = async (id, role) => {
+    if (role === 'consumer'){
+      await db.Consumer.destroy({
+        where: {
+          id: id
+        }
+      })
+    }
+
+    if (role === 'bar'){
+      await db.Bar.destroy({
+        where: {
+          id: id
+        }
+      })
+    }
+  }
 }
-
-
