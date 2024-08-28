@@ -1,15 +1,8 @@
-import {DataTypes} from 'sequelize'
-import {connectionDb} from "../../config/db.config.js";
 
-export const Bar = connectionDb.define(
+export const barModel = (sequelize, DataTypes) => {
+return sequelize.define(
     'Bars',
     {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true,
-            allowNull: false
-        },
         address: {
             type: DataTypes.STRING,
             allowNull: false
@@ -20,7 +13,8 @@ export const Bar = connectionDb.define(
         },
         email: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         price: {
             type: DataTypes.INTEGER,
@@ -29,17 +23,15 @@ export const Bar = connectionDb.define(
             type: DataTypes.STRING,
         },
         photo: {
-            type: DataTypes.STRING
+            type: DataTypes.BLOB('long')
         },
         password: {
             type: DataTypes.STRING(1234),
             allowNull: false
-        },
-        like_consumer: {
-            type: DataTypes.INTEGER
         },
         role: {
             type: DataTypes.STRING,
             allowNull: false
         }
     })
+}

@@ -1,15 +1,6 @@
-import {DataTypes} from 'sequelize'
-import { connectionDb } from '../../config/db.config.js'
 
-export const Consumer = connectionDb.define(
-    'Consumers',
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true,
-            allowNull: false
-        },
+export const consumerModel = (sequelize, DataTypes) => {
+    return sequelize.define( 'Consumers', {
         firstName: {
             type: DataTypes.STRING,
             allowNull: false
@@ -26,15 +17,10 @@ export const Consumer = connectionDb.define(
             type: DataTypes.STRING(1234),
             allowNull: false
         },
-        favoris_match: {
-            type: DataTypes.INTEGER,
-        },
-        like_bar: {
-            type: DataTypes.INTEGER
-        },
         role: {
             type: DataTypes.STRING,
             defaultValue: 'consumer',
             allowNull: false
         }
     })
+}

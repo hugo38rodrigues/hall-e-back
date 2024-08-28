@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import { db } from '../../db/mysql/index.js'
+import { db } from '../../../hall-e-back/db/mysql/index.js'
 import { Storage } from '../interface/storage.js'
 
 dotenv.config()
@@ -16,6 +16,10 @@ export class MysqlDB extends Storage {
         where: { name: name },
       })
 
+      if (created) {
+        console.log(`Game created with this name: ${name}`)
+      }
+
       return game.dataValues.id
       
       
@@ -31,6 +35,11 @@ export class MysqlDB extends Storage {
         where: { name: name },
         defaults: { name: name },
       })
+      
+      if (created) {
+        console.log(`League created with this name: ${name}`)
+      }
+
       return league.dataValues.id
 
     } catch (error) {
@@ -65,6 +74,7 @@ export class MysqlDB extends Storage {
         const gameId = await this.#insertGame(value.gameName)
         const [team1Id, team2Id] = await this.#insertTeams(value.team1, value.team2)
 
+        // eslint-disable-next-line no-unused-vars
         const [match, create] = await db.Match.findOrCreate({
           where:{ 
             id_match: value.idMatch
@@ -79,8 +89,8 @@ export class MysqlDB extends Storage {
           }
         })
 
-        if (match){
-          console.log(match)
+        if (create){
+          console.log(`Match created with ${value.idMatch}`)
         }
         
       } catch (error) {
