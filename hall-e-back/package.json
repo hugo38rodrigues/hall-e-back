@@ -7,18 +7,21 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "lint": "npx eslint",
-    "fix-eslint": "npx eslint --fix "
+    "fix-eslint": "npx eslint --fix ",
+    "swagger-autogen": "node ./docs/swagger.js"
   },
   "type": "module",
   "author": "Xwdrblue",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@stylistic/eslint-plugin-js": "^2.6.4",
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "@stylistic/eslint-plugin-js": "^2.6.4",  
     "globals": "^15.8.0",
     "mysql2": "^3.10.3",
-    "sequelize": "^6.37.3"
+    "sequelize": "^6.37.3",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1"
   }
 }
