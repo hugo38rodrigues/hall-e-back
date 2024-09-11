@@ -23,5 +23,9 @@
     "sequelize": "^6.37.3",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1"
+  },
+  "dependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "yamljs": "^0.3.0"
   }
 }

@@ -4,8 +4,9 @@ import userRoutes from './routes/user.route.js'
 import { BDD_TARGET, DEV_MODE } from './utils/constants.js'
 import { setupAssociations } from './db/mysql/association.js'
 import { db } from './db/mysql/index.js'
+import YAML from 'yamljs'
 import swaggerUi from 'swagger-ui-express'
-import {swaggerDocument} from './docs/swagger_output.json' assert { type: 'json' }
+
 
 // import consumerRoutes from './routes/userRoute.js';
 // import barRoutes from './routes/animalRoute.js';
@@ -13,6 +14,13 @@ import {swaggerDocument} from './docs/swagger_output.json' assert { type: 'json'
 
 const app = express()
 const port = process.env.PORT
+
+
+// Charger le fichier principal swagger.yaml dans ./docs
+const swaggerDocument = YAML.load('./docs/swagger.yaml')
+console.log(swaggerDocument)
+// Configurer Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 app.use(express.json())
 app.use(cors())
@@ -31,16 +39,12 @@ switch (BDD_TARGET){
     }
 }
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
 
 // app.use('/v1/consumer', consumerRoutes);
 app.use('/api/v1/user', userRoutes)
 // app.use('/v1/bar', barRoutes);
 // app.use('/v1/admin', adminRoutes);
-
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

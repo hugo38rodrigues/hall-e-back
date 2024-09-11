@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: Hall-E API
+  version: 1.0.0
+  description: API de l'application Hall-E
+  contact:
+    name: hall-esport38@gmail.com
+servers:
+  - url: http://localhost:5000
+
+paths:
+  /api/v1/user/sign-in:
+    post:
+      summary: Inscription d'un Consumer
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/Consumer'
+                - $ref: '#/components/schemas/Bar'
+      responses:
+        200:
+          description: The user1 was successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: success 
+
+  
+
+
+components:
+  schemas:
+    Consumer:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: Prénom de l'utilisateur
+        lastName:
+          type: string
+          description: Nom de l'utilisateur
+        password:
+          type: string
+          description: Token d'authentification
+        email:
+          type: string
+          description: The email of the user
+        role: 
+          type: string
+          enum: [consumer]
+          description: Role of user 
+
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - role
+      example:
+        firstName: John
+        lastName: Doe
+        password: 
+        email: johndoe@example.com
+        role: consumer
+
+    Bar:
+      type: object
+      required:
+        - email
+        - role
+      properties:
+        role:
+          type: string
+          enum: [bar]
+          description: Role de l'utilisateur
+        email:
+          type: string
+          description: Email de l'utilisateur
+      example:
+        email: johndoe@example.com
+        role: bar 
+        
+        
+
+
