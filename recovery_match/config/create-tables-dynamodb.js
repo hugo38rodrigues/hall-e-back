@@ -48,8 +48,7 @@ export class DynamoDbTables extends Table {
     if (!this.#connexion) {
       await this.#initConnexion()
     }
-
-
+    
     try {
       await this.#connexion.send(new DescribeTableCommand(this.#table.TableName))
       console.log(`The ${this.#table.TableName} table already exists.`)

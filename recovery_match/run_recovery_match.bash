@@ -46,8 +46,9 @@ echo "Data retrieval from API for Hall-e database"
 
 echo -e "\n##################################"
 # Execute database creation based on bdd_name
+echo$
 case $bdd_name in
-  dynamodb)
+  dynamo)
     echo "Loading environment for DynamoDB"
     if [ -f "./env/.env.dynamodb.sh" ]; then
       source "./env/.env.dynamodb.sh"
@@ -67,10 +68,10 @@ case $bdd_name in
       exit 1
     fi
     ;;
-  mongodb)
+  mongo)
     echo "Loading environment for MongoDB"
-    if [ -f "./env/.env.mongodb.sh" ]; then
-      source "./env/.env.mongodb.sh"
+    if [ -f "./env/.env.mongo.sh" ]; then
+      source "./env/.env.mongo.sh"
       npm run load-data
     else
       echo "Environment file for MongoDB not found!"
