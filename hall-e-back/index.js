@@ -14,7 +14,7 @@ const port = process.env.PORT
 app.use(express.json())
 app.use(cors())
 app.disable('x-powered-by')
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
 
 if (DEV_MODE === 'true') {
     db.sequelize.sync()
