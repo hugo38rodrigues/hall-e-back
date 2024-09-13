@@ -1,4 +1,3 @@
-export TOKEN_API_PANDASCORE=""
 export BDD_TARGET=""
 export BDD_REGION=""
 export ENDPOINT=""
