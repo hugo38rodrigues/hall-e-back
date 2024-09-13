@@ -1,3 +1,4 @@
+export TOKEN_API_PANDASCORE=""
 export BDD_TARGET="mysql"
 export DB_PORT=3306
 export DB_USER=""

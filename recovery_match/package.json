@@ -3,13 +3,11 @@
   "author": "Xwdrblue",
   "type": "module",
   "license": "ISC",
-
   "scripts": {
     "lint": "npx eslint",
     "fix-eslint": "npx eslint --fix ",
     "load-data": "node main.js"
   },
-
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.606.0",
     "@aws-sdk/lib-dynamodb": "^3.606.0",
@@ -19,8 +17,8 @@
     "axios": "^1.6.8",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "eslint": "^9.9.0",
     "mysql2": "^3.11.0",
-    "sequelize": "^6.37.3",
-    "eslint": "^9.9.0"
+    "sequelize": "^6.37.3"
   }
 }

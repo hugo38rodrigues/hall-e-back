@@ -37,44 +37,46 @@ export const setupAssociations = () => {
   })
 
   // Relation 1:N avec Comment (un consumer peut écrire plusieurs Comments)
- 
-
-   db.Bar.hasMany(db.Comment, {
-      foreignKey: 'barId',
-      allowNull: false
-    })
+  db.Bar.hasMany(db.Comment, {
+    foreignKey: 'barId',
+    allowNull: false
+  })
 
     
-    // Relation N:1 avec Bar (un commentaire appartient à un bar)
-    db.Comment.belongsTo(db.Bar, {
-      foreignKey: 'barId',
-      allowNull: false
-    })
+  // Relation N:1 avec Bar (un commentaire appartient à un bar)
+  db.Comment.belongsTo(db.Bar, {
+    foreignKey: 'barId',
+    allowNull: false
+  })
 
-    // Relation N:1 avec Consumer (un commentaire appartient à un consumer)
-    db.Comment.belongsTo(db.Consumer, {
-      foreignKey: 'consumerId',
-      as: 'Consumers',
-      allowNull: false
-    })
+  // Relation N:1 avec Consumer (un commentaire appartient à un consumer)
+  db.Comment.belongsTo(db.Consumer, {
+    foreignKey: 'consumerId',
+    as: 'Consumers',
+    allowNull: false
+  })
 
-    db.League.belongsToMany(db.Consumer, {
-      through: 'ConsumerLeagueFavorites',
-      as: 'favoritedByConsumers',
-      allowNull: false
-    })
+  db.League.belongsToMany(db.Consumer, {
+    through: 'ConsumerLeagueFavorites',
+    as: 'favoritedByConsumers',
+    allowNull: false
+  })
 
-    db.Game.belongsToMany(db.Consumer, {
-      through: 'ConsumerGameFavorites',
-      as: 'favoritedByConsumers',
-      allowNull: false
-    })
+  db.Game.belongsToMany(db.Consumer, {
+    through: 'ConsumerGameFavorites',
+    as: 'favoritedByConsumers',
+    allowNull: false
+  })
 
 
-    // Relation N:M avec Consumer (favoris)
-    db.Team.belongsToMany(db.Consumer, {
-      through: 'ConsumerTeamFavorites',
-      as: 'favoritedByConsumers',
-      allowNull: false
-    })
+  // Relation N:M avec Consumer (favoris)
+  db.Team.belongsToMany(db.Consumer, {
+    through: 'ConsumerTeamFavorites',
+    as: 'favoritedByConsumers',
+    allowNull: false
+  })
+
+  // Relation N:M avec Bar et Match
+  db.Bar.belongsToMany(db.Match, { through: db.BarMatch })
+  db.Match.belongsToMany(db.Bar, { through: db.BarMatch })
 }

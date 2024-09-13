@@ -1,3 +1,4 @@
+export TOKEN_API_PANDASCORE=""
 export BDD_TARGET="mongo"
 export DB_PORT="27017"
 export MONGO_INITDB_ROOT_USERNAME=""

@@ -1,4 +1,5 @@
 import { UserMysqlService } from '../services/user/user.mysql.service.js'
+import { ConsumerMysqlService } from '../services/consumer/consumer.mysql.service.js'
 
 export const userInstance = (bddTarget) => {
     switch (bddTarget) {
@@ -27,13 +28,15 @@ export const userInstance = (bddTarget) => {
 //     }
 // }
 
-// export const consumerInstance = (bddTarget) => {
-//     switch (bddTarget){
-//         case 'mysql':
-//             return new ConsumerMysqlService()
-//         case 'mangodb':
-//             return new ConsumerMangoService()
-//         case 'dynamodb':
-//             return new ConsumerDynamoService()
-//     }
-// }
+export const consumerInstance = (bddTarget) => {
+    switch (bddTarget){
+        case 'mysql':
+            return new ConsumerMysqlService()
+        // case 'mangodb':
+            // return new ConsumerMangoService()
+        // case 'dynamodb':
+            // return new ConsumerDynamoService()
+        default: 
+        console.log(`${bddTarget} is not supported`)
+    }
+}
