@@ -11,7 +11,7 @@ servers:
 paths:
   /api/v1/user/sign-in:
     post:
-      summary: Inscription d'un Consumer
+      summary: Inscription d'un utilisateur
       tags: [Users]
       requestBody:
         required: true
@@ -21,9 +21,26 @@ paths:
               oneOf:
                 - $ref: '#/components/schemas/Consumer'
                 - $ref: '#/components/schemas/Bar'
+            examples: 
+              consumer:
+                summary: An example of a consumer
+                value:
+                  firstName: John
+                  lastName: Doe
+                  password: 
+                  email: johndoe@example.com
+                  role: consumer
+              bar: 
+                summary: An example of a bar
+                value:
+                  firstName: John
+                  lastName: Doe
+                  password: 
+                  email: johndoe@example.com
+                  role: bar
       responses:
         200:
-          description: The user1 was successfully created
+          description: The user was successfully created
           content:
             application/json:
               schema:
@@ -33,7 +50,96 @@ paths:
                     type: string
                     example: success 
 
-  
+  /api/v1/user/connexion:
+    post:
+      summary: Connexion d'un Utilisateur
+      tags: [Users]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Connexion'      
+      responses:
+        200:
+          description: The consumer/bar was successfully connexion
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                consumer:
+                  summary: An example of a consumer
+                  value:
+                    id: 1
+                    firstName: John
+                    lastName: Doe
+                    isAuthenticated: true 
+                    email: johndoe@example.com
+                    role: consumer
+                bar: 
+                  summary: An example of a bar
+                  value:
+                    id: 1
+                    firstName: John
+                    lastName: Doe
+                    isAuthenticated: true 
+                    email: johndoe@example.com
+                    role: bar
+        401:
+          description: Inforamtions is missing
+          content:
+            text/paint:
+              schema:
+                type: string
+              examples: 
+                
+  /api/v1/user/:
+      delete:
+        summary: Supprésion d'un Utilisateur
+        tags: [Users]
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                schema:
+                $ref: '#/components/schemas/Delete'
+              examples:
+                consumer:
+                  summary: An example of a consumer
+                  value:
+                    id: 1
+                    role: consumer
+                bar: 
+                  summary: An example of a bar
+                  value:
+                    id: 1
+                    role: bar
+        responses:
+          200:
+            description: The consumer/bar was successfully delete compte
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message: 
+                      type: string
+                      description: "message success"
+                    isDelete: 
+                      type: bool
+                      description: boolean de retour
+                example:
+                  message: "User delete with success"
+                  isDelete: true
+          500:
+            description: Erreur server
+            content:
+              text/paint:
+                schema:
+                  type: string
+                  example: Erreur server
 
 
 components:
@@ -57,19 +163,43 @@ components:
           type: string
           enum: [consumer]
           description: Role of user 
-
       required:
         - firstName
         - lastName
         - email
         - password
         - role
+    
+    Delete:
+      type: object
+      properties:
+        id:
+          type: string
+          description: user id
+        role: 
+          type: string
+          description: Role of user  
+      required:
+        - id
+        - role
+
+    Connexion:
+      type: object
+      properties:
+        password:
+          type: string
+          description: Token d'authentification
+        email:
+          type: string
+          description: The email of the user
+
+      required:
+        - email
+        - password
       example:
-        firstName: John
-        lastName: Doe
         password: 
         email: johndoe@example.com
-        role: consumer
+
 
     Bar:
       type: object

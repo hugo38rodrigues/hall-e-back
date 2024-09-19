@@ -182,7 +182,7 @@ export class UserController {
     let params
     try {
       if (!req.body) {
-        return res.status(500).json({ message: 'Missing params' })
+        return res.status(401).json({ message: 'Missing params' })
       }
 
       if (req.body.role === 'consumer'){
@@ -194,7 +194,7 @@ export class UserController {
       }
 
       else {
-        return res.status(500).json({ message: 'Role must be consumer or bar' })
+        return res.status(401).json({ message: 'Role must be consumer or bar' })
       }
       
       if (!params){
@@ -221,7 +221,7 @@ export class UserController {
   connexion = async (req, res) => {
     try {
       if (!req.body) {
-        return res.status(500).json({ message: 'Missing params' })
+        return res.status(401).json({ message: 'Missing params' })
       }
 
       const params = this.#connexionValidationFrom(req.body, res)
@@ -246,18 +246,18 @@ export class UserController {
     try {
       
       if (!req.body) {
-        return res.status(500).json({ message: 'Missing body params' })
+        return res.status(401).json({ message: 'Missing body params' })
       }
 
       const isRole = IS_STRING.test(req.body.role)
       const isIdUser = IS_NUMBER.test(req.body.id)
 
       if (!isRole){
-        return res.status(500).json({ message: 'Role must be string' })
+        return res.status(401).json({ message: 'Role must be string' })
       }
 
       if (!isIdUser){
-        return res.status(500).json({ message: 'Id must be integer' })
+        return res.status(401).json({ message: 'Id must be integer' })
       }
 
       const user = userInstance(this.#bddTarget)
@@ -279,13 +279,13 @@ export class UserController {
   updateProfile = async (req, res) => {
     try {
       if (!req.body) {
-        return res.status(500).json({ message: 'Missing params' })
+        return res.status(401).json({ message: 'Missing params' })
       }
 
       const isId = IS_NUMBER.test(req.body.id)
       
       if (!isId){
-        return res.status(500).json({ message: 'Id must be integer' })
+        return res.status(401).json({ message: 'Id must be integer' })
       }
 
       const params = this.#updateFormValidation(req.body, res)
@@ -298,7 +298,7 @@ export class UserController {
       const idUser = await user.updateUser(req.body.id, params)
 
       if (!idUser){
-        res.status(500).json({ message: 'Impossible to update profile' })
+        res.status(404).json({ message: 'Impossible to update profile' })
       }
       res.status(200).json({ message: 'Update  account' })
     }
@@ -307,8 +307,5 @@ export class UserController {
       return res.status(500).json({ message: 'Internal server error' })
     }
   }
-
-
-
 }
 
