@@ -1,5 +1,5 @@
-import { ConsumerService } from './consumer.service.js'
 import { db } from '../../db/mysql/index.js'
+import { ConsumerService } from './consumer.service.js'
 
 export class ConsumerMysqlService extends ConsumerService {
   
@@ -21,12 +21,114 @@ export class ConsumerMysqlService extends ConsumerService {
     })
     return matches
   }
-  
-  addFavoritesMatch = async () => {}
-  addFavoritesGame = async () => {}
-  addFavoritesLeague = async () => {}
-  addFavoritesTeam = async () => {}
 
+  getConsumer =  async (consumerId) => {
+    
+    return  await db.Consumer.findByPk(consumerId)
+  }
+
+  getGame = async (gameId) => {
+    
+    return await db.Game.findByPk(gameId)
+  }
+
+  getTeam = async (teamId) => {
+    
+    return await db.Team.findByPk(teamId)
+  }
+
+  getLeague = async (leagueId) => {
+    return await db.League.findByPk(leagueId)
+  }
+ 
+  addFavoriteGame = async (consumer, game ) => {
+
+    try {    
+      const favoriteGame = await consumer.addFavoriteGame(game)
+      if (favoriteGame) {
+        return favoriteGame
+      }
+      return false
+      
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  removeFavoriteGame = async (consumer, game) =>{
+    try {    
+      const favoriteGame = await consumer.removeFavoriteGame(game)
+      if (favoriteGame) {
+        return favoriteGame
+      }
+      return false
+    }
+    catch (error){
+      console.log(error)
+    }
+    
+  }
+
+  addFavoriteTeam = async (consumer, team) => {
+
+    try {    
+      const favoriteTeam = await consumer.addFavoriteTeam(team)
+      if (favoriteTeam) {
+        return favoriteTeam
+      }
+      return false
+      
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  removeFavoriteTeam = async (consumer, team) =>{
+    try {    
+      const favoriteTeam = await consumer.removeFavoriteTeam(team)
+      
+
+      if (favoriteTeam) {
+        return favoriteTeam
+      }
+      return false
+    }
+    catch (error){
+      console.log(error)
+    }
+    
+  }
+
+  addFavoriteLeague = async (consumer, league) => {
+    try {    
+      const favoriteLeague = await consumer.addFavoriteLeague(league)
+      if (favoriteLeague) {
+        return favoriteLeague
+      }
+      return false
+      
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  removeFavoriteLeague = async (consumer, league) =>{
+    try {    
+      const favoriteLeague = await consumer.removeFavoriteLeague(league)
+
+      if (favoriteLeague) {
+        return favoriteLeague
+      }
+      return false
+    }
+    catch (error){
+      console.log(error)
+    }
+    
+  }
   addLikeBar = async () => {}
   addComments = async () => {}
 }

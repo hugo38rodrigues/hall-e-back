@@ -4,6 +4,10 @@ export class ConsumerService {
 
   getMatch = async () => {}
   addFavoritesMatch = async (idMatches) => {}
-  addLikeBar = async (idBar) => {}
-  addComments = async (comments, idBar) => {}
+  addFavoritesGame = async () => {}
+  addFavoritesLeague = async () => {}
+  addFavoritesTeam = async () => {}
+  addLikeBar = async () => {}
+  addComments = async () => {}
+
 }

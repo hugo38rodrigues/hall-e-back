@@ -1,5 +1,5 @@
-import { UserService } from './user.service.js'
 import { db } from '../../db/mysql/index.js'
+import { UserService } from './user.service.js'
 
 export class UserMysqlService extends UserService{
   
@@ -12,6 +12,20 @@ export class UserMysqlService extends UserService{
   getUser = async (params) => {
     const consumer = await this.db.Consumer.findOne({
       attributes: ['email', 'lastName', 'firstName', 'role'],
+      include: [
+        {
+          model: db.Game,
+          as: 'favoriteGames',  // Inclure les jeux favoris
+        },
+        {
+          model: db.League,
+          as: 'favoriteLeagues',  // Inclure les ligues favorites
+        },
+        {
+          model: db.Team,
+          as: 'favoriteTeams',  // Inclure les équipes favorites
+        }
+      ],
       where: {
         email: params.email,
         password: params.password,
