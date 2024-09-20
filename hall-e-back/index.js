@@ -5,21 +5,17 @@ import { db } from './db/mysql/index.js'
 import consumerRoutes from './routes/consumer.route.js'
 import userRoutes from './routes/user.route.js'
 import { BDD_TARGET, DEV_MODE } from './utils/constants.js'
-import { Midleware } from './utils/midleware.js'
+
 // import barRoutes from './routes/animalRoute.js';
 // import adminRoutes from './routes/alertRoute.js';
 
 const app = express()
 const port = process.env.PORT
-const middleware = new Midleware()
+
 
 app.use(express.json())
 app.use(cors())
 app.disable('x-powered-by')
-app.use('/v1/user/connexion', (req, res, next) => {
-  next()
-})
-app.use(middleware.verifyRoleInBody)
 
 
 switch (BDD_TARGET){
