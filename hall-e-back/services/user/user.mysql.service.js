@@ -10,29 +10,32 @@ export class UserMysqlService extends UserService{
 
   
   getUser = async (params) => {
-    if (params.role === 'consumer') {
-      this.db.Consumer.getFavori
-      return await this.db.Consumer.findOne({
-        attributes: ['email', 'lastName', 'firstName', 'role'],
-        where: {
-          email: params.email,
-          password: params.password,
-          role: params.role
-        }
-      })
-    } else if (params.role === 'bar') {
-      return await this.db.Bar.findOne({
-        attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'role'],
-        where: {
-          email: params.email,
-          password: params.password,
-          role: params.role
-        }
-      })
+    const consumer = await this.db.Consumer.findOne({
+      attributes: ['email', 'lastName', 'firstName', 'role'],
+      where: {
+        email: params.email,
+        password: params.password,
+      }
+    })
+
+    const bar =  this.db.Bar.findOne({
+      attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'role'],
+      where: {
+        email: params.email,
+        password: params.password,
+      }
+    })
+
+    if (consumer) {
+      return consumer
     }
+    if (bar) {
+      return bar
+    }
+    return null
   }
 
-  getUserById = async (id, role) => {
+  getUserById = async (role, id) => {
     if (role === 'consumer') {
       return await this.db.Consumer.findOne({
         attributes: ['id'],
@@ -48,7 +51,7 @@ export class UserMysqlService extends UserService{
         }
       })
     } else {
-      return 0
+      return false
     }
   }
 
@@ -70,21 +73,33 @@ export class UserMysqlService extends UserService{
     }
   }
 
-  updateUser = async (id, params) => {
-    if (params.role === 'consumer') {
-      try {
-        return await db.Consumer.update(params, {
-          where: { id: id },
+  updateUser = async (id, ressources) => {
+    
+   if (ressources.role === 'consumer') {
+    try {
+      // Trouver la ressource par son identifiant
+      const resource = await db.Consumer.findByPk(id)
+     
+      if (!resource) {
+        // Mettre à jour les champs de la ressource
+        Error('ressource not found')
+        return {
+          isError: true,
+          message: 'ressource not found'
         }
-        )
-      } catch (error){
-        return error
       }
-    }
 
-    if (params.role === 'bar') {
+      return await resource.update(ressources)
+
+    } catch (error){
+      return error
+    }
+  }
+    
+
+    if (ressources.role === 'bar') {
       try {
-        return await db.Bar.update(params, {
+        return await db.Bar.update(ressources, {
           where: { id: id },
         })
       } catch (error){
@@ -94,6 +109,7 @@ export class UserMysqlService extends UserService{
   }
 
   deleteUser = async (id, role) => {
+    console.log(id)
     if (role === 'consumer'){
       await db.Consumer.destroy({
         where: {
