@@ -15,6 +15,6 @@ router.delete('/favorite/team', middleware.verifyRoleInBody,  consumer.deleteFav
 router.post('/favorite/league', middleware.verifyRoleInBody,  consumer.addFavorisLeagueController)
 router.delete('/favorite/league', middleware.verifyRoleInBody,  consumer.deleteFavorisLeagueController)
 router.post('/like',  middleware.verifyRoleInBody, consumer.addLikeBarController)
-router.post('/comment',  middleware.verifyRoleInBody, consumer.addCommentsController)
+// router.post('/comment',  middleware.verifyRoleInBody, consumer.addCommentsController)
 
 export default router
