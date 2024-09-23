@@ -24,6 +24,11 @@ export class UserMysqlService extends UserService{
         {
           model: db.Team,
           as: 'favoriteTeams',  // Inclure les équipes favorites
+        },
+        {
+          model: db.Bar,
+          as: 'likedBars',
+          attributes: { exclude: ['password'] }
         }
       ],
       where: {
