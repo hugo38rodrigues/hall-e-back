@@ -27,6 +27,11 @@ export class ConsumerMysqlService extends ConsumerService {
     return  await db.Consumer.findByPk(consumerId)
   }
 
+  getBar =  async (barId) => {
+    
+    return  await db.Bar.findByPk(barId)
+  }
+
   getGame = async (gameId) => {
     
     return await db.Game.findByPk(gameId)
@@ -125,10 +130,54 @@ export class ConsumerMysqlService extends ConsumerService {
       return false
     }
     catch (error){
-      console.log(error)
+      console.error(error)
+       throw error
     }
-    
   }
-  addLikeBar = async () => {}
+
+  addLikeBar = async (consumerId, barId) => {
+    try {
+      const [like, createdLike] = await db.Like.findOrCreate({
+        where: { 
+          consumerId,
+          barId
+        }
+      })
+
+      if (createdLike) {
+        console.log('Bar liked successfully')
+        return like
+      } 
+      return false
+    } 
+    catch (error) {
+      console.error('Error liking the bar:', error)
+      throw error
+    }
+  }
+
+  dissLikeBar = async (consumerId, barId) => {
+    try {
+      const remove = await db.Like.destroy({
+        where: { 
+          consumerId,
+          barId
+        }
+      })
+
+      if (remove) {
+        console.log('Bar dissliked successfully')
+        return true
+      } 
+    }
+    catch (error) {
+      console.error('Error liking the bar:', error)
+      throw error
+    }
+  }
+
+  
+  
+
   addComments = async () => {}
 }
