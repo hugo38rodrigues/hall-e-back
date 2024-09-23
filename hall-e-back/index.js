@@ -3,11 +3,11 @@ import express from 'express'
 import { setupAssociations } from './db/mysql/association.js'
 import { db } from './db/mysql/index.js'
 import consumerRoutes from './routes/consumer.route.js'
-import userRoutes from './routes/user.route.js'
+import communRoutes from './routes/commun.route.js'
+import barRoutes from './routes/bar.router.js'
 import { BDD_TARGET, DEV_MODE } from './utils/constants.js'
 
-// import barRoutes from './routes/animalRoute.js';
-// import adminRoutes from './routes/alertRoute.js';
+
 
 const app = express()
 const port = process.env.PORT
@@ -31,10 +31,10 @@ switch (BDD_TARGET){
     }
 }
 
-app.use('/v1/consumer', consumerRoutes )
-app.use('/v1/user', userRoutes)
-// app.use('/v1/bar', barRoutes);
-// app.use('/v1/admin', adminRoutes);
+app.use('/v1/consumer', consumerRoutes)
+app.use('/v1/commun', communRoutes)
+app.use('/v1/bar', barRoutes)
+
 
 
 app.listen(port, () => {
