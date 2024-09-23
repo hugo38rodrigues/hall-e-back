@@ -36,6 +36,22 @@ export const setupAssociations = () => {
     allowNull: false
   })
 
+ 
+  db.Consumer.belongsToMany(db.Bar, {
+    through: 'Likes',    
+    as: 'likedBars',     
+    foreignKey: 'consumerId' 
+  })
+
+  
+  db.Bar.belongsToMany(db.Consumer, {
+    through: 'Likes',   
+    as: 'likers',       
+    foreignKey: 'barId'
+  })
+
+
+
   // Relation 1:N avec Comment (un consumer peut écrire plusieurs Comments)
   db.Bar.hasMany(db.Comment, {
     foreignKey: 'barId',
