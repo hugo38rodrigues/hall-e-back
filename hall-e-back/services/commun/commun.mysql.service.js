@@ -1,7 +1,7 @@
 import { db } from '../../db/mysql/index.js'
-import { UserService } from './user.service.js'
+import { CommunService } from './commun.service.js'
 
-export class UserMysqlService extends UserService{
+export class CommunMysqlService extends CommunService{
   
   constructor () {
     super()
@@ -39,6 +39,20 @@ export class UserMysqlService extends UserService{
 
     const bar =  this.db.Bar.findOne({
       attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'role'],
+      include: [
+        {
+          model: db.Game,
+          as: 'favoriteGamesBar',  // Inclure les jeux favoris
+        },
+        {
+          model: db.League,
+          as: 'favoriteLeaguesBar',  // Inclure les ligues favorites
+        },
+        {
+          model: db.Team,
+          as: 'favoriteTeamsBar',  // Inclure les équipes favorites
+        }
+      ],
       where: {
         email: params.email,
         password: params.password,
@@ -55,6 +69,7 @@ export class UserMysqlService extends UserService{
   }
 
   getUserById = async (role, id) => {
+    console.log(id)
     if (role === 'consumer') {
       return await this.db.Consumer.findOne({
         attributes: ['id'],

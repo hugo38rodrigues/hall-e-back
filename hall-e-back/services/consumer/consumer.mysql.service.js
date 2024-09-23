@@ -9,7 +9,7 @@ export class ConsumerMysqlService extends ConsumerService {
   }
   
   getMatch = async () => {
-     const matches = await db.Match.findAll({
+    const matches = await db.Match.findAll({
       attributes: { exclude: ['gameId', 'leagueId', 'team1Id', 'team2Id'] },
       include: [
         { model: db.Game }, // Inclure le jeu associé
@@ -94,7 +94,6 @@ export class ConsumerMysqlService extends ConsumerService {
     try {    
       const favoriteTeam = await consumer.removeFavoriteTeam(team)
       
-
       if (favoriteTeam) {
         return favoriteTeam
       }

@@ -1,4 +1,4 @@
-import { userInstance } from '../config/db.config.js'
+import { communInstance } from '../config/db.config.js'
 import {
   IS_ADDRESS,
   IS_BAR_NAME,
@@ -9,7 +9,7 @@ import {
   IS_STRING
 } from '../utils/regex.js'
 
-export class UserController {
+export class CommunController {
   #bddTarget
 
   constructor () {
@@ -219,7 +219,7 @@ export class UserController {
         return 
       }
 
-      const user = userInstance(this.#bddTarget)
+      const user = communInstance(this.#bddTarget)
       const userIsFound = await user.getUser(data.ressources)
 
       if (userIsFound) {
@@ -247,7 +247,7 @@ export class UserController {
         return 
       }
 
-      const user = userInstance(this.#bddTarget)
+      const user = communInstance(this.#bddTarget)
       const userIsFound = await user.getUser(ressources)
     
       if (!userIsFound) {
@@ -281,8 +281,8 @@ export class UserController {
         return res.status(401).json({ message: 'Id must be integer' })
       }
 
-      const user = userInstance(this.#bddTarget)
-      const userIsPresent = await user.getUserById(req.body.id, req.body.role)
+      const user = communInstance(this.#bddTarget)
+      const userIsPresent = await user.getUserById(req.body.role, req.body.id)
 
       if (!userIsPresent) {
         return res.status(400).json({ message: 'error delete user not found' })
@@ -317,9 +317,9 @@ export class UserController {
         return 
       }
        
-      const user = userInstance(this.#bddTarget)
+      const user = communInstance(this.#bddTarget)
       const isVerifyId = await user.getUserById(req.body.role, req.body.id)
-      console.log(isVerifyId)
+      
       if (!isVerifyId){
         return res.status(400).json({ message: 'user not found' })
       }

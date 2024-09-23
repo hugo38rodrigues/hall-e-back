@@ -1,10 +1,11 @@
-import { UserMysqlService } from '../services/user/user.mysql.service.js'
+import { CommunMysqlService } from '../services/commun/commun.mysql.service.js'
 import { ConsumerMysqlService } from '../services/consumer/consumer.mysql.service.js'
+import { BarMysqlService } from '../services/bar/bar.mysql.service.js'
 
-export const userInstance = (bddTarget) => {
+export const communInstance = (bddTarget) => {
     switch (bddTarget) {
         case 'mysql':{
-            return new UserMysqlService()
+            return new CommunMysqlService()
         }
         // case 'mangodb':
         //     return new UserMangoService()
@@ -17,16 +18,18 @@ export const userInstance = (bddTarget) => {
 }
 
 
-// export const barInstance = (bddTarget) => {
-//     switch (bddTarget){
-//         case 'mysql':
-//             return new BarMysqlService()
-//         case 'mangodb':
-//             return new BarMangoService()
-//         case 'dynamodb':
-//             return new BarDynamoService()
-//     }
-// }
+export const barInstance = (bddTarget) => {
+    switch (bddTarget){
+        case 'mysql':
+            return new BarMysqlService()
+        // case 'mangodb':
+        //     return new BarMangoService()
+        // case 'dynamodb':
+        //     return new BarDynamoService()
+        default:
+            console.log(`${bddTarget} is not supported`)
+    }
+}
 
 export const consumerInstance = (bddTarget) => {
     switch (bddTarget){
