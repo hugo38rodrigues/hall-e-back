@@ -15,83 +15,81 @@ export const setupAssociations = () => {
   
   db.Match.belongsTo(db.Team, { as: 'team2', foreignKey: 'team2Id' })
   
-  // Relation N:M avec Consumer => Game 
+  // Consumer et ses favoris
   db.Consumer.belongsToMany(db.Game, {
-      through: 'ConsumerGameFavorites',
-      as: 'favoriteGames',
-      foreignKey: 'consumerId', // Ajout de foreignKey pour plus de clarté
+    through: 'ConsumerGameFavorites',
+    as: 'favoriteGames',
+    foreignKey: 'consumerId',
   })
 
   db.Game.belongsToMany(db.Consumer, {
-      through: 'ConsumerGameFavorites',
-      as: 'favoritedByConsumers',
-      foreignKey: 'gameId', // Ajout de foreignKey pour plus de clarté
+    through: 'ConsumerGameFavorites',
+    as: 'favoritedByConsumers',
+    foreignKey: 'gameId',
   })
 
-  // Relation N:M avec Consumer => Team
   db.Consumer.belongsToMany(db.Team, {
-      through: 'ConsumerTeamFavorites',
-      as: 'favoriteTeams',
-      foreignKey: 'consumerId', // Ajout de foreignKey pour plus de clarté
+    through: 'ConsumerTeamFavorites',
+    as: 'favoriteTeams',
+    foreignKey: 'consumerId',
   })
 
   db.Team.belongsToMany(db.Consumer, {
-      through: 'ConsumerTeamFavorites',
-      as: 'favoritedByConsumers',
-      foreignKey: 'teamId', // Ajout de foreignKey pour plus de clarté
+    through: 'ConsumerTeamFavorites',
+    as: 'favoritedByConsumers',
+    foreignKey: 'teamId',
   })
 
-  // Relation N:M avec Consumer => League
   db.Consumer.belongsToMany(db.League, {
-      through: 'ConsumerLeagueFavorites',
-      as: 'favoriteLeagues',
-      foreignKey: 'consumerId', // Ajout de foreignKey pour plus de clarté
+    through: 'ConsumerLeagueFavorites',
+    as: 'favoriteLeagues',
+    foreignKey: 'consumerId',
   })
 
   db.League.belongsToMany(db.Consumer, {
-      through: 'ConsumerLeagueFavorites', // Utiliser la même table de liaison
-      as: 'favoritedByConsumers', // Corrigé pour être cohérent
-      foreignKey: 'leagueId', // Ajout de foreignKey pour plus de clarté
+    through: 'ConsumerLeagueFavorites',
+    as: 'favoritedByConsumers',
+    foreignKey: 'leagueId',
   })
 
-  // Relation N:M avec Bar => Game 
+  // Bar et ses favoris
   db.Bar.belongsToMany(db.Game, {
-      through: 'BarGameFavorites',
-      as: 'favoriteGamesBar',
-      foreignKey: 'barId', // Ajout de foreignKey pour plus de clarté
+    through: 'BarGameFavorites',
+    as: 'favoriteGamesBar',
+    foreignKey: 'barId',
   })
 
   db.Game.belongsToMany(db.Bar, {
-      through: 'BarGameFavorites',
-      as: 'favoritedByBars',
-      foreignKey: 'gameId', // Ajout de foreignKey pour plus de clarté
+    through: 'BarGameFavorites',
+    as: 'favoritedByBars',
+    foreignKey: 'gameId',
   })
 
-  // Relation N:M avec Bar => Team
   db.Bar.belongsToMany(db.Team, {
-      through: 'BarTeamFavorites',
-      as: 'favoriteTeamsBar',
-      foreignKey: 'barId', // Ajout de foreignKey pour plus de clarté
+    through: 'BarTeamFavorites',
+    as: 'favoriteTeamsBar',
+    foreignKey: 'barId',
   })
 
   db.Team.belongsToMany(db.Bar, {
-      through: 'BarTeamFavorites',
-      as: 'favoritedByBars',
-      foreignKey: 'teamId', // Ajout de foreignKey pour plus de clarté
+    through: 'BarTeamFavorites',
+    as: 'favoritedByBars',
+    foreignKey: 'teamId',
   })
 
-  // Relation N:M avec Bar => League
   db.Bar.belongsToMany(db.League, {
-      through: 'BarLeagueFavorites',
-      as: 'favoriteLeaguesBar', // Corrigé pour éviter l'erreur typographique
-      foreignKey: 'barId', // Ajout de foreignKey pour plus de clarté
+    through: 'BarLeagueFavorites',
+    as: 'favoriteLeaguesBar',
+    foreignKey: 'barId',
   })
 
   db.League.belongsToMany(db.Bar, {
-      through: 'BarLeagueFavorites', // Utiliser la même table de liaison
-      as: 'favoritedByBars', // Corrigé pour être cohérent
-      foreignKey: 'leagueId', // Ajout de foreignKey pour plus de clarté
+    through: 'BarLeagueFavorites',
+    as: 'favoritedByBars',
+    foreignKey: 'leagueId',
   })
+
+
 
   // Relation N:M avec Consumer => Like
   db.Consumer.belongsToMany(db.Bar, {

@@ -297,18 +297,6 @@ export class CommunController {
     }
   }
 
-  getMatchesAndScheduledMatchesController = async (req, res)=> {
-    try {
-      const newuser = communInstance(this.#bddTarget)
-      const matches = await newuser.getMatchesAndScheduledMatches()
-      return res.status(200).json({ data: matches })
-    }
-    catch (error) {
-      console.log(error)
-      return res.status(500).json({ message: 'Internal error' })
-    }
-  }
-
   updateProfile = async (req, res) => {
     try {
       if (!req.body) {
@@ -346,6 +334,237 @@ export class CommunController {
     catch (error) {
       console.log(error)
       return res.status(500).json({ message: 'Internal server error' })
+    }
+  }
+
+  getMatchesAndScheduledMatchesController = async (req, res)=> {
+    try {
+      const newuser = communInstance(this.#bddTarget)
+      const matches = await newuser.getMatchesAndScheduledMatches()
+      return res.status(200).json({ data: matches })
+    }
+    catch (error) {
+      console.log(error)
+      return res.status(500).json({ message: 'Internal error' })
+    }
+  }
+
+  addFavorisGameController = async (req, res) => {
+    try {
+      const gameId = req.body.gameId
+      const userId = req.body.userId
+      const role = req.body.role
+      const isvalidGameId = gameId && IS_NUMBER.test(gameId)
+      const isvalidUserId = userId && IS_NUMBER.test(userId)
+
+      if (!isvalidGameId || !isvalidUserId){
+        return res.status(401).json({ message: 'The id bar or game id is not a number' })
+      }
+
+      const newUser = communInstance(this.#bddTarget)
+
+      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const favoriteMethode = role === 'consumer' ? 'addFavoriteGame' : 'addFavoriteGamesBar'
+
+      const game = await newUser.getGame(gameId)
+
+      if (!getUser || !game){
+        return res.status(401).json({ message: 'Unknown user or unknown game' })
+      }
+    
+      const isAddFavorisGame = await newUser.addFavoriteGame(getUser, game, favoriteMethode) 
+      
+      if (!isAddFavorisGame) {
+        return res.status(401).json({ message:  'The game already exists' })
+      }
+
+      res.status(200).json({ message: 'Games added to favorites' })
+    } 
+    catch (error) {
+      console.log(error)
+      res.status(500).json({ message: 'Internal error' })
+    }
+  }
+
+  deleteFavorisGameController = async (req, res) => {
+    try {
+      const gameId = req.body.gameId
+      const userId = req.body.userId
+      const role = req.body.role
+      const isvalidGameId = gameId && IS_NUMBER.test(gameId)
+      const isvalidUserId = userId && IS_NUMBER.test(userId)
+
+      if (!isvalidGameId || !isvalidUserId){
+        return res.status(401).json({ message: 'The id user or game id is not a number' })
+      }
+
+      const newUser = communInstance(this.#bddTarget)
+      
+      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const favoriteMethode = role === 'consumer' ? 'removeFavoriteGame' : 'removeFavoriteGamesBar'
+      const game = await newUser.getGame(gameId)
+
+      if (!getUser || !game){
+        return res.status(401).json({ message: 'Unknown user or unknown game' })
+      }
+    
+      const isAddFavorisGame = await newUser.removeFavoriteGame(getUser, game, favoriteMethode ) 
+      
+      if (!isAddFavorisGame) {
+        return res.status(401).json({ message:  'Unable to delete the game' })
+      }
+
+      res.status(200).json({ message: 'Games removed from favorites' })
+    } 
+    catch (error){
+      console.log(error)
+      res.status(500).json({ messag: 'Internal error' })
+    }
+  }
+
+  addFavorisTeamController = async (req, res) => {
+    try {
+      const teamId = req.body.teamId
+      const userId = req.body.userId
+      const role = req.body.role
+      const isvalidTeamId = teamId && IS_NUMBER.test(teamId)
+      const isvalidUserId = userId && IS_NUMBER.test(userId)
+
+      if (!isvalidTeamId || !isvalidUserId){
+        return res.status(401).json({ message: 'The id bar or team id is not a number' })
+      }
+
+      const newUser = communInstance(this.#bddTarget)
+      
+      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const favoriteMethode = role === 'consumer' ? 'addFavoriteTeam' : 'addFavoriteTeamsBar'
+      
+      const team = await newUser.getTeam(teamId)
+
+      if (!getUser || !team){
+        return res.status(401).json({ message: 'Unknown user or unknown team' })
+      }
+    
+      const isAddFavorisTeam = await newUser.addFavoriteTeam(getUser, team, favoriteMethode) 
+      
+      if (!isAddFavorisTeam) {
+        return res.status(401).json({ message:  'The team already exists' })
+      }
+
+      res.status(200).json({ message: 'Team added to favorites' })
+    } 
+    catch (error) {
+      console.log(error)
+      res.status(500).json({ message: 'Internal error' })
+    }
+  }
+
+  deleteFavorisTeamController = async (req, res) => {
+    try {
+      const teamId = req.body.teamId
+      const userId = req.body.userId
+      const role = req.body.role
+      const isvalidGameId = teamId && IS_NUMBER.test(teamId)
+      const isvalidUserId = userId && IS_NUMBER.test(userId)
+
+      if (!isvalidGameId || !isvalidUserId){
+        return res.status(401).json({ message: 'The id user or team id is not a number' })
+      }
+
+      const newUser = communInstance(this.#bddTarget)
+      
+      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const favoriteMethode = role === 'consumer' ? 'addFavoriteTeam' : 'addFavoriteTeamsBar'
+      const team = await newUser.getTeam(teamId)
+
+      if (!getUser || !team){
+        return res.status(401).json({ message: 'Unknown user or unknown team' })
+      }
+    
+      const isAddFavorisTeam = await newUser.removeFavoriteTeam(getUser, team, favoriteMethode) 
+      
+      if (!isAddFavorisTeam) {
+        return res.status(401).json({ message:  'Impossible to delete the team' })
+      }
+
+      res.status(200).json({ message: 'Team removed from favorites' })
+    } 
+    catch (error) {
+      console.log(error)
+      res.status(500).json({ message: 'Internal error' })
+    }
+  }
+
+ 
+  addFavorisLeagueController = async (req, res) => {
+    try {
+      const leagueId = req.body.leagueId
+      const userId = req.body.userId
+      const role = req.body.role
+      const isvalidLeagueId = leagueId && IS_NUMBER.test(leagueId)
+      const isvalidUserId = userId && IS_NUMBER.test(userId)
+
+      if (!isvalidLeagueId || !isvalidUserId){
+        return res.status(401).json({ message: 'The user id or league id is not a number.' })
+      }
+
+      const newUser = communInstance(this.#bddTarget)
+      
+      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const favoriteMethode = role === 'consumer' ? 'addFavoriteLeague' : 'addFavoriteLeaguesBar'
+      const league = await newUser.getLeague(leagueId)
+
+      if (!getUser || !league){
+        return res.status(401).json({ message: 'Unknown user or unknown league' })
+      }
+    
+      const isAddFavorisLeague = await newUser.addFavoriteLeague(getUser, league, favoriteMethode) 
+      
+      if (!isAddFavorisLeague) {
+        return res.status(401).json({ message:  'The league already exist' })
+      }
+
+      res.status(200).json({ message: 'League added to favorites' })
+    } 
+    catch (error) {
+      console.log(error)
+      res.status(500).json({ message: 'Internal error' })
+    }
+  }
+
+  deleteFavorisLeagueController = async (req, res) => {
+    try {
+      const leagueId = req.body.leagueId
+      const userId = req.body.userId
+      const role = req.body.role
+      const isvalidLeagueId = leagueId && IS_NUMBER.test(leagueId)
+      const isvalidUserId = userId && IS_NUMBER.test(userId)
+
+      if (!isvalidLeagueId || !isvalidUserId){
+        return res.status(401).json({ message: 'The user id or league id is not a number.' })
+      }
+
+      const newUser = communInstance(this.#bddTarget)
+      
+      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const favoriteMethode = role === 'consumer' ? 'addFavoriteLeague' : 'addFavoriteLeaguesBar'
+      const league = await newUser.getLeague(leagueId)
+
+      if (!getUser || !league){
+        return res.status(401).json({ message: 'Unknown user or league' })
+      }
+    
+      const isAddFavorisLeague = await newUser.removeFavoriteLeague(getUser, league, favoriteMethode) 
+      
+      if (!isAddFavorisLeague) {
+        return res.status(401).json({ message: 'Impossible to deleted the league' })
+      }
+
+      res.status(200).json({ message: 'League removed from favorites' })
+    } 
+    catch (error) {
+      console.log(error)
+      res.status(500).json({ message: 'Internal error' })
     }
   }
 }

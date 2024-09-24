@@ -3,15 +3,36 @@ export class CommunService {
     constructor () {
     }
     
-    getUser = async (params) => {}
+    getUser = async (ressources) => {}
 
-    getUserById = async (id, role) => {}
+    getConsumer =  async (consumerId) => {}
 
-    addUser = async (params) => {}
+    getBar =  async (barId) => {}
 
-    updateUser = async (params) => {}
+    getGame = async (gameId) => {}
+
+    getTeam = async (teamId) => {}
+
+    getLeague = async (leagueId) => {}
+    
+    getUserById = async (role, id) => {}
+
+    addUser = async (ressources) => {}
+
+    updateUser = async (id, ressources) => {}
 
     deleteUserById = async (id, role) => {}
+
+    addFavoritesGame = async (bar, game) => {}
+    removeFavoritesGame = async (bar, game) => {}
+
+    addFavoritesLeague = async (bar, league) => {}
+    removeFavoritesLeague = async (bar, league) => {}
+
+    addFavoritesTeam = async (bar, team) => {}
+    removeFavoritesTeam = async (bar, team) => {}
+
+    getMatchesAndScheduledMatches = async () => {}
 }
 
 

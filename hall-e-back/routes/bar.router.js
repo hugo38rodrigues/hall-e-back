@@ -8,13 +8,6 @@ const middleware = new Midleware()
 
 router.get('/', middleware.verifyRoleInBody, bar.getMatchController)
 router.post('/', middleware.verifyRoleInBody,  bar.matchesPlanningsController)
-router.post('/favorite/game', middleware.verifyRoleInBody, bar.addFavorisGameController)
-router.delete('/favorite/game', middleware.verifyRoleInBody, bar.deleteFavorisGameController)
-router.post('/favorite/league',  middleware.verifyRoleInBody, bar.addFavorisLeagueController)
-router.post('/favorite/team', middleware.verifyRoleInBody,  bar.addFavorisTeamController)
-router.delete('/favorite/team', middleware.verifyRoleInBody,  bar.deleteFavorisTeamController)
-router.post('/favorite/league', middleware.verifyRoleInBody,  bar.addFavorisLeagueController)
-router.delete('/favorite/league', middleware.verifyRoleInBody,  bar.deleteFavorisLeagueController)
 
 
 export default router

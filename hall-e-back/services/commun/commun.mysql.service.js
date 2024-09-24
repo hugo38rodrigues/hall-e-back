@@ -9,7 +9,7 @@ export class CommunMysqlService extends CommunService{
   }
 
   
-  getUser = async (params) => {
+  getUser = async (ressources) => {
     const consumer = await this.db.Consumer.findOne({
       attributes: ['email', 'lastName', 'firstName', 'role'],
       include: [
@@ -32,8 +32,8 @@ export class CommunMysqlService extends CommunService{
         }
       ],
       where: {
-        email: params.email,
-        password: params.password,
+        email: ressources.email,
+        password: ressources.password,
       }
     })
 
@@ -54,8 +54,8 @@ export class CommunMysqlService extends CommunService{
         }
       ],
       where: {
-        email: params.email,
-        password: params.password,
+        email: ressources.email,
+        password: ressources.password,
       }
     })
 
@@ -89,18 +89,18 @@ export class CommunMysqlService extends CommunService{
     }
   }
 
-  addUser = async (params) => {
-    if (params.role === 'consumer') {
+  addUser = async (ressources) => {
+    if (ressources.role === 'consumer') {
       try {
-        return await this.db.Consumer.create(params)
+        return await this.db.Consumer.create(ressources)
       } catch (error) {
         return error
       }
     } 
 
-    if (params.role === 'bar') {
+    if (ressources.role === 'bar') {
       try {
-        return await this.db.Bar.create(params)
+        return await this.db.Bar.create(ressources)
       } catch (error) {
         return error
       }
@@ -181,5 +181,117 @@ export class CommunMysqlService extends CommunService{
       ],
       order: [['id', 'ASC']],
     })
+  }
+
+  getConsumer =  async (consumerId) => {
+    
+    return  await db.Consumer.findByPk(consumerId)
+  }
+
+  getBar =  async (barId) => {
+    
+    return  await db.Bar.findByPk(barId)
+  }
+
+  getGame = async (gameId) => {
+    
+    return await db.Game.findByPk(gameId)
+  }
+
+  getTeam = async (teamId) => {
+    
+    return await db.Team.findByPk(teamId)
+  }
+
+  getLeague = async (leagueId) => {
+    return await db.League.findByPk(leagueId)
+  }
+
+  addFavoriteGame = async (user, game, favoriteMethode) => {
+    
+    try {    
+      const favoriteGame = await user[favoriteMethode](game)
+      if (favoriteGame) {
+        return favoriteGame
+      }
+      return false
+      
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  removeFavoriteGame = async (user, game, favoriteMethode) =>{
+    try {    
+      const favoriteGame = await user[favoriteMethode](game)
+      if (favoriteGame) {
+        return favoriteGame
+      }
+      return false
+    }
+    catch (error){
+      console.log(error)
+    }
+    
+  }
+
+  addFavoriteTeam = async (user, team, favoriteMethode) => {
+
+    try {    
+      const favoriteTeam = await user[favoriteMethode](team)
+      if (favoriteTeam) {
+        return favoriteTeam
+      }
+      return false
+      
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  removeFavoriteTeam = async (user, team, favoriteMethode) =>{
+    try {    
+      const favoriteTeam = await user[favoriteMethode](team)
+      
+      if (favoriteTeam) {
+        return favoriteTeam
+      }
+      return false
+    }
+    catch (error){
+      console.log(error)
+    }
+    
+  }
+
+  addFavoriteLeague = async (user, league, favoriteMethode) => {
+    try {    
+      const favoriteLeague = await user[favoriteMethode](league)
+      if (favoriteLeague) {
+        return favoriteLeague
+      }
+      return false
+      
+    }
+    catch (error){
+      console.log(error)
+    }
+  }
+
+  removeFavoriteLeague = async (user, league, favoriteMethode) =>{
+    try {    
+      const favoriteLeague = await user[favoriteMethode](league)
+
+      if (favoriteLeague) {
+        return favoriteLeague
+      }
+      return false
+    }
+    catch (error){
+      console.error(error)
+       throw error
+    }
   }
 }
