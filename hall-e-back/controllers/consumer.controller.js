@@ -22,7 +22,7 @@ export class ConsumerController {
     } 
     catch (error){
       console.log(error)
-      return res.status(500).json({ message: 'Internal Error' })
+      return res.status(500).json({ message: 'Internal error' })
     }
   }
 
@@ -56,7 +56,7 @@ export class ConsumerController {
     } 
     catch (error) {
       console.log(error)
-      res.status(500).json({ message: 'Internal Error' })
+      res.status(500).json({ message: 'Internal error' })
     }
   }
 
@@ -124,7 +124,7 @@ export class ConsumerController {
     } 
     catch (error) {
       console.log(error)
-      res.status(500).json({ message: 'Internal Error' })
+      res.status(500).json({ message: 'Internal error' })
     }
   }
 
@@ -158,7 +158,7 @@ export class ConsumerController {
     } 
     catch (error) {
       console.log(error)
-      res.status(500).json({ message: 'Internal Error' })
+      res.status(500).json({ message: 'Internal error' })
     }
   }
 
@@ -193,7 +193,7 @@ export class ConsumerController {
     } 
     catch (error) {
       console.log(error)
-      res.status(500).json({ message: 'Internal Error' })
+      res.status(500).json({ message: 'Internal error' })
     }
   }
 
@@ -227,7 +227,7 @@ export class ConsumerController {
     } 
     catch (error) {
       console.log(error)
-      res.status(500).json({ message: 'Internal Error' })
+      res.status(500).json({ message: 'Internal error' })
     }
   }
 

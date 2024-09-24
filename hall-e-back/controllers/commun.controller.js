@@ -1,12 +1,12 @@
 import { communInstance } from '../config/db.config.js'
 import {
-  IS_ADDRESS,
-  IS_BAR_NAME,
-  IS_DESCRIPTION,
-  IS_EMAIL,
-  IS_NUMBER,
-  IS_PASSWORD,
-  IS_STRING
+    IS_ADDRESS,
+    IS_BAR_NAME,
+    IS_DESCRIPTION,
+    IS_EMAIL,
+    IS_NUMBER,
+    IS_PASSWORD,
+    IS_STRING
 } from '../utils/regex.js'
 
 export class CommunController {
@@ -294,6 +294,18 @@ export class CommunController {
     } catch (error) {
       console.log(error)
       return res.status(500).json({ message: 'Internal server error' })
+    }
+  }
+
+  getMatchesAndScheduledMatchesController = async (req, res)=> {
+    try {
+      const newuser = communInstance(this.#bddTarget)
+      const matches = await newuser.getMatchesAndScheduledMatches()
+      return res.status(200).json({ data: matches })
+    }
+    catch (error) {
+      console.log(error)
+      return res.status(500).json({ message: 'Internal error' })
     }
   }
 
