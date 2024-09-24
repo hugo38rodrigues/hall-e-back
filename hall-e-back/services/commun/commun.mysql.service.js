@@ -37,7 +37,7 @@ export class CommunMysqlService extends CommunService{
       }
     })
 
-    const bar =  this.db.Bar.findOne({
+    const bar = await this.db.Bar.findOne({
       attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'role'],
       include: [
         {
@@ -159,5 +159,27 @@ export class CommunMysqlService extends CommunService{
         }
       })
     }
+  }
+
+  getMatchesAndScheduledMatches = async () => {
+    return await db.Match.findAll({
+      attributes: { exclude: ['gameId', 'leagueId', 'team1Id', 'team2Id'] },
+      include: [{
+          model: db.Bar,
+          as: 'barsScheduling',
+          attributes: {
+            exclude: ['password'],
+          },
+          through: {
+            attributes: ['scheduled'],
+          },
+        },
+        { model: db.Game },
+        { model: db.League },
+        { model: db.Team, as: 'team1' },
+        { model: db.Team, as: 'team2' },
+      ],
+      order: [['id', 'ASC']],
+    })
   }
 }

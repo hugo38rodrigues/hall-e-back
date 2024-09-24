@@ -7,7 +7,8 @@ const user = new CommunController()
 const middleware = new Midleware()
 
 router.post('/sign-in', middleware.verifyRoleInBody, user.createAccount)
-router.post('/connexion', user.connexion) 
+router.post('/connexion', user.connexion)
+router.get('/', user.getMatchesAndScheduledMatchesController)
 router.delete('/', middleware.verifyRoleInBody, user.deleteUser)
 router.put('/', middleware.verifyRoleInBody, user.updateProfile)
 

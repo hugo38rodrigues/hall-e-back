@@ -22,6 +22,11 @@ export class BarMysqlService extends BarService {
     return matches
   }
 
+  getMatchById = async (matchId) => {
+
+    return await db.Match.findByPk(matchId)
+  }
+
   getConsumer =  async (consumerId) => {
     
     return  await db.Consumer.findByPk(consumerId)
@@ -131,6 +136,25 @@ export class BarMysqlService extends BarService {
     catch (error){
       console.error(error)
        throw error
+    }
+  }
+
+  matchesPlannings = async (barId, matchId) => {
+    try {
+      const matchPlanning = await db.barMatchSchedule.create({
+      barId,
+      matchId,
+      scheduled: true, // Enregistre la date de planification
+    })
+
+      if (matchPlanning){
+        return matchPlanning
+      }
+
+      return false
+    } catch (error){
+      console.error(error)
+      throw error
     }
   }
 }
