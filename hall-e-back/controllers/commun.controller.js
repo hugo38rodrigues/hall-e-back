@@ -1,12 +1,12 @@
-import { communInstance } from '../config/db.config.js'
+import { communInstance } from '../utils/classes-instance-dispatcher.js'
 import {
-    IS_ADDRESS,
-    IS_BAR_NAME,
-    IS_DESCRIPTION,
-    IS_EMAIL,
-    IS_NUMBER,
-    IS_PASSWORD,
-    IS_STRING
+  IS_ADDRESS,
+  IS_BAR_NAME,
+  IS_DESCRIPTION,
+  IS_EMAIL,
+  IS_NUMBER,
+  IS_PASSWORD,
+  IS_STRING
 } from '../utils/regex.js'
 
 export class CommunController {
@@ -64,7 +64,6 @@ export class CommunController {
     }    
 
     const ressources = this.#formData(body)
-    console.log(ressources)
 
     return {
       ressources,
@@ -197,6 +196,7 @@ export class CommunController {
   createAccount = async (req, res) => {
     
     let data
+
     try {
       if (!req.body) {
         return res.status(401).json({ message: 'Missing params' })
@@ -237,6 +237,7 @@ export class CommunController {
 
   connexion = async (req, res) => {
     try {
+
       if (!req.body) {
         return res.status(401).json({ message: 'Missing params' })
       }
@@ -339,8 +340,8 @@ export class CommunController {
 
   getMatchesAndScheduledMatchesController = async (req, res)=> {
     try {
-      const newuser = communInstance(this.#bddTarget)
-      const matches = await newuser.getMatchesAndScheduledMatches()
+      const newUser = communInstance(this.#bddTarget)
+      const matches = await newUser.getMatchesAndScheduledMatches()
       return res.status(200).json({ data: matches })
     }
     catch (error) {
@@ -363,16 +364,16 @@ export class CommunController {
 
       const newUser = communInstance(this.#bddTarget)
 
-      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const userIsFound = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
       const favoriteMethode = role === 'consumer' ? 'addFavoriteGame' : 'addFavoriteGamesBar'
 
       const game = await newUser.getGame(gameId)
 
-      if (!getUser || !game){
+      if (!userIsFound || !game){
         return res.status(401).json({ message: 'Unknown user or unknown game' })
       }
     
-      const isAddFavorisGame = await newUser.addFavoriteGame(getUser, game, favoriteMethode) 
+      const isAddFavorisGame = await newUser.addFavoriteGame(userIsFound, game, favoriteMethode) 
       
       if (!isAddFavorisGame) {
         return res.status(401).json({ message:  'The game already exists' })
@@ -400,15 +401,15 @@ export class CommunController {
 
       const newUser = communInstance(this.#bddTarget)
       
-      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const userIsFound = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
       const favoriteMethode = role === 'consumer' ? 'removeFavoriteGame' : 'removeFavoriteGamesBar'
       const game = await newUser.getGame(gameId)
 
-      if (!getUser || !game){
+      if (!userIsFound || !game){
         return res.status(401).json({ message: 'Unknown user or unknown game' })
       }
     
-      const isAddFavorisGame = await newUser.removeFavoriteGame(getUser, game, favoriteMethode ) 
+      const isAddFavorisGame = await newUser.removeFavoriteGame(userIsFound, game, favoriteMethode ) 
       
       if (!isAddFavorisGame) {
         return res.status(401).json({ message:  'Unable to delete the game' })
@@ -436,16 +437,16 @@ export class CommunController {
 
       const newUser = communInstance(this.#bddTarget)
       
-      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const userIsFound = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
       const favoriteMethode = role === 'consumer' ? 'addFavoriteTeam' : 'addFavoriteTeamsBar'
       
       const team = await newUser.getTeam(teamId)
 
-      if (!getUser || !team){
+      if (!userIsFound || !team){
         return res.status(401).json({ message: 'Unknown user or unknown team' })
       }
     
-      const isAddFavorisTeam = await newUser.addFavoriteTeam(getUser, team, favoriteMethode) 
+      const isAddFavorisTeam = await newUser.addFavoriteTeam(userIsFound, team, favoriteMethode) 
       
       if (!isAddFavorisTeam) {
         return res.status(401).json({ message:  'The team already exists' })
@@ -473,15 +474,15 @@ export class CommunController {
 
       const newUser = communInstance(this.#bddTarget)
       
-      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const userIsFound = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
       const favoriteMethode = role === 'consumer' ? 'addFavoriteTeam' : 'addFavoriteTeamsBar'
       const team = await newUser.getTeam(teamId)
 
-      if (!getUser || !team){
+      if (!userIsFound || !team){
         return res.status(401).json({ message: 'Unknown user or unknown team' })
       }
     
-      const isAddFavorisTeam = await newUser.removeFavoriteTeam(getUser, team, favoriteMethode) 
+      const isAddFavorisTeam = await newUser.removeFavoriteTeam(userIsFound, team, favoriteMethode) 
       
       if (!isAddFavorisTeam) {
         return res.status(401).json({ message:  'Impossible to delete the team' })
@@ -510,15 +511,15 @@ export class CommunController {
 
       const newUser = communInstance(this.#bddTarget)
       
-      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const userIsFound = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
       const favoriteMethode = role === 'consumer' ? 'addFavoriteLeague' : 'addFavoriteLeaguesBar'
       const league = await newUser.getLeague(leagueId)
 
-      if (!getUser || !league){
+      if (!userIsFound || !league){
         return res.status(401).json({ message: 'Unknown user or unknown league' })
       }
     
-      const isAddFavorisLeague = await newUser.addFavoriteLeague(getUser, league, favoriteMethode) 
+      const isAddFavorisLeague = await newUser.addFavoriteLeague(userIsFound, league, favoriteMethode) 
       
       if (!isAddFavorisLeague) {
         return res.status(401).json({ message:  'The league already exist' })
@@ -546,15 +547,15 @@ export class CommunController {
 
       const newUser = communInstance(this.#bddTarget)
       
-      const getUser = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
+      const userIsFound = role === 'consumer' ? await newUser.getConsumer(userId) : await newUser.getBar(userId)
       const favoriteMethode = role === 'consumer' ? 'addFavoriteLeague' : 'addFavoriteLeaguesBar'
       const league = await newUser.getLeague(leagueId)
 
-      if (!getUser || !league){
+      if (!userIsFound || !league){
         return res.status(401).json({ message: 'Unknown user or league' })
       }
     
-      const isAddFavorisLeague = await newUser.removeFavoriteLeague(getUser, league, favoriteMethode) 
+      const isAddFavorisLeague = await newUser.removeFavoriteLeague(userIsFound, league, favoriteMethode) 
       
       if (!isAddFavorisLeague) {
         return res.status(401).json({ message: 'Impossible to deleted the league' })

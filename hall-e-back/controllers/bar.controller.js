@@ -1,5 +1,6 @@
-import { barInstance } from '../config/db.config.js'
+import { barInstance } from '../utils/classes-instance-dispatcher.js'
 import { IS_NUMBER } from '../utils/regex.js'
+
 export class BarController {
     #bddTarget
 
@@ -32,9 +33,9 @@ export class BarController {
       const matchId = req.body.matchId
       const barId = req.body.barId
       const isvalidMatchId = matchId && IS_NUMBER.test(matchId)
-      const isvalidbarId = barId && IS_NUMBER.test(barId)
+      const isvalidBarId = barId && IS_NUMBER.test(barId)
       
-      if (!isvalidMatchId || !isvalidbarId){
+      if (!isvalidMatchId || !isvalidBarId){
         return res.status(401).json({ message: 'l\'id bar ou l\'id du match n\'est pas un number' })
       }
 

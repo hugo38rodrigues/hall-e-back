@@ -6,11 +6,11 @@ export class Midleware {
   verifyRoleInBody = (req, res, next) => {
     
     if (!req.body.role) {
-      return res.status(400).json({ message: 'Le champ "role" est manquant' })
+      return res.status(400).json({ message: 'The “role” field is missing' })
     }
     
     if (req.body.role !== 'consumer' && req.body.role !== 'bar') {
-      return res.status(401).json({ message: `Le rôle ${req.body.role} n'est pas accepté` })
+      return res.status(401).json({ message: `The role ${req.body.role} is not accepted` })
     }
 
     next()

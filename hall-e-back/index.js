@@ -7,11 +7,7 @@ import communRoutes from './routes/commun.route.js'
 import barRoutes from './routes/bar.router.js'
 import { BDD_TARGET, DEV_MODE } from './utils/constants.js'
 
-
-
 const app = express()
-const port = process.env.PORT
-
 
 app.use(express.json())
 app.use(cors())
@@ -31,12 +27,9 @@ switch (BDD_TARGET){
     }
 }
 
-app.use('/v1/consumer', consumerRoutes)
-app.use('/v1/commun', communRoutes)
-app.use('/v1/bar', barRoutes)
+app.use('/api/v1/consumer', consumerRoutes)
+app.use('/api/v1/commun', communRoutes)
+app.use('/api/v1/bar', barRoutes)
 
+export default app
 
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
