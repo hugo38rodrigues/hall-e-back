@@ -8,7 +8,6 @@ export class CommunMysqlService extends CommunService{
     this.db = db
   }
 
-  
   getUser = async (ressources) => {
     const consumer = await this.db.Consumer.findOne({
       attributes: ['email', 'lastName', 'firstName', 'role'],
@@ -143,7 +142,6 @@ export class CommunMysqlService extends CommunService{
   }
 
   deleteUser = async (id, role) => {
-    console.log(id)
     if (role === 'consumer'){
       await db.Consumer.destroy({
         where: {
