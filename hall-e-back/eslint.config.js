@@ -3,10 +3,13 @@ import globals from 'globals'
 
 export default [
     {
-        languageOptions: { globals: globals.node, ecmaVersion: 2024,
-            sourceType: 'module', },
+        languageOptions: { 
+            globals: globals.node, 
+            ecmaVersion: 2024,
+            sourceType: 'module'
+        },
         files: ['**/*.js'],
-        ignores: ['node_modules/**/*'],
+        ignores: ['node_modules/**/*', 'test/**/*'],
         rules: {
             'no-unused-vars': 'error',
             'semi': ['error', 'never'],
