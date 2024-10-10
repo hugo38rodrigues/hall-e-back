@@ -44,7 +44,7 @@ export class CommunController {
     }
   }
 
-  #consumerAccountFormValidation = (body, res) => {
+  #consumerAccountVerify = (body, res) => {
     const isEmail = IS_EMAIL.test(body.email)
     const isPassword = IS_PASSWORD.test(body.password)
     const isFirstName = IS_STRING.test(body.firstName)
@@ -71,7 +71,7 @@ export class CommunController {
     }
   }
 
-  #barAccountFormValidation = (body, res) => {
+  #barAccountVerify = (body, res) => {
     const isEmail = IS_EMAIL.test(body.email)
     const isPassword = IS_PASSWORD.test(body.password)
     const isAddress = IS_ADDRESS.test(body.address)
@@ -89,15 +89,15 @@ export class CommunController {
   
     }
     if (!isValidAddress) {
-      return res.status(401).json({ message: 'Address must be in street city postal code' })
+      return res.status(400).json({ message: 'Address must be in number of street street, postal code, City' })
     }
 
     if (!isValidDescription) {
-      return res.status(401).json({ message: 'Description must be a description of your bar' })
+      return res.status(400).json({ message: 'Description is a string and must be a description of your bar' })
     }
 
     if (!isValidName) {
-      return res.status(401).json({ message: 'Name must be string' })
+      return res.status(400).json({ message: 'Missing name or name must be string' })
     }
 
     const ressources = this.#formData(body)
@@ -198,27 +198,19 @@ export class CommunController {
     let data
 
     try {
-      if (!req.body) {
-        return res.status(401).json({ message: 'Missing params' })
-      }
-
+     
       if (req.body.role === 'consumer'){
-        data = this.#consumerAccountFormValidation(req.body, res)
+        data = this.#consumerAccountVerify(req.body, res)
       }
 
-      else if (req.body.role === 'bar'){
-        data = this.#barAccountFormValidation(req.body, res)
+      if (req.body.role === 'bar'){
+        data = this.#barAccountVerify(req.body, res)
       }
-     
-      else {
-        return res.status(401).json({ message: 'Role must be consumer or bar' })
-      }
-
-     
+         
       if (!data.isValid){
         return 
       }
-
+      
       const user = communInstance(this.#bddTarget)
       const userIsFound = await user.getUser(data.ressources)
 
@@ -237,10 +229,6 @@ export class CommunController {
 
   connexion = async (req, res) => {
     try {
-
-      if (!req.body) {
-        return res.status(401).json({ message: 'Missing params' })
-      }
 
       const { isValid, ressources } = this.#connexionValidationFrom(req.body, res)
 
