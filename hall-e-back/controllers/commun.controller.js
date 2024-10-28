@@ -213,12 +213,13 @@ export class CommunController {
       
       const user = communInstance(this.#bddTarget)
       const userIsFound = await user.getUser(data.ressources)
-
+      
       if (userIsFound) {
         return res.status(401).json({ message: 'The user already exists' })
       }
-
+      
       await user.addUser(data.ressources)
+      
       return res.status(201).json({ message: 'Sign in success' })
     }
     catch (error) {
