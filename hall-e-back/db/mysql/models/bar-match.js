@@ -1,5 +1,5 @@
 export const barMatchScheduleModel = (sequelize, DataTypes) => {
-  return sequelize.define('BarMatchSchedule', {
+  return sequelize.define('BarMatchSchedules', {
     barId: {
       type: DataTypes.INTEGER,
       references: {
@@ -13,9 +13,6 @@ export const barMatchScheduleModel = (sequelize, DataTypes) => {
         model: 'Matches',
         key: 'id',
       },
-    },
-    scheduled: {
-      type: DataTypes.BOOLEAN
-    },
+    }
   })
 }

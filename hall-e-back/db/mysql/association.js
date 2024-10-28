@@ -132,13 +132,13 @@ export const setupAssociations = () => {
 
   // Relation N:M avec Bar et Match
   db.Bar.belongsToMany(db.Match, {
-    through: 'BarMatchSchedule',
+    through: 'BarMatchSchedules',
     as: 'scheduledMatches',
     foreignKey: 'barId',
   })
 
   db.Match.belongsToMany(db.Bar, {
-    through: 'BarMatchSchedule',
+    through: 'BarMatchSchedules',
     as: 'barsScheduling',
     foreignKey: 'matchId',
   })

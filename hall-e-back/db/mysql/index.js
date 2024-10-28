@@ -21,7 +21,7 @@ db.Game = gameModel(sequelize, DataTypes)
 db.League = leagueModel(sequelize, DataTypes)
 db.Match = matchModel(sequelize, DataTypes)
 db.Team = teamModel(sequelize, DataTypes)
-db.barMatchSchedule = barMatchScheduleModel(sequelize, DataTypes)
+db.barMatchSchedules = barMatchScheduleModel(sequelize, DataTypes)
 db.Like = likeModel(sequelize, DataTypes)
 
 // Ajout de l'instance Sequelize à l'objet db
