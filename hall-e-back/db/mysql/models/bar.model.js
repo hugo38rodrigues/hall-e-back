@@ -1,4 +1,3 @@
-
 export const barModel = (sequelize, DataTypes) => {
 return sequelize.define(
     'Bars',
@@ -31,6 +30,7 @@ return sequelize.define(
         },
         role: {
             type: DataTypes.STRING,
+            defaultValue: 'bar',
             allowNull: false
         }
     })

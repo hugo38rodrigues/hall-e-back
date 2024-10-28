@@ -37,7 +37,7 @@ export class CommunMysqlService extends CommunService{
     })
 
     const bar = await this.db.Bar.findOne({
-      attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'role'],
+      attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'role'],
       include: [
         {
           model: db.Game,
@@ -92,6 +92,7 @@ export class CommunMysqlService extends CommunService{
     if (ressources.role === 'consumer') {
       try {
         return await this.db.Consumer.create(ressources)
+
       } catch (error) {
         return error
       }
@@ -100,6 +101,7 @@ export class CommunMysqlService extends CommunService{
     if (ressources.role === 'bar') {
       try {
         return await this.db.Bar.create(ressources)
+
       } catch (error) {
         return error
       }

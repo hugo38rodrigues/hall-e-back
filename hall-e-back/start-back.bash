@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "Start API for Hall-E"
-source "./env/.env.mysql.sh"
+source "./env/dev/.env.mysql.sh"
 npm run start
