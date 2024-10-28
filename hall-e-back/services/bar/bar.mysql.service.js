@@ -34,12 +34,11 @@ export class BarMysqlService extends BarService {
 
   matchesPlannings = async (barId, matchId) => {
     try {
-      const matchPlanning = await db.barMatchSchedule.create({
+      const matchPlanning = await db.barMatchSchedules.create({
       barId,
-      matchId,
-      scheduled: true, // Enregistre la date de planification
+      matchId
     })
-
+    
       if (matchPlanning){
         return matchPlanning
       }

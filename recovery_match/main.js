@@ -1,5 +1,5 @@
 import { setupAssociations } from '../hall-e-back/db/mysql/association.js'
-import { db } from '../hall-e-back/db/mysql/index.js'
+import { db } from './db/mysql/index.js'
 import { Match } from './classes/Match.js'
 import { MysqlDB } from './classes/services/mysql-db.js'
 import {
@@ -35,12 +35,11 @@ switch (BDD_TARGET) {
 // }
 
 case 'mysql': {
-
-  setupAssociations()
-
   if (DEV_MODE === 'true') {
+    console.log('######## DEV MODE ########')
     db.sequelize.sync()
   }
+  setupAssociations()
   
   const mysql = new MysqlDB()
   await mysql.savingMatches(lolMatch)
