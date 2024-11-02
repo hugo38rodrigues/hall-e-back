@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 0 ]; then
-  echo "No parameters provided. Please specify an environment using --env=<environment>."
+  echo "No parameters provided. Please specify an environment using --bdd=<environment>."
   exit 1
 fi
 

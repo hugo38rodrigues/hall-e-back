@@ -7,7 +7,6 @@ import {
   optionLol,
   optionValorant
 } from './utils/api.utils.js'
-
 import { BDD_TARGET, DEV_MODE } from './utils/constants.utils.js'
 
 console.log('############ START GET DATA ############')
@@ -23,8 +22,6 @@ const valorantMatch = await valorant.createdMatch()
 console.log('############ END CREATED MATCH ############')
 
 console.log('############ START SAVING MATCH ############')
-
-
 switch (BDD_TARGET) {
 // case 'dynamodb':{
 // const dynamodb = new DynamoDB()
