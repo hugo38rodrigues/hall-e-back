@@ -14,7 +14,7 @@ export class Crypt {
 		// Obtenir le répertoire du fichier
 		const __dirname = dirname(__filename)
 		const parentDir = join(__dirname, '..')
-		const jwtSecret = join(parentDir, '/toto.txt') 
+		const jwtSecret = join(parentDir, '/secrete.key') 
 
 		const JWT_SECRET = await readFile(jwtSecret, 'utf8') // Assurez-vous que le chemin est correct
 	
