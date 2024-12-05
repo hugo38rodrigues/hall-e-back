@@ -2,3 +2,4 @@
 *.plantuml
 .idea
 .vscode
+*.key
