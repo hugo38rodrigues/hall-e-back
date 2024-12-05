@@ -1,6 +1,5 @@
 // import { Bar } from '../../db/mysql/bar.model.js';
-// import { Consumer } from '../../db/mysql/consumer.model.js';
-
+// import { Consumer } from '../../db/mysql/client.model.js';
 
 // export class UserDynamoService extends UserDynamoService {
 
@@ -9,7 +8,7 @@
 //   }
 
 //   getUser = async (params) => {
-//     if (params.role === 'consumer') {
+//     if (params.role === 'client') {
 //       return await Consumer.findAll({
 //         attributes: ['email', 'lastName', 'firstName', 'favorite_match', 'like_bar', 'role'],
 //         where: {
@@ -21,7 +20,7 @@
 //     }
 //     else if (params.role === 'bar') {
 //       return await Bar.findAll({
-//         attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'like_consumer', 'role'],
+//         attributes: ['id', 'address', 'name', 'email', 'price', 'description', 'photo', 'password', 'like_client', 'role'],
 //         where: {
 //           email: params.email,
 //           password: params.password,
@@ -32,7 +31,7 @@
 //   }
 
 //   getUserById = async (id, role) => {
-//     if (role === 'consumer') {
+//     if (role === 'client') {
 //      return await Consumer.findAll({
 //         attributes: ['id'],
 //         where: {
@@ -53,7 +52,7 @@
 //   }
 
 //   addUser = async (params) => {
-//     if (params.role === 'consumer') {
+//     if (params.role === 'client') {
 //       try {
 //         return await Consumer.create({
 //           'firstName': params.firstName,

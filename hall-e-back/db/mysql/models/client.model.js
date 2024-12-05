@@ -1,5 +1,5 @@
-export const consumerModel = (sequelize, DataTypes) => {
-	return sequelize.define('Consumers', {
+export const clientModel = (sequelize, DataTypes) => {
+	return sequelize.define('Client', {
 		firstName: {
 			type: DataTypes.STRING,
 			allowNull: false,
@@ -13,12 +13,12 @@ export const consumerModel = (sequelize, DataTypes) => {
 			allowNull: false,
 		},
 		password: {
-			type: DataTypes.STRING(1234),
+			type: DataTypes.STRING,
 			allowNull: false,
 		},
 		role: {
 			type: DataTypes.STRING,
-			defaultValue: 'consumer',
+			defaultValue: 'client',
 			allowNull: false,
 		},
 	})

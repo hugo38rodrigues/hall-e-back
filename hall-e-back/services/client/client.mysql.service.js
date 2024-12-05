@@ -1,5 +1,5 @@
 import { db } from '../../db/mysql/index.js'
-import { ConsumerService } from './consumer.service.js'
+import { ConsumerService } from './client.service.js'
 
 export class ConsumerMysqlService extends ConsumerService {
 	constructor () {
@@ -60,15 +60,15 @@ export class ConsumerMysqlService extends ConsumerService {
 		return matches
 	}
 
-	getConsumer = async (consumerId) => {
-		return await db.Consumer.findByPk(consumerId)
+	getConsumer = async (clientId) => {
+		return await db.Consumer.findByPk(clientId)
 	}
 
-	addLikeBar = async (consumerId, barId) => {
+	addLikeBar = async (clientId, barId) => {
 		try {
 			const [like, createdLike] = await db.Like.findOrCreate({
 				where: {
-					consumerId,
+					clientId,
 					barId,
 				},
 			})
@@ -84,11 +84,11 @@ export class ConsumerMysqlService extends ConsumerService {
 		}
 	}
 
-	dissLikeBar = async (consumerId, barId) => {
+	dissLikeBar = async (clientId, barId) => {
 		try {
 			const remove = await db.Like.destroy({
 				where: {
-					consumerId,
+					clientId,
 					barId,
 				},
 			})

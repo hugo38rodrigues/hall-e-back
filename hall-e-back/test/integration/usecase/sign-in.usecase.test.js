@@ -1,12 +1,19 @@
 import { describe } from 'vitest'
-import { missingEmailBar, missingPasswordBar, validBar } from '../../fixtures/bar.fixture'
+import {
+	missingEmailBar,
+	missingPasswordBar,
+	validBar,
+} from '../../fixtures/bar.fixture'
 import {
 	missingEmailConsumer,
 	missingPasswordConsumer,
-} from '../../fixtures/consumer.fixture'
+} from '../../fixtures/client.fixture'
 import { errorResponseBar } from '../specs/sign-in/bar.spec.sign-in'
-import { checkMissingPasswordOrEmail, successFullUserSignIn } from '../specs/sign-in/commun.spec.sign-in'
-import { errorResponseConsumer } from '../specs/sign-in/consumer.spec.sign-in'
+import { errorResponseConsumer } from '../specs/sign-in/client.spec.sign-in'
+import {
+	checkMissingPasswordOrEmail,
+	successFullUserSignIn,
+} from '../specs/sign-in/commun.spec.sign-in'
 describe('Register a user', () => {
 	const signInUrl = '/api/v1/commun/sign-in'
 

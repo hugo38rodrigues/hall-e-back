@@ -1,38 +1,35 @@
 /* eslint-disable no-unused-vars */
 export class CommunService {
-    constructor () {
-    }
-    
-    getUser = async (ressources) => {}
+	constructor() {}
 
-    getConsumer =  async (consumerId) => {}
+	getProfileUser = async (ressources) => {}
 
-    getBar =  async (barId) => {}
+	getClient = async (clientId) => {}
 
-    getGame = async (gameId) => {}
+	getBar = async (barId) => {}
 
-    getTeam = async (teamId) => {}
+	getGame = async (gameId) => {}
 
-    getLeague = async (leagueId) => {}
-    
-    getUserById = async (role, id) => {}
+	getTeam = async (teamId) => {}
 
-    addUser = async (ressources) => {}
+	getLeague = async (leagueId) => {}
 
-    updateUser = async (id, ressources) => {}
+	getUserById = async (role, id) => {}
 
-    deleteUserById = async (id, role) => {}
+	addUser = async (ressources) => {}
 
-    addFavoritesGame = async (bar, game) => {}
-    removeFavoritesGame = async (bar, game) => {}
+	updateUser = async (id, ressources) => {}
 
-    addFavoritesLeague = async (bar, league) => {}
-    removeFavoritesLeague = async (bar, league) => {}
+	deleteUserById = async (id, role) => {}
 
-    addFavoritesTeam = async (bar, team) => {}
-    removeFavoritesTeam = async (bar, team) => {}
+	addFavoritesGame = async (bar, game) => {}
+	removeFavoritesGame = async (bar, game) => {}
 
-    getMatchesAndScheduledMatches = async () => {}
+	addFavoritesLeague = async (bar, league) => {}
+	removeFavoritesLeague = async (bar, league) => {}
+
+	addFavoritesTeam = async (bar, team) => {}
+	removeFavoritesTeam = async (bar, team) => {}
+
+	getMatches = async () => {}
 }
-
-

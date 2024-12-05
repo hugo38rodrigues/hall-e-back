@@ -2,68 +2,86 @@ import axios from 'axios'
 import { format } from 'date-fns'
 
 export class Match {
+	#urlConnection
 
-  #urlConnection
+	constructor (urlConnection) {
+		this.#urlConnection = urlConnection
+	}
 
-  constructor (urlConnection) {
-    this.#urlConnection = urlConnection
-  }
+	#checkedData = (value) => {
+		return value === null || value === '' || value === undefined
+	}
 
-  #checkedData = (value) => {
-    return value === null || value === '' || value === undefined
-  }
+	#formatedDate = (date) => {
+		const curentYears = new Date().getFullYear()
+		const formatedDate = format(new Date(date), 'yyyy-MM-dd HH:mm:ss')
+		const dateObj = new Date(formatedDate.replace(' ', 'T'))
+		if (dateObj.getFullYear() === curentYears) {
+			return formatedDate
+		} else {
+			return null
+		}
+	}
 
-  #formatedDate = (date) => {
-    const curentYears = new Date().getFullYear()
-    const formatedDate = format(new Date(date), 'yyyy-MM-dd HH:mm:ss')
-    const dateObj = new Date(formatedDate.replace(' ', 'T'))
-    if (dateObj.getFullYear() === curentYears) {
-      return formatedDate
-    } else {
-      return null
-    }
-  }
+	#getData = async (urlConnection) => {
+		try {
+			const response = await axios(urlConnection)
+			if (response.status === 200) {
+				return response.data
+			} else {
+				console.log(`Error while retrieving data from api ${response}`)
+				process.exit()
+			}
+		} catch (error) {
+			console.error('Error:', error)
+			process.exit()
+		}
+	}
 
-  #getData = async (urlConnection) => {
-    try {
-      const response = await axios(urlConnection)
-      if (response.status === 200) {
-        return response.data
-      }
-      else {
-        console.log(`Error while retrieving data from api ${response}`)
-        process.exit()
-      }
+	createdMatch = async () => {
+		const responseData = await this.#getData(this.#urlConnection)
+		const matches = responseData.map((data) => {
+			const idMatch = data.id
+			const date = this.#formatedDate(data.begin_at)
+			const gameName = data.videogame.slug
+			const leagueName = data.league.name
+			const getTeamData = (field) =>
+				data.opponents.map((opponent) => opponent.opponent[field]) || []
 
-    } catch (error) {
-      console.error('Error:', error)
-      process.exit()
-    }
-  }
+			const [team1Name, team2Name] = getTeamData('name')
+			const [team1Acronym, team2Acronym] = getTeamData('acronym')
+			const [team1Logo, team2Logo] = getTeamData('image_url')
+	
 
-  createdMatch = async () => {
-    const responseData = await this.#getData(this.#urlConnection)
-    const matches = responseData.map((data) => {
-      const idMatch = data.id
-      const date = this.#formatedDate(data.begin_at)
-      const gameName = data.videogame.slug
-      const leagueName = data.league.name
-      const [team1, team2] = data.opponents.map(opponent => opponent.opponent.acronym) || []
-      const isEmptyData = this.#checkedData(idMatch) || this.#checkedData(date) || this.#checkedData(gameName) || this.#checkedData(leagueName) || this.#checkedData(team1) || this.#checkedData(team2)
-      if (isEmptyData ) {
-        return null
-      }
+			const isEmptyData = [
+				idMatch,
+				date,
+				gameName,
+				leagueName,
+				team1Name,
+				team2Name,
+				team1Acronym,
+				team2Acronym
+			].some((field) => this.#checkedData(field))
 
-      return {
-        idMatch,
-        date,
-        leagueName,
-        gameName,
-        team1,
-        team2
-      }
-    })
+			if (isEmptyData) {
+				return null
+			}
 
-    return matches.filter(item => item !== null)
-  }
+			return {
+				idMatch,
+				date,
+				leagueName,
+				gameName,
+				team1Name,
+				team2Name,
+				team1Acronym,
+				team2Acronym,
+				team1Logo,
+				team2Logo,
+			}
+		})
+
+		return matches.filter((item) => item !== null)
+	}
 }

@@ -4,7 +4,7 @@ import app from '../../../../index.js'
 import {
 	missingFirstNameConsumer,
 	missingLastNameConsumer,
-} from '../../../fixtures/consumer.fixture.js'
+} from '../../../fixtures/client.fixture.js'
 
 export const errorResponseConsumer = async (signInUrl) => {
 	test('Should be a error with missing first name or last name', async () => {

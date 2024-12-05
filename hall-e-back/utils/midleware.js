@@ -1,19 +1,17 @@
 export class Midleware {
-  constructor () {
+	constructor () {}
 
-  }
+	verifyRoleInBody = (req, res, next) => {
+		if (!req.body.role) {
+			return res.status(400).json({ message: 'The “role” field is missing' })
+		}
 
-  verifyRoleInBody = (req, res, next) => {
-    
-    if (!req.body.role) {
-      return res.status(400).json({ message: 'The “role” field is missing' })
-    }
-    
-    if (req.body.role !== 'consumer' && req.body.role !== 'bar') {
-      return res.status(401).json({ message: `The role ${req.body.role} is not accepted` })
-    }
+		if (req.body.role !== 'client' && req.body.role !== 'bar') {
+			return res
+				.status(401)
+				.json({ message: `The role ${req.body.role} is not accepted` })
+		}
 
-    next()
-  }
-
+		next()
+	}
 }

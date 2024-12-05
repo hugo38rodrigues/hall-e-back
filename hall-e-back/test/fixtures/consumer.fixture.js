@@ -5,7 +5,7 @@ export const validConsumer = {
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
 	email: 'hugoConsumer@gmail.com',
-	role: 'consumer',
+	role: 'client',
 }
 
 export const validConnexionConsumer = {
@@ -13,7 +13,7 @@ export const validConnexionConsumer = {
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
 }
-export const consumerNotFound = {
+export const clientNotFound = {
 	email: 'toto@gmail.com',
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
@@ -25,7 +25,7 @@ export const missingEmailConsumer = {
 	firstName: 'tata',
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-	role: 'consumer',
+	role: 'client',
 }
 
 export const missingPasswordConsumer = {
@@ -33,7 +33,7 @@ export const missingPasswordConsumer = {
 	lastName: 'toto',
 	firstName: 'tata',
 	email: 'hugoConsumer@gmail.com',
-	role: 'consumer',
+	role: 'client',
 }
 
 export const missingFirstNameConsumer = {
@@ -42,7 +42,7 @@ export const missingFirstNameConsumer = {
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
 	email: 'hugoConsumer@gmail.com',
-	role: 'consumer',
+	role: 'client',
 }
 
 export const missingLastNameConsumer = {
@@ -51,10 +51,10 @@ export const missingLastNameConsumer = {
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
 	email: 'hugoConsumer@gmail.com',
-	role: 'consumer',
+	role: 'client',
 }
 
-export const consumerWithoutFavoriteAndLike = {
+export const clientWithoutFavoriteAndLike = {
 	email: 'hugoConsumer@gmail.com',
 	favoriteGames: [],
 	favoriteLeagues: [],
@@ -62,5 +62,5 @@ export const consumerWithoutFavoriteAndLike = {
 	firstName: 'tata',
 	lastName: 'toto',
 	likedBars: [],
-	role: 'consumer',
+	role: 'client',
 }

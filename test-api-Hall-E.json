@@ -1,1598 +1,1598 @@
 {
-    "clientName": "Thunder Client",
-    "collectionName": "Hall-E",
-    "collectionId": "c563aac2-77da-4532-abef-e231af07ce3d",
-    "dateExported": "2024-09-19T13:14:17.899Z",
-    "version": "1.2",
-    "folders": [
-        {
-            "_id": "02764022-4a14-49f7-8178-aa682bc64e4d",
-            "name": "user",
-            "containerId": "",
-            "created": "2024-07-16T08:24:28.751Z",
-            "sortNum": 10000
-        },
-        {
-            "_id": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "sign-in",
-            "containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
-            "created": "2024-09-18T13:27:33.651Z",
-            "sortNum": 10000
-        },
-        {
-            "_id": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "sign-in",
-            "containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
-            "created": "2024-09-18T13:28:29.412Z",
-            "sortNum": 10000
-        },
-        {
-            "_id": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
-            "name": "connexion",
-            "containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
-            "created": "2024-09-18T14:25:50.968Z",
-            "sortNum": 20000
-        },
-        {
-            "_id": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "modify profile",
-            "containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
-            "created": "2024-09-19T08:17:10.720Z",
-            "sortNum": 30000
-        },
-        {
-            "_id": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
-            "name": "consumer",
-            "containerId": "02764022-4a14-49f7-8178-aa682bc64e4d",
-            "created": "2024-09-18T13:14:49.578Z",
-            "sortNum": 40000
-        },
-        {
-            "_id": "965729eb-ceee-4d24-8eea-985b737ff0ab",
-            "name": "bar",
-            "containerId": "02764022-4a14-49f7-8178-aa682bc64e4d",
-            "created": "2024-09-18T13:26:34.346Z",
-            "sortNum": 50000
-        },
-        {
-            "_id": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
-            "name": "connexion",
-            "containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
-            "created": "2024-09-18T14:17:11.562Z",
-            "sortNum": 70000
-        },
-        {
-            "_id": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "modify profile",
-            "containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
-            "created": "2024-09-19T07:06:18.464Z",
-            "sortNum": 80000
-        },
-        {
-            "_id": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
-            "name": "address",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "created": "2024-09-19T09:08:41.026Z",
-            "sortNum": 90000
-        },
-        {
-            "_id": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
-            "name": "delete user",
-            "containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
-            "created": "2024-09-19T09:51:34.467Z",
-            "sortNum": 90000
-        },
-        {
-            "_id": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
-            "name": "delete user",
-            "containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
-            "created": "2024-09-19T09:35:34.900Z",
-            "sortNum": 100000
-        }
-    ],
-    "requests": [
-        {
-            "_id": "1f58a36d-5af6-4519-8a86-0dc29c8c6665",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "valide",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 625,
-            "created": "2024-09-19T08:17:10.721Z",
-            "modified": "2024-09-19T08:57:23.497Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 9,\n  \"email\": \"heeugo2Bar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{\"message\":\"Update account\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
-        {
-            "_id": "03d77919-070e-4585-a615-d082df21daff",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "error email",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 1250,
-            "created": "2024-09-19T08:54:57.741Z",
-            "modified": "2024-09-19T09:01:59.831Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"email\": \"heeugo2Bargmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Email must be in xxx@xxx.xxx or xxx.xxx@xxx.xxx\" }"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "eea01209-0aa2-47fd-8fe3-e11a72e9f0cc",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "error name",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 1406.3,
-            "created": "2024-09-19T08:55:25.801Z",
-            "modified": "2024-09-19T09:03:44.973Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"name\": 544554,\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Name must be string\" }"
-                }
-            ]
-        },
-        {
-            "_id": "26969b00-737d-4547-b6d2-d16ae71e3a2a",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "error description",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 1562.5,
-            "created": "2024-09-19T08:55:06.153Z",
-            "modified": "2024-09-19T09:09:24.962Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"description\": 33333,\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Description must be a description of your bar\" }"
-                }
-            ]
-        },
-        {
-            "_id": "d354385e-677c-4b93-a9fc-5c202a0ec3e0",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "error password",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 1875,
-            "created": "2024-09-19T08:55:02.137Z",
-            "modified": "2024-09-19T09:06:13.368Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"password\": \"ze65f4ze6cze\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Password is not token\" }"
-                }
-            ]
-        },
-        {
-            "_id": "c2231081-b3d0-4372-ad57-ebd2806e2ac5",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "error id is is not integer",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 2500,
-            "created": "2024-09-19T08:54:34.265Z",
-            "modified": "2024-09-19T09:07:12.087Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": \"deded\",\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Id must be integer\" }"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "b21cc431-ef3b-4b6c-8134-250699666c20",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "error role",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 5000,
-            "created": "2024-09-18T13:28:29.414Z",
-            "modified": "2024-09-18T14:06:40.652Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Role must be consumer or bar\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "a1b16feb-73a3-458d-8420-a0534bcf7048",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
-            "name": "error not found id",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 5000,
-            "created": "2024-09-19T08:54:28.755Z",
-            "modified": "2024-09-19T10:03:53.367Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 76688831,\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"ressource not found\" }"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "d2f5cb48-ba6b-4496-bee4-06939ad02cce",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "",
-            "name": "Get API Data",
-            "url": "https://api.pandascore.co/lol/matches/upcoming",
-            "method": "GET",
-            "sortNum": 10000,
-            "created": "2024-05-10T17:42:07.811Z",
-            "modified": "2024-05-10T17:42:07.811Z",
-            "headers": [
-                {
-                    "name": "Accept",
-                    "value": "application/json"
-                },
-                {
-                    "name": "Authorization",
-                    "value": "Bearer d4IuV4C2nQrDTvlPjKSXIoJqNP6B4ySOwqoqcVORoGlEk7wmBo0"
-                }
-            ]
-        },
-        {
-            "_id": "8f9d7be0-8af0-41d9-a643-278027b7c5ee",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "valide",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 10000,
-            "created": "2024-07-16T08:21:22.200Z",
-            "modified": "2024-09-19T12:53:30.968Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": \"766801\",\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"totoConsumer@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Sign in success\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "201"
-                }
-            ]
-        },
-        {
-            "_id": "c63b79ef-60fb-4a48-854d-3b6f257a982b",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
-            "name": "valide",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 10000,
-            "created": "2024-07-16T08:23:59.447Z",
-            "modified": "2024-09-19T08:16:51.617Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"totoConsumer@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{\"email\":\"totoConsumer@gmail.com\",\"lastName\":\"toto\",\"firstName\":\"tata\",\"role\":\"consumer\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
-        {
-            "_id": "551114f3-26b6-44f4-b343-86a842a3d945",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "valide",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 10000,
-            "created": "2024-07-16T08:24:46.975Z",
-            "modified": "2024-09-19T08:34:35.066Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{\"message\":\"Update account\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
-        {
-            "_id": "1dbf44eb-10e2-48a8-9785-496fb967df14",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
-            "name": "deleteAccount",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "DELETE",
-            "sortNum": 10000,
-            "created": "2024-07-16T08:25:20.384Z",
-            "modified": "2024-09-19T09:54:49.412Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{ \n  \"id\": 9,\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": ""
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
-        {
-            "_id": "2bb8c01c-3214-47ef-a3e2-c6d531b4274d",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "valide",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 10000,
-            "created": "2024-09-18T11:52:31.369Z",
-            "modified": "2024-09-19T13:04:02.407Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 9,\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, 25555, Limoge \",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Sign in success\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "201"
-                }
-            ]
-        },
-        {
-            "_id": "f7d977ff-fde4-4986-884c-8f518461f3ce",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
-            "name": "valide",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 10000,
-            "created": "2024-09-18T14:25:50.968Z",
-            "modified": "2024-09-19T09:53:29.750Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"heeugoBar@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{\"id\": 7,\"address\":\"5 rue victor hugo limoge 25555\",\"name\":\"Tonneaux de limoge\",\"email\":\"heeugoBar@gmail.com\",\"price\": null,\"description\":\"Le meilleur bar de limoge\",\"photo\": null,\"password\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\"role\":\"bar\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
-        {
-            "_id": "7adc5282-be63-49d4-89c7-54dd7e251d10",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
-            "name": "error address don' respect order",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 10000,
-            "created": "2024-09-19T09:07:30.103Z",
-            "modified": "2024-09-19T09:32:13.459Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"address\": \"12 Rue de la mer, 6555, loire\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Description must be a description of your bar\" }"
-                }
-            ]
-        },
-        {
-            "_id": "447441fc-7b2e-4aa2-aee5-38b69c605039",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
-            "name": "deleteAccount",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "DELETE",
-            "sortNum": 10000,
-            "created": "2024-09-19T09:51:34.468Z",
-            "modified": "2024-09-19T12:56:56.511Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{ \n  \"id\": 766801,\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"delete user\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
-        {
-            "_id": "5c0cca6d-2f52-4183-b9b1-b62621b19961",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "",
-            "name": "getMatch",
-            "url": "http://localhost:3000/v1/consumer/",
-            "method": "GET",
-            "sortNum": 15000,
-            "created": "2024-09-07T16:42:29.979Z",
-            "modified": "2024-09-07T16:43:29.621Z",
-            "headers": []
-        },
-        {
-            "_id": "9b7dd783-128e-4d49-89c6-f5b5f4d83e8b",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "",
-            "name": "helloworld",
-            "url": "http://localhost:3000/",
-            "method": "GET",
-            "sortNum": 20000,
-            "created": "2024-07-15T17:41:36.899Z",
-            "modified": "2024-07-15T17:41:53.350Z",
-            "headers": []
-        },
-        {
-            "_id": "1ad46b76-2879-4440-a737-9b7d1959d83f",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "user exist",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T13:21:56.135Z",
-            "modified": "2024-09-18T14:13:00.556Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"totoConsumer@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"The user already exists\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "39c047f4-b52d-4cad-90af-c8825175ddb8",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "user exist",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T13:28:29.413Z",
-            "modified": "2024-09-18T14:00:41.630Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "The user already exists"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "32167ae6-964e-47aa-93cd-e7d834d93bd6",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "error address",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T13:44:23.729Z",
-            "modified": "2024-09-18T14:08:32.619Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Address must be in street city postal code\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "35125172-950d-47d1-92b4-6781e1e3487a",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
-            "name": "user not exit",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T14:17:27.960Z",
-            "modified": "2024-09-18T14:18:12.461Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"tovfeer@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"User is not found\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "bc0ef80a-89f4-4f8a-9c44-6e031194cbb0",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
-            "name": "error email",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T14:18:23.695Z",
-            "modified": "2024-09-18T14:27:57.105Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "f1c7c4a7-f3de-4ccb-aa05-f164a18821ed",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
-            "name": "error password",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T14:24:43.225Z",
-            "modified": "2024-09-18T14:25:37.177Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"totoConsumer@gmail.com\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "d211528e-ba9f-4852-bd7d-0d09dbdad2a7",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
-            "name": "user not exit",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T14:25:50.969Z",
-            "modified": "2024-09-18T14:25:50.968Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"tovfeer@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"User is not found\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "c542553a-3f6c-4a2a-a3c3-99684bb8c571",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
-            "name": "error email",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T14:25:50.970Z",
-            "modified": "2024-09-18T14:48:26.355Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "39409f99-1883-40e7-b0c1-b7e9b5c2abd0",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
-            "name": "error password",
-            "url": "http://localhost:3000/v1/user/connexion",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2024-09-18T14:25:50.971Z",
-            "modified": "2024-09-18T14:48:25.344Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"email\": \"heeugoBar@gmail.com\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "2fa61735-2ce8-46f7-abdc-2c2a32a5d220",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "error not found id",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 20000,
-            "created": "2024-09-19T08:17:27.083Z",
-            "modified": "2024-09-19T12:56:39.955Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 76681,\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"ressource not found\" }"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "84570a2f-e300-40b3-9056-a3e297712c9d",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
-            "name": "error address missing postal code",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 20000,
-            "created": "2024-09-19T09:10:23.683Z",
-            "modified": "2024-09-19T09:32:25.135Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"address\": \"12 Rue de la mer, loire\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Description must be a description of your bar\" }"
-                }
-            ]
-        },
-        {
-            "_id": "8f067ad6-41c6-45f6-beb1-f8f358ecc26d",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
-            "name": "error id is not found",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "DELETE",
-            "sortNum": 20000,
-            "created": "2024-09-19T09:46:57.043Z",
-            "modified": "2024-09-19T09:48:46.002Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{ \n  \"id\": 8888,\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"error delete user not found\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "6a25f66d-ae2c-4a94-9851-4a2d1e1d46e7",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
-            "name": "error id is not found",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "DELETE",
-            "sortNum": 20000,
-            "created": "2024-09-19T09:51:34.469Z",
-            "modified": "2024-09-19T09:51:56.283Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{ \n  \"id\": 8888,\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"error delete user not found\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "7ec8213a-0eb5-4cf4-9ef1-e3e389c9612e",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "error role",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 30000,
-            "created": "2024-09-18T13:13:32.995Z",
-            "modified": "2024-09-18T14:13:22.940Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heedsfuxsxgo@gmail.com\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Role must be consumer or bar\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "84b71ee5-8b74-4100-9768-d1f21b1f6b03",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "error id is is not integer",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 30000,
-            "created": "2024-09-19T08:34:46.605Z",
-            "modified": "2024-09-19T08:39:26.994Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": \"deded\",\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Id must be integer\" }"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "125cdf63-dd29-45e9-bdc0-9a412ab5cffd",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
-            "name": "error address missing city",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 30000,
-            "created": "2024-09-19T09:11:05.496Z",
-            "modified": "2024-09-19T09:32:33.650Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"address\": \"12 Rue de la mer, 5555 \",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Description must be a description of your bar\" }"
-                }
-            ]
-        },
-        {
-            "_id": "64541893-4a14-4f23-a372-5d6fb53336ba",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
-            "name": "error id is not  integer",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "DELETE",
-            "sortNum": 30000,
-            "created": "2024-09-19T09:49:28.029Z",
-            "modified": "2024-09-19T09:51:01.874Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{ \n  \"id\": \"decdc\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Id must be integer\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "2124aae3-edf2-4a77-bb33-2014e2937bfe",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
-            "name": "error id is not  integer",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "DELETE",
-            "sortNum": 30000,
-            "created": "2024-09-19T09:51:34.470Z",
-            "modified": "2024-09-19T09:52:00.473Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{ \n  \"id\": \"decdc\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Id must be integer\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "2864814c-974e-4780-bc4a-26fb89e36dfa",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "error email",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 40000,
-            "created": "2024-09-18T13:12:07.038Z",
-            "modified": "2024-09-18T14:13:33.355Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "4406afdc-532d-40a4-a795-44ffe0889177",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "error email",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 40000,
-            "created": "2024-09-18T13:28:29.415Z",
-            "modified": "2024-09-18T14:07:15.146Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "e5c9d7cc-30dc-4424-af11-ffb1c8ffa83f",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "error email",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 40000,
-            "created": "2024-09-19T08:40:28.561Z",
-            "modified": "2024-09-19T08:47:21.131Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"email\": \"totogmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Email must be in xxx@xxx.xxx or xxx.xxx@xxx.xxx\" }"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "1d580996-a505-45f2-89fd-ee1872202527",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
-            "name": "error address missing number of street",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 40000,
-            "created": "2024-09-19T09:11:36.546Z",
-            "modified": "2024-09-19T09:31:54.427Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"address\": \"rue de la Paix, 75008, Paris\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Description must be a description of your bar\" }"
-                }
-            ]
-        },
-        {
-            "_id": "8d2c2343-b5dc-45dc-ae66-c9e2b6a0b0b1",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "error lastName",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 50000,
-            "created": "2024-09-18T13:10:54.573Z",
-            "modified": "2024-09-18T14:13:42.812Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heedsfuxsxgo@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing first name or last name\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "4a8b1e17-9fa5-43c3-8435-fccb6a950c36",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "error description",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 50000,
-            "created": "2024-09-18T13:28:29.418Z",
-            "modified": "2024-09-19T09:57:18.972Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Address must be in street city postal code\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                }
-            ]
-        },
-        {
-            "_id": "30444dcf-0cf0-4a94-89d5-033ed7d64944",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "error password",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 50000,
-            "created": "2024-09-19T08:47:40.494Z",
-            "modified": "2024-09-19T08:49:58.592Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"password\": \"ze65f4ze6cze\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Password is not token\" }"
-                }
-            ]
-        },
-        {
-            "_id": "7fa6b6cb-9111-4a80-b71d-6b79933c7a88",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "error firtsName",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 60000,
-            "created": "2024-09-18T13:11:45.879Z",
-            "modified": "2024-09-18T14:13:54.434Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"lastName\":\"toto\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heedsfuxsxgo@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing first name or last name\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "2f8a2216-58ff-4a91-8359-0f29859a1a34",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "error name",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 60000,
-            "created": "2024-09-18T13:28:29.419Z",
-            "modified": "2024-09-19T09:57:49.353Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"address\": \"5 rue victor hugo, 55555, Limoge\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Name must be string\"}"
-                }
-            ]
-        },
-        {
-            "_id": "bd7e461b-1f22-4acc-8cdb-dbb9d9f92728",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "error lastName",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 60000,
-            "created": "2024-09-19T08:50:27.655Z",
-            "modified": "2024-09-19T08:52:27.821Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"lastName\": 544554,\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"Last name must be string\" }"
-                }
-            ]
-        },
-        {
-            "_id": "990e59bf-c5cd-4f80-ace9-cce680e95403",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
-            "name": "error pwd",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 70000,
-            "created": "2024-09-18T13:11:48.342Z",
-            "modified": "2024-09-18T14:14:15.849Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"email\": \"heedsfuxsxgo@gmail.com\",\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "4230659a-fffc-4153-81e9-39747142181d",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
-            "name": "error pwd",
-            "url": "http://localhost:3000/v1/user/sign-in",
-            "method": "POST",
-            "sortNum": 70000,
-            "created": "2024-09-18T13:28:29.420Z",
-            "modified": "2024-09-18T14:04:49.496Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "{\"message\":\"Missing email or password\"}"
-                },
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "264058dc-1bd9-4102-a983-ff738738045f",
-            "colId": "c563aac2-77da-4532-abef-e231af07ce3d",
-            "containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
-            "name": "error firstName",
-            "url": "http://localhost:3000/v1/user/",
-            "method": "PUT",
-            "sortNum": 70000,
-            "created": "2024-09-19T08:53:33.259Z",
-            "modified": "2024-09-19T08:54:01.637Z",
-            "headers": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"firstName\": 544554,\n  \"role\": \"consumer\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "401"
-                },
-                {
-                    "type": "res-body",
-                    "custom": "",
-                    "action": "isjson",
-                    "value": "{ \"message\": \"First name must be string\" }"
-                }
-            ]
-        }
-    ],
-    "ref": "5_JLIXQF8FvoLtxmjuJYbLXZhZXz2CkeMJdbiiHHFhNKAFbZCwa9zS0uh_COb1-MMfyWa_zqPSv7ujstFW7M9w"
+	"clientName": "Thunder Client",
+	"collectionName": "Hall-E",
+	"collectionId": "c563aac2-77da-4532-abef-e231af07ce3d",
+	"dateExported": "2024-09-19T13:14:17.899Z",
+	"version": "1.2",
+	"folders": [
+		{
+			"_id": "02764022-4a14-49f7-8178-aa682bc64e4d",
+			"name": "user",
+			"containerId": "",
+			"created": "2024-07-16T08:24:28.751Z",
+			"sortNum": 10000
+		},
+		{
+			"_id": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "sign-in",
+			"containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
+			"created": "2024-09-18T13:27:33.651Z",
+			"sortNum": 10000
+		},
+		{
+			"_id": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "sign-in",
+			"containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
+			"created": "2024-09-18T13:28:29.412Z",
+			"sortNum": 10000
+		},
+		{
+			"_id": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
+			"name": "connexion",
+			"containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
+			"created": "2024-09-18T14:25:50.968Z",
+			"sortNum": 20000
+		},
+		{
+			"_id": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "modify profile",
+			"containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
+			"created": "2024-09-19T08:17:10.720Z",
+			"sortNum": 30000
+		},
+		{
+			"_id": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
+			"name": "client",
+			"containerId": "02764022-4a14-49f7-8178-aa682bc64e4d",
+			"created": "2024-09-18T13:14:49.578Z",
+			"sortNum": 40000
+		},
+		{
+			"_id": "965729eb-ceee-4d24-8eea-985b737ff0ab",
+			"name": "bar",
+			"containerId": "02764022-4a14-49f7-8178-aa682bc64e4d",
+			"created": "2024-09-18T13:26:34.346Z",
+			"sortNum": 50000
+		},
+		{
+			"_id": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
+			"name": "connexion",
+			"containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
+			"created": "2024-09-18T14:17:11.562Z",
+			"sortNum": 70000
+		},
+		{
+			"_id": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "modify profile",
+			"containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
+			"created": "2024-09-19T07:06:18.464Z",
+			"sortNum": 80000
+		},
+		{
+			"_id": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
+			"name": "address",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"created": "2024-09-19T09:08:41.026Z",
+			"sortNum": 90000
+		},
+		{
+			"_id": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
+			"name": "delete user",
+			"containerId": "7a57ac63-e10f-4022-9e39-cb7cbf3de72f",
+			"created": "2024-09-19T09:51:34.467Z",
+			"sortNum": 90000
+		},
+		{
+			"_id": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
+			"name": "delete user",
+			"containerId": "965729eb-ceee-4d24-8eea-985b737ff0ab",
+			"created": "2024-09-19T09:35:34.900Z",
+			"sortNum": 100000
+		}
+	],
+	"requests": [
+		{
+			"_id": "1f58a36d-5af6-4519-8a86-0dc29c8c6665",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "valide",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 625,
+			"created": "2024-09-19T08:17:10.721Z",
+			"modified": "2024-09-19T08:57:23.497Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 9,\n  \"email\": \"heeugo2Bar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{\"message\":\"Update account\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				}
+			]
+		},
+		{
+			"_id": "03d77919-070e-4585-a615-d082df21daff",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "error email",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 1250,
+			"created": "2024-09-19T08:54:57.741Z",
+			"modified": "2024-09-19T09:01:59.831Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"email\": \"heeugo2Bargmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Email must be in xxx@xxx.xxx or xxx.xxx@xxx.xxx\" }"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "eea01209-0aa2-47fd-8fe3-e11a72e9f0cc",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "error name",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 1406.3,
+			"created": "2024-09-19T08:55:25.801Z",
+			"modified": "2024-09-19T09:03:44.973Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"name\": 544554,\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Name must be string\" }"
+				}
+			]
+		},
+		{
+			"_id": "26969b00-737d-4547-b6d2-d16ae71e3a2a",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "error description",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 1562.5,
+			"created": "2024-09-19T08:55:06.153Z",
+			"modified": "2024-09-19T09:09:24.962Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"description\": 33333,\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Description must be a description of your bar\" }"
+				}
+			]
+		},
+		{
+			"_id": "d354385e-677c-4b93-a9fc-5c202a0ec3e0",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "error password",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 1875,
+			"created": "2024-09-19T08:55:02.137Z",
+			"modified": "2024-09-19T09:06:13.368Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"password\": \"ze65f4ze6cze\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Password is not token\" }"
+				}
+			]
+		},
+		{
+			"_id": "c2231081-b3d0-4372-ad57-ebd2806e2ac5",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "error id is is not integer",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 2500,
+			"created": "2024-09-19T08:54:34.265Z",
+			"modified": "2024-09-19T09:07:12.087Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": \"deded\",\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Id must be integer\" }"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "b21cc431-ef3b-4b6c-8134-250699666c20",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "error role",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 5000,
+			"created": "2024-09-18T13:28:29.414Z",
+			"modified": "2024-09-18T14:06:40.652Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Role must be client or bar\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "a1b16feb-73a3-458d-8420-a0534bcf7048",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "2e5b96a2-32a2-4b00-b363-175c4f9fb172",
+			"name": "error not found id",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 5000,
+			"created": "2024-09-19T08:54:28.755Z",
+			"modified": "2024-09-19T10:03:53.367Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 76688831,\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"ressource not found\" }"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "d2f5cb48-ba6b-4496-bee4-06939ad02cce",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "",
+			"name": "Get API Data",
+			"url": "https://api.pandascore.co/lol/matches/upcoming",
+			"method": "GET",
+			"sortNum": 10000,
+			"created": "2024-05-10T17:42:07.811Z",
+			"modified": "2024-05-10T17:42:07.811Z",
+			"headers": [
+				{
+					"name": "Accept",
+					"value": "application/json"
+				},
+				{
+					"name": "Authorization",
+					"value": "Bearer d4IuV4C2nQrDTvlPjKSXIoJqNP6B4ySOwqoqcVORoGlEk7wmBo0"
+				}
+			]
+		},
+		{
+			"_id": "8f9d7be0-8af0-41d9-a643-278027b7c5ee",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "valide",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 10000,
+			"created": "2024-07-16T08:21:22.200Z",
+			"modified": "2024-09-19T12:53:30.968Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": \"766801\",\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"totoConsumer@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Sign in success\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				}
+			]
+		},
+		{
+			"_id": "c63b79ef-60fb-4a48-854d-3b6f257a982b",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
+			"name": "valide",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 10000,
+			"created": "2024-07-16T08:23:59.447Z",
+			"modified": "2024-09-19T08:16:51.617Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"totoConsumer@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{\"email\":\"totoConsumer@gmail.com\",\"lastName\":\"toto\",\"firstName\":\"tata\",\"role\":\"client\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				}
+			]
+		},
+		{
+			"_id": "551114f3-26b6-44f4-b343-86a842a3d945",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "valide",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 10000,
+			"created": "2024-07-16T08:24:46.975Z",
+			"modified": "2024-09-19T08:34:35.066Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{\"message\":\"Update account\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				}
+			]
+		},
+		{
+			"_id": "1dbf44eb-10e2-48a8-9785-496fb967df14",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
+			"name": "deleteAccount",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "DELETE",
+			"sortNum": 10000,
+			"created": "2024-07-16T08:25:20.384Z",
+			"modified": "2024-09-19T09:54:49.412Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{ \n  \"id\": 9,\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": ""
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				}
+			]
+		},
+		{
+			"_id": "2bb8c01c-3214-47ef-a3e2-c6d531b4274d",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "valide",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 10000,
+			"created": "2024-09-18T11:52:31.369Z",
+			"modified": "2024-09-19T13:04:02.407Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 9,\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, 25555, Limoge \",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Sign in success\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "201"
+				}
+			]
+		},
+		{
+			"_id": "f7d977ff-fde4-4986-884c-8f518461f3ce",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
+			"name": "valide",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 10000,
+			"created": "2024-09-18T14:25:50.968Z",
+			"modified": "2024-09-19T09:53:29.750Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"heeugoBar@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{\"id\": 7,\"address\":\"5 rue victor hugo limoge 25555\",\"name\":\"Tonneaux de limoge\",\"email\":\"heeugoBar@gmail.com\",\"price\": null,\"description\":\"Le meilleur bar de limoge\",\"photo\": null,\"password\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\"role\":\"bar\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				}
+			]
+		},
+		{
+			"_id": "7adc5282-be63-49d4-89c7-54dd7e251d10",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
+			"name": "error address don' respect order",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 10000,
+			"created": "2024-09-19T09:07:30.103Z",
+			"modified": "2024-09-19T09:32:13.459Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"address\": \"12 Rue de la mer, 6555, loire\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Description must be a description of your bar\" }"
+				}
+			]
+		},
+		{
+			"_id": "447441fc-7b2e-4aa2-aee5-38b69c605039",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
+			"name": "deleteAccount",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "DELETE",
+			"sortNum": 10000,
+			"created": "2024-09-19T09:51:34.468Z",
+			"modified": "2024-09-19T12:56:56.511Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{ \n  \"id\": 766801,\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"delete user\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "200"
+				}
+			]
+		},
+		{
+			"_id": "5c0cca6d-2f52-4183-b9b1-b62621b19961",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "",
+			"name": "getMatch",
+			"url": "http://localhost:3000/v1/client/",
+			"method": "GET",
+			"sortNum": 15000,
+			"created": "2024-09-07T16:42:29.979Z",
+			"modified": "2024-09-07T16:43:29.621Z",
+			"headers": []
+		},
+		{
+			"_id": "9b7dd783-128e-4d49-89c6-f5b5f4d83e8b",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "",
+			"name": "helloworld",
+			"url": "http://localhost:3000/",
+			"method": "GET",
+			"sortNum": 20000,
+			"created": "2024-07-15T17:41:36.899Z",
+			"modified": "2024-07-15T17:41:53.350Z",
+			"headers": []
+		},
+		{
+			"_id": "1ad46b76-2879-4440-a737-9b7d1959d83f",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "user exist",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T13:21:56.135Z",
+			"modified": "2024-09-18T14:13:00.556Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"totoConsumer@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"The user already exists\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "39c047f4-b52d-4cad-90af-c8825175ddb8",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "user exist",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T13:28:29.413Z",
+			"modified": "2024-09-18T14:00:41.630Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "The user already exists"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "32167ae6-964e-47aa-93cd-e7d834d93bd6",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "error address",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T13:44:23.729Z",
+			"modified": "2024-09-18T14:08:32.619Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Address must be in street city postal code\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "35125172-950d-47d1-92b4-6781e1e3487a",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
+			"name": "user not exit",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T14:17:27.960Z",
+			"modified": "2024-09-18T14:18:12.461Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"tovfeer@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"User is not found\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "bc0ef80a-89f4-4f8a-9c44-6e031194cbb0",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
+			"name": "error email",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T14:18:23.695Z",
+			"modified": "2024-09-18T14:27:57.105Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "f1c7c4a7-f3de-4ccb-aa05-f164a18821ed",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "a92c330f-c8fb-4f2e-83a1-a2ed1024ca44",
+			"name": "error password",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T14:24:43.225Z",
+			"modified": "2024-09-18T14:25:37.177Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"totoConsumer@gmail.com\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "d211528e-ba9f-4852-bd7d-0d09dbdad2a7",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
+			"name": "user not exit",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T14:25:50.969Z",
+			"modified": "2024-09-18T14:25:50.968Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"tovfeer@gmail.com\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"User is not found\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "c542553a-3f6c-4a2a-a3c3-99684bb8c571",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
+			"name": "error email",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T14:25:50.970Z",
+			"modified": "2024-09-18T14:48:26.355Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "39409f99-1883-40e7-b0c1-b7e9b5c2abd0",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "015bb30a-6d25-4499-bd80-bb64ed47b5d3",
+			"name": "error password",
+			"url": "http://localhost:3000/v1/user/connexion",
+			"method": "POST",
+			"sortNum": 20000,
+			"created": "2024-09-18T14:25:50.971Z",
+			"modified": "2024-09-18T14:48:25.344Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"email\": \"heeugoBar@gmail.com\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "2fa61735-2ce8-46f7-abdc-2c2a32a5d220",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "error not found id",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 20000,
+			"created": "2024-09-19T08:17:27.083Z",
+			"modified": "2024-09-19T12:56:39.955Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 76681,\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"ressource not found\" }"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "84570a2f-e300-40b3-9056-a3e297712c9d",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
+			"name": "error address missing postal code",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 20000,
+			"created": "2024-09-19T09:10:23.683Z",
+			"modified": "2024-09-19T09:32:25.135Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"address\": \"12 Rue de la mer, loire\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Description must be a description of your bar\" }"
+				}
+			]
+		},
+		{
+			"_id": "8f067ad6-41c6-45f6-beb1-f8f358ecc26d",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
+			"name": "error id is not found",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "DELETE",
+			"sortNum": 20000,
+			"created": "2024-09-19T09:46:57.043Z",
+			"modified": "2024-09-19T09:48:46.002Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{ \n  \"id\": 8888,\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"error delete user not found\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "6a25f66d-ae2c-4a94-9851-4a2d1e1d46e7",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
+			"name": "error id is not found",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "DELETE",
+			"sortNum": 20000,
+			"created": "2024-09-19T09:51:34.469Z",
+			"modified": "2024-09-19T09:51:56.283Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{ \n  \"id\": 8888,\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"error delete user not found\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "7ec8213a-0eb5-4cf4-9ef1-e3e389c9612e",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "error role",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 30000,
+			"created": "2024-09-18T13:13:32.995Z",
+			"modified": "2024-09-18T14:13:22.940Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heedsfuxsxgo@gmail.com\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Role must be client or bar\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "84b71ee5-8b74-4100-9768-d1f21b1f6b03",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "error id is is not integer",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 30000,
+			"created": "2024-09-19T08:34:46.605Z",
+			"modified": "2024-09-19T08:39:26.994Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": \"deded\",\n  \"email\": \"toto@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Id must be integer\" }"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "125cdf63-dd29-45e9-bdc0-9a412ab5cffd",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
+			"name": "error address missing city",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 30000,
+			"created": "2024-09-19T09:11:05.496Z",
+			"modified": "2024-09-19T09:32:33.650Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"address\": \"12 Rue de la mer, 5555 \",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Description must be a description of your bar\" }"
+				}
+			]
+		},
+		{
+			"_id": "64541893-4a14-4f23-a372-5d6fb53336ba",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "28a63299-0d0d-4d2e-9e65-47a4a796405e",
+			"name": "error id is not  integer",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "DELETE",
+			"sortNum": 30000,
+			"created": "2024-09-19T09:49:28.029Z",
+			"modified": "2024-09-19T09:51:01.874Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{ \n  \"id\": \"decdc\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Id must be integer\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "2124aae3-edf2-4a77-bb33-2014e2937bfe",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "68c74f32-178d-4c74-9bb0-4b827cfe7a86",
+			"name": "error id is not  integer",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "DELETE",
+			"sortNum": 30000,
+			"created": "2024-09-19T09:51:34.470Z",
+			"modified": "2024-09-19T09:52:00.473Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{ \n  \"id\": \"decdc\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Id must be integer\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "2864814c-974e-4780-bc4a-26fb89e36dfa",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "error email",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 40000,
+			"created": "2024-09-18T13:12:07.038Z",
+			"modified": "2024-09-18T14:13:33.355Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "4406afdc-532d-40a4-a795-44ffe0889177",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "error email",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 40000,
+			"created": "2024-09-18T13:28:29.415Z",
+			"modified": "2024-09-18T14:07:15.146Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "e5c9d7cc-30dc-4424-af11-ffb1c8ffa83f",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "error email",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 40000,
+			"created": "2024-09-19T08:40:28.561Z",
+			"modified": "2024-09-19T08:47:21.131Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"email\": \"totogmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Email must be in xxx@xxx.xxx or xxx.xxx@xxx.xxx\" }"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "1d580996-a505-45f2-89fd-ee1872202527",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "f368daa5-d0f3-48a7-bccb-d91405ee3df5",
+			"name": "error address missing number of street",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 40000,
+			"created": "2024-09-19T09:11:36.546Z",
+			"modified": "2024-09-19T09:31:54.427Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"address\": \"rue de la Paix, 75008, Paris\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Description must be a description of your bar\" }"
+				}
+			]
+		},
+		{
+			"_id": "8d2c2343-b5dc-45dc-ae66-c9e2b6a0b0b1",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "error lastName",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 50000,
+			"created": "2024-09-18T13:10:54.573Z",
+			"modified": "2024-09-18T14:13:42.812Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"firstName\": \"tata\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heedsfuxsxgo@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing first name or last name\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "4a8b1e17-9fa5-43c3-8435-fccb6a950c36",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "error description",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 50000,
+			"created": "2024-09-18T13:28:29.418Z",
+			"modified": "2024-09-19T09:57:18.972Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Address must be in street city postal code\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				}
+			]
+		},
+		{
+			"_id": "30444dcf-0cf0-4a94-89d5-033ed7d64944",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "error password",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 50000,
+			"created": "2024-09-19T08:47:40.494Z",
+			"modified": "2024-09-19T08:49:58.592Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"password\": \"ze65f4ze6cze\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Password is not token\" }"
+				}
+			]
+		},
+		{
+			"_id": "7fa6b6cb-9111-4a80-b71d-6b79933c7a88",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "error firtsName",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 60000,
+			"created": "2024-09-18T13:11:45.879Z",
+			"modified": "2024-09-18T14:13:54.434Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"lastName\":\"toto\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heedsfuxsxgo@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing first name or last name\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "2f8a2216-58ff-4a91-8359-0f29859a1a34",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "error name",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 60000,
+			"created": "2024-09-18T13:28:29.419Z",
+			"modified": "2024-09-19T09:57:49.353Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"address\": \"5 rue victor hugo, 55555, Limoge\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"password\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Name must be string\"}"
+				}
+			]
+		},
+		{
+			"_id": "bd7e461b-1f22-4acc-8cdb-dbb9d9f92728",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "error lastName",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 60000,
+			"created": "2024-09-19T08:50:27.655Z",
+			"modified": "2024-09-19T08:52:27.821Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"lastName\": 544554,\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"Last name must be string\" }"
+				}
+			]
+		},
+		{
+			"_id": "990e59bf-c5cd-4f80-ace9-cce680e95403",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "11d4095d-d8cd-4d96-97ad-1e9dc3208f1d",
+			"name": "error pwd",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 70000,
+			"created": "2024-09-18T13:11:48.342Z",
+			"modified": "2024-09-18T14:14:15.849Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"lastName\":\"toto\",\n  \"firstName\": \"tata\",\n  \"email\": \"heedsfuxsxgo@gmail.com\",\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "4230659a-fffc-4153-81e9-39747142181d",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "e3d21047-618f-4052-9774-0195aaced4c3",
+			"name": "error pwd",
+			"url": "http://localhost:3000/v1/user/sign-in",
+			"method": "POST",
+			"sortNum": 70000,
+			"created": "2024-09-18T13:28:29.420Z",
+			"modified": "2024-09-18T14:04:49.496Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"name\": \"Tonneaux de limoge\",\n  \"address\": \"5 rue victor hugo, limoge 55555\",\n  \"description\": \"Le meilleur bar de limoge\",\n  \"email\": \"heeugoBar@gmail.com\",\n  \"role\": \"bar\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "equal",
+					"value": "{\"message\":\"Missing email or password\"}"
+				},
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "400"
+				}
+			]
+		},
+		{
+			"_id": "264058dc-1bd9-4102-a983-ff738738045f",
+			"colId": "c563aac2-77da-4532-abef-e231af07ce3d",
+			"containerId": "b7712d8b-5b24-4d05-bd40-9e51b0c7113e",
+			"name": "error firstName",
+			"url": "http://localhost:3000/v1/user/",
+			"method": "PUT",
+			"sortNum": 70000,
+			"created": "2024-09-19T08:53:33.259Z",
+			"modified": "2024-09-19T08:54:01.637Z",
+			"headers": [],
+			"body": {
+				"type": "json",
+				"raw": "{\n  \"id\": 766801,\n  \"email\": \"toto@gmail.com\",\n  \"firstName\": 544554,\n  \"role\": \"client\"\n}",
+				"form": []
+			},
+			"tests": [
+				{
+					"type": "res-code",
+					"custom": "",
+					"action": "equal",
+					"value": "401"
+				},
+				{
+					"type": "res-body",
+					"custom": "",
+					"action": "isjson",
+					"value": "{ \"message\": \"First name must be string\" }"
+				}
+			]
+		}
+	],
+	"ref": "5_JLIXQF8FvoLtxmjuJYbLXZhZXz2CkeMJdbiiHHFhNKAFbZCwa9zS0uh_COb1-MMfyWa_zqPSv7ujstFW7M9w"
 }

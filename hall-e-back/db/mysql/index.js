@@ -1,22 +1,21 @@
-import { barModel } from './models/bar.model.js'
-import { commentModel } from './models/comment.model.js'
-import { consumerModel } from './models/consumer.model.js'
 import { DataTypes } from 'sequelize'
+import { barMatchScheduleModel } from './models/bar-match.js'
+import { barModel } from './models/bar.model.js'
+import { clientModel } from './models/client.model.js'
+import { commentModel } from './models/comment.model.js'
 import { gameModel } from './models/game.model.js'
 import { leagueModel } from './models/league.model.js'
+import { likeModel } from './models/likes.js'
 import { matchModel } from './models/match.model.js'
 import { teamModel } from './models/team.model.js'
-import { barMatchScheduleModel } from './models/bar-match.js'
 import { sequelize } from './sequelize.js'
-import { likeModel } from './models/likes.js'
-
 
 export const db = {}
 
 // Initialisation des modèles
 db.Bar = barModel(sequelize, DataTypes)
 db.Comment = commentModel(sequelize, DataTypes)
-db.Consumer = consumerModel(sequelize, DataTypes)
+db.Client = clientModel(sequelize, DataTypes)
 db.Game = gameModel(sequelize, DataTypes)
 db.League = leagueModel(sequelize, DataTypes)
 db.Match = matchModel(sequelize, DataTypes)
@@ -26,4 +25,3 @@ db.Like = likeModel(sequelize, DataTypes)
 
 // Ajout de l'instance Sequelize à l'objet db
 db.sequelize = sequelize
-
