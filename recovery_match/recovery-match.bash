@@ -40,8 +40,8 @@ case $bdd_name in
     ;;
   mysql)
     echo "Loading environment for MySQL"
-    if [ -f "./env/.env.mysql.sh" ]; then
-      source "./env/.env.mysql.sh"
+    if [ -f "./env/dev/.env.mysql.sh" ]; then
+      source "./env/dev/.env.mysql.sh"
       npm run load-data
     else
       echo "Environment file for MySQL not found!"
@@ -50,8 +50,8 @@ case $bdd_name in
     ;;
   mongo)
     echo "Loading environment for MongoDB"
-    if [ -f "./env/.env.mongo.sh" ]; then
-      source "./env/.env.mongo.sh"
+    if [ -f "./env/dev/.env.mongo.sh" ]; then
+      source "./env/dev/.env.mongo.sh"
       npm run load-data
     else
       echo "Environment file for MongoDB not found!"
