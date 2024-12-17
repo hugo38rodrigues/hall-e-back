@@ -1,9 +1,11 @@
-import app from './index.js'
 import dotenv from 'dotenv'
-dotenv.config({ path: './env/dev/.env' })
+import app from './index.js'
+
+dotenv.config({ path: './env/dev/.env-debugger' })
 
 const PORT = process.env.PORT
+console.log(PORT)
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+	console.log(`Server is running on port ${PORT}`)
 })
