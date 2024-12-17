@@ -2,41 +2,30 @@ import { db } from '../../db/mysql/index.js'
 import { CommunService } from './commun.service.js'
 
 export class CommunMysqlService extends CommunService {
-	constructor () {
+	constructor() {
 		super()
 		this.db = db
 	}
 
-	getUserIsFound = async (role, email) => {
-		if (role === 'client'){
-			return await this.db.Client.findOne({ where: { email }})
-		} else {
-			return await this.db.Client.findOne({ where: { email }})
+	getUserIsFound = async (email) => {
+		const foundClient = await this.db.Client.findOne({ where: { email } })
+		const foundBar = await this.db.Bar.findOne({ where: { email } })
+		if (foundClient || foundBar) {
+			return true
 		}
+		return false
+	}
+
+	getFavorites = async (user) => {
+		const favoritesLeagues = await user.getFavoritesLeagues()
+		const favoritesGames = await user.getFavoritesGames()
+		const favoritesTeams = await user.getFavoritesTeams()
+		return { favoritesGames, favoritesLeagues, favoritesTeams }
 	}
 
 	getProfileUser = async (email) => {
 		const client = await this.db.Client.findOne({
 			attributes: ['id', 'email', 'lastName', 'firstName', 'password', 'role'],
-			include: [
-				{
-					model: db.Game,
-					as: 'favoriteGames', // Inclure les jeux favoris
-				},
-				{
-					model: db.League,
-					as: 'favoriteLeagues', // Inclure les ligues favorites
-				},
-				{
-					model: db.Team,
-					as: 'favoriteTeams', // Inclure les équipes favorites
-				},
-				{
-					model: db.Bar,
-					as: 'likedBars',
-					attributes: { exclude: ['password'] },
-				},
-			],
 			where: {
 				email: email,
 			},
@@ -54,20 +43,6 @@ export class CommunMysqlService extends CommunService {
 				'photo',
 				'role',
 			],
-			include: [
-				{
-					model: db.Game,
-					as: 'favoriteGamesBar', // Inclure les jeux favoris
-				},
-				{
-					model: db.League,
-					as: 'favoriteLeaguesBar', // Inclure les ligues favorites
-				},
-				{
-					model: db.Team,
-					as: 'favoriteTeamsBar', // Inclure les équipes favorites
-				},
-			],
 			where: {
 				email: email,
 			},
@@ -75,31 +50,33 @@ export class CommunMysqlService extends CommunService {
 
 		if (client) {
 			return client
+		} else if (bar) {
+			return bar
 		}
+		return false
+	}
+
+	getUserById = async (id) => {
+		const client = await this.db.Client.findOne({
+			where: {
+				id: id,
+			},
+		})
+		const bar = await this.db.Bar.findOne({
+			where: {
+				id: id,
+			},
+		})
+
+		if (client) {
+			return client
+		}
+
 		if (bar) {
 			return bar
 		}
-		return null
-	}
 
-	getUserById = async (role, id) => {
-		if (role === 'client') {
-			return await this.db.Client.findOne({
-				attributes: ['id'],
-				where: {
-					id: id,
-				},
-			})
-		} else if (role === 'bar') {
-			return await this.db.Bar.findOne({
-				attributes: ['id'],
-				where: {
-					id: id,
-				},
-			})
-		} else {
-			return false
-		}
+		return null
 	}
 
 	addUser = async (ressources) => {
@@ -131,7 +108,7 @@ export class CommunMysqlService extends CommunService {
 					Error('ressource not found')
 					return {
 						isError: true,
-						message: 'ressource not found',
+						errorMessage: 'ressource not found',
 					}
 				}
 
@@ -191,14 +168,6 @@ export class CommunMysqlService extends CommunService {
 			],
 			order: [['id', 'ASC']],
 		})
-	}
-
-	getClient = async (clientId) => {
-		return await db.Client.findByPk(clientId)
-	}
-
-	getBar = async (barId) => {
-		return await db.Bar.findByPk(barId)
 	}
 
 	getGame = async (gameId) => {
@@ -272,20 +241,6 @@ export class CommunMysqlService extends CommunService {
 			return false
 		} catch (error) {
 			console.log(error)
-		}
-	}
-
-	removeFavoriteLeague = async (user, league, favoriteMethode) => {
-		try {
-			const favoriteLeague = await user[favoriteMethode](league)
-
-			if (favoriteLeague) {
-				return favoriteLeague
-			}
-			return false
-		} catch (error) {
-			console.error(error)
-			throw error
 		}
 	}
 }

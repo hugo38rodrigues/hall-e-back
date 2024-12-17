@@ -12,8 +12,6 @@ import {
 	IS_STRING,
 } from '../utils/regex.js'
 
-import { get } from '../utils/request-http.js'
-
 export class CommunController {
 	#bddTarget
 
@@ -52,11 +50,10 @@ export class CommunController {
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isFirstName = IS_STRING.test(body.firstName)
 		const isLastName = IS_STRING.test(body.lastName)
-    const isValidEmail = body.email && isEmail
-    const isValidPassword = body.password && isPassword
-    const isValidLastName = body.lastName && isLastName
-    const isValidFirstName = body.firstName && isFirstName
-
+		const isValidEmail = body.email && isEmail
+		const isValidPassword = body.password && isPassword
+		const isValidLastName = body.lastName && isLastName
+		const isValidFirstName = body.firstName && isFirstName
 
 		if (!isValidEmail || !isValidPassword) {
 			return { isValid: false, message: 'Missing email or password' }
@@ -65,8 +62,7 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const isSignIn = true
-		const ressources = this.#formatData(body, isSignIn)
+		const ressources = this.#formatData(body)
 
 		return {
 			ressources,
@@ -80,7 +76,7 @@ export class CommunController {
 		const isAddress = IS_ADDRESS.test(body.address)
 		const isName = IS_BAR_NAME.test(body.name)
 		const isDescription = IS_DESCRIPTION.test(body.description)
-		
+
 		if (!isEmail || !isPassword) {
 			return { isValid: false, message: 'password or email invalid' }
 		}
@@ -112,22 +108,33 @@ export class CommunController {
 		}
 	}
 
-	#connexionValidationFrom = (email, password) => {
+	#validationEmail = (email) => {
 		const isEmail = IS_EMAIL.test(email)
-		const isPassword = IS_PASSWORD.test(password)
 
-		if (!isEmail || !isPassword) {
-			return false
-		}
-
-		const ressources = {
-			email,
-			password,
+		if (!isEmail) {
+			return {
+				isValidEmail: false,
+				errorEmailMessage: 'L\'email n\'est pas au bon format',
+			}
 		}
 
 		return {
-			isValid: true,
-			ressources,
+			isValidEmail: true,
+		}
+	}
+
+	#validationPassword = (password) => {
+		const isPassword = IS_PASSWORD.test(password)
+
+		if (!isPassword) {
+			return {
+				isValidPassword: false,
+				errorPasswordMessage: 'Le mot de passe n\'est pas au bon format',
+			}
+		}
+		return {
+			isValidPassword: true,
+			errorPasswordMessage: '',
 		}
 	}
 
@@ -216,7 +223,7 @@ export class CommunController {
 			}
 
 			const user = communInstance(this.#bddTarget)
-			const userIsFound = await user.getUserIsFound(role, data.ressources.email)
+			const userIsFound = await user.getUserIsFound(data.ressources.email)
 
 			if (userIsFound) {
 				return res.status(401).json({ message: 'The user already exists' })
@@ -233,7 +240,7 @@ export class CommunController {
 
 	connexion = async (req, res) => {
 		try {
-			const password = req.body.password
+			const userPassword = req.body.password
 			const email = req.body.email
 
 			const { isValidEmail, errorEmailMessage } = this.#validationEmail(email)
@@ -407,13 +414,13 @@ export class CommunController {
 				return res.status(400).json({ message: 'user not found' })
 			}
 
-			const { isError, message } = await user.updateUser(
+			const { isError, errorMessage } = await user.updateUser(
 				req.body.id,
 				ressources
 			)
 
 			if (isError) {
-				return res.status(400).json({ message })
+				return res.status(400).json({ errorMessage })
 			}
 			return res.status(200).json({ message: 'Update  account' })
 		} catch (error) {
@@ -426,12 +433,10 @@ export class CommunController {
 		try {
 			const newUser = communInstance(this.#bddTarget)
 			const matches = await newUser.getMatches()
-			console.log(matches)
-			const logo1 = await get(matches.team1.logo_url)
-			const logo2 = await get(matches.team2.logo_url)
-			console.log(logo1)
-			matches.teams1.logo = logo1
-			matches.teams2.logo = logo2
+			// const logo1 = await get(matches.team1.logo_url)
+			// const logo2 = await get(matches.team2.logo_url)
+			// matches.teams1.logo = logo1
+			// matches.teams2.logo = logo2
 
 			return res.status(200).json({ data: matches })
 		} catch (error) {
@@ -440,281 +445,5 @@ export class CommunController {
 		}
 	}
 
-	addFavorisGameController = async (req, res) => {
-		try {
-			const gameId = req.body.gameId
-			const userId = req.body.userId
-			const role = req.body.role
-			const isvalidGameId = gameId && IS_NUMBER.test(gameId)
-			const isvalidUserId = userId && IS_NUMBER.test(userId)
 
-			if (!isvalidGameId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: 'The id bar or game id is not a number' })
-			}
-
-			const newUser = communInstance(this.#bddTarget)
-
-			const userIsFound =
-				role === 'client'
-					? await newUser.getClient(userId)
-					: await newUser.getBar(userId)
-			const favoriteMethode =
-				role === 'client' ? 'addFavoriteGame' : 'addFavoriteGamesBar'
-
-			const game = await newUser.getGame(gameId)
-
-			if (!userIsFound || !game) {
-				return res.status(401).json({ message: 'Unknown user or unknown game' })
-			}
-
-			const isAddFavorisGame = await newUser.addFavoriteGame(
-				userIsFound,
-				game,
-				favoriteMethode
-			)
-
-			if (!isAddFavorisGame) {
-				return res.status(401).json({ message: 'The game already exists' })
-			}
-
-			res.status(200).json({ message: 'Games added to favorites' })
-		} catch (error) {
-			console.log(error)
-			res.status(500).json({ message: 'Internal error' })
-		}
-	}
-
-	deleteFavorisGameController = async (req, res) => {
-		try {
-			const gameId = req.body.gameId
-			const userId = req.body.userId
-			const role = req.body.role
-			const isvalidGameId = gameId && IS_NUMBER.test(gameId)
-			const isvalidUserId = userId && IS_NUMBER.test(userId)
-
-			if (!isvalidGameId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: 'The id user or game id is not a number' })
-			}
-
-			const newUser = communInstance(this.#bddTarget)
-
-			const userIsFound =
-				role === 'client'
-					? await newUser.getClient(userId)
-					: await newUser.getBar(userId)
-			const favoriteMethode =
-				role === 'client' ? 'removeFavoriteGame' : 'removeFavoriteGamesBar'
-			const game = await newUser.getGame(gameId)
-
-			if (!userIsFound || !game) {
-				return res.status(401).json({ message: 'Unknown user or unknown game' })
-			}
-
-			const isAddFavorisGame = await newUser.removeFavoriteGame(
-				userIsFound,
-				game,
-				favoriteMethode
-			)
-
-			if (!isAddFavorisGame) {
-				return res.status(401).json({ message: 'Unable to delete the game' })
-			}
-
-			res.status(200).json({ message: 'Games removed from favorites' })
-		} catch (error) {
-			console.log(error)
-			res.status(500).json({ messag: 'Internal error' })
-		}
-	}
-
-	addFavorisTeamController = async (req, res) => {
-		try {
-			const teamId = req.body.teamId
-			const userId = req.body.userId
-			const role = req.body.role
-			const isvalidTeamId = teamId && IS_NUMBER.test(teamId)
-			const isvalidUserId = userId && IS_NUMBER.test(userId)
-
-			if (!isvalidTeamId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: 'The id bar or team id is not a number' })
-			}
-
-			const newUser = communInstance(this.#bddTarget)
-
-			const userIsFound =
-				role === 'client'
-					? await newUser.getClient(userId)
-					: await newUser.getBar(userId)
-			const favoriteMethode =
-				role === 'client' ? 'addFavoriteTeam' : 'addFavoriteTeamsBar'
-
-			const team = await newUser.getTeam(teamId)
-
-			if (!userIsFound || !team) {
-				return res.status(401).json({ message: 'Unknown user or unknown team' })
-			}
-
-			const isAddFavorisTeam = await newUser.addFavoriteTeam(
-				userIsFound,
-				team,
-				favoriteMethode
-			)
-
-			if (!isAddFavorisTeam) {
-				return res.status(401).json({ message: 'The team already exists' })
-			}
-
-			res.status(200).json({ message: 'Team added to favorites' })
-		} catch (error) {
-			console.log(error)
-			res.status(500).json({ message: 'Internal error' })
-		}
-	}
-
-	deleteFavorisTeamController = async (req, res) => {
-		try {
-			const teamId = req.body.teamId
-			const userId = req.body.userId
-			const role = req.body.role
-			const isvalidGameId = teamId && IS_NUMBER.test(teamId)
-			const isvalidUserId = userId && IS_NUMBER.test(userId)
-
-			if (!isvalidGameId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: 'The id user or team id is not a number' })
-			}
-
-			const newUser = communInstance(this.#bddTarget)
-
-			const userIsFound =
-				role === 'client'
-					? await newUser.getClient(userId)
-					: await newUser.getBar(userId)
-			const favoriteMethode =
-				role === 'client' ? 'addFavoriteTeam' : 'addFavoriteTeamsBar'
-			const team = await newUser.getTeam(teamId)
-
-			if (!userIsFound || !team) {
-				return res.status(401).json({ message: 'Unknown user or unknown team' })
-			}
-
-			const isAddFavorisTeam = await newUser.removeFavoriteTeam(
-				userIsFound,
-				team,
-				favoriteMethode
-			)
-
-			if (!isAddFavorisTeam) {
-				return res
-					.status(401)
-					.json({ message: 'Impossible to delete the team' })
-			}
-
-			res.status(200).json({ message: 'Team removed from favorites' })
-		} catch (error) {
-			console.log(error)
-			res.status(500).json({ message: 'Internal error' })
-		}
-	}
-
-	addFavorisLeagueController = async (req, res) => {
-		try {
-			const leagueId = req.body.leagueId
-			const userId = req.body.userId
-			const role = req.body.role
-			const isvalidLeagueId = leagueId && IS_NUMBER.test(leagueId)
-			const isvalidUserId = userId && IS_NUMBER.test(userId)
-
-			if (!isvalidLeagueId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: 'The user id or league id is not a number.' })
-			}
-
-			const newUser = communInstance(this.#bddTarget)
-
-			const userIsFound =
-				role === 'client'
-					? await newUser.getClient(userId)
-					: await newUser.getBar(userId)
-			const favoriteMethode =
-				role === 'client' ? 'addFavoriteLeague' : 'addFavoriteLeaguesBar'
-			const league = await newUser.getLeague(leagueId)
-
-			if (!userIsFound || !league) {
-				return res
-					.status(401)
-					.json({ message: 'Unknown user or unknown league' })
-			}
-
-			const isAddFavorisLeague = await newUser.addFavoriteLeague(
-				userIsFound,
-				league,
-				favoriteMethode
-			)
-
-			if (!isAddFavorisLeague) {
-				return res.status(401).json({ message: 'The league already exist' })
-			}
-
-			res.status(200).json({ message: 'League added to favorites' })
-		} catch (error) {
-			console.log(error)
-			res.status(500).json({ message: 'Internal error' })
-		}
-	}
-
-	deleteFavorisLeagueController = async (req, res) => {
-		try {
-			const leagueId = req.body.leagueId
-			const userId = req.body.userId
-			const role = req.body.role
-			const isvalidLeagueId = leagueId && IS_NUMBER.test(leagueId)
-			const isvalidUserId = userId && IS_NUMBER.test(userId)
-
-			if (!isvalidLeagueId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: 'The user id or league id is not a number.' })
-			}
-
-			const newUser = communInstance(this.#bddTarget)
-
-			const userIsFound =
-				role === 'client'
-					? await newUser.getClient(userId)
-					: await newUser.getBar(userId)
-			const favoriteMethode =
-				role === 'client' ? 'addFavoriteLeague' : 'addFavoriteLeaguesBar'
-			const league = await newUser.getLeague(leagueId)
-
-			if (!userIsFound || !league) {
-				return res.status(401).json({ message: 'Unknown user or league' })
-			}
-
-			const isAddFavorisLeague = await newUser.removeFavoriteLeague(
-				userIsFound,
-				league,
-				favoriteMethode
-			)
-
-			if (!isAddFavorisLeague) {
-				return res
-					.status(401)
-					.json({ message: 'Impossible to deleted the league' })
-			}
-
-			res.status(200).json({ message: 'League removed from favorites' })
-		} catch (error) {
-			console.log(error)
-			res.status(500).json({ message: 'Internal error' })
-		}
-	}
 }
