@@ -23,8 +23,10 @@ router.get('/', user.getMatchesController)
 
 router.post('/connexion', user.connexion)
 router.post('/sign-in', middleware.verifyRoleInBody, user.createAccount)
+router.post('/forgot-password', user.forgotPassword)
+router.post('/reset-password', user.resetPassword)
+router.post('/verify-token', user.verifyToken)
 router.delete('/', middleware.verifyRoleInBody, user.deleteUser)
 router.put('/', middleware.verifyRoleInBody, user.updateProfile)
-
 
 export default router
