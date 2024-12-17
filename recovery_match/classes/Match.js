@@ -22,6 +22,9 @@ export class Match {
 			return null
 		}
 	}
+	#formatLeagueName = (name) => {
+		return name.replace(/-/g, ' ').replace(/^./, (char) => char.toUpperCase()) // Met la première lettre en majuscule
+	}
 
 	#getData = async (urlConnection) => {
 		try {
@@ -43,7 +46,7 @@ export class Match {
 		const matches = responseData.map((data) => {
 			const idMatch = data.id
 			const date = this.#formatedDate(data.begin_at)
-			const gameName = data.videogame.slug
+			const gameName = this.#formatLeagueName(data.videogame.slug)
 			const leagueName = data.league.name
 			const getTeamData = (field) =>
 				data.opponents.map((opponent) => opponent.opponent[field]) || []
@@ -51,7 +54,6 @@ export class Match {
 			const [team1Name, team2Name] = getTeamData('name')
 			const [team1Acronym, team2Acronym] = getTeamData('acronym')
 			const [team1Logo, team2Logo] = getTeamData('image_url')
-	
 
 			const isEmptyData = [
 				idMatch,
@@ -61,7 +63,7 @@ export class Match {
 				team1Name,
 				team2Name,
 				team1Acronym,
-				team2Acronym
+				team2Acronym,
 			].some((field) => this.#checkedData(field))
 
 			if (isEmptyData) {
