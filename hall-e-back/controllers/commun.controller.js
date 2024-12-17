@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { communInstance } from '../utils/classes-instance-dispatcher.js'
+import { sendEmailResetPassword } from '../utils/email.js'
 import {
 	IS_ADDRESS,
 	IS_BAR_NAME,
@@ -235,15 +236,16 @@ export class CommunController {
 			const password = req.body.password
 			const email = req.body.email
 
-			const isValidCredentiel = this.#connexionValidationFrom(
-				req.body.email,
-				req.body.password
-			)
+			const { isValidEmail, errorEmailMessage } = this.#validationEmail(email)
+			const { isValidPassword, errorPasswordMessage } =
+				this.#validationPassword(userPassword)
 
-			if (!isValidCredentiel) {
-				return res
-					.status(401)
-					.json({ message: 'L\'email ou le mot de passe sont manquant' })
+			if (!isValidEmail) {
+				return res.status(401).json({ errorEmailMessage })
+			}
+
+			if (!isValidPassword) {
+				return res.status(401).json({ errorPasswordMessage })
 			}
 
 			const newUser = communInstance(this.#bddTarget)
@@ -252,13 +254,18 @@ export class CommunController {
 			if (!userInDb) {
 				return res
 					.status(401)
-					.json({ message: 'L\'utilisateur est introuvable' })
+					.json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const isMatchPassword = await bcrypt.compare(password, userInDb.password)
+			const isMatchPassword = await bcrypt.compare(
+				userPassword,
+				userInDb.password
+			)
 
 			if (!isMatchPassword) {
-				return res.status(401).json({ message: 'Le mot de passe est invalide' })
+				return res
+					.status(401)
+					.json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
 			const validToken = await this.encrypt.tokenCreation(
@@ -267,12 +274,80 @@ export class CommunController {
 			)
 
 			const profile = { ...userInDb.dataValues, token: validToken }
-
-			return res.status(200).json(profile)
+			const { password, ...newProfile } = profile
+			return res.status(200).json({ newProfile })
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ message: 'Internal server error' })
 		}
+	}
+
+	forgotPassword = async (req, res) => {
+		const email = req.body.email
+		const { isValidCredentiel, message } = this.#validationEmail(email)
+
+		if (isValidCredentiel) {
+			return res.status(401).json({ message })
+		}
+
+		const newUser = communInstance(this.#bddTarget)
+
+		const userIsFound = await newUser.getProfileUser(email)
+
+		console.log(userIsFound)
+		if (userIsFound) {
+			const token = await this.encrypt.tokenCreation(
+				userIsFound.dataValues.id,
+				email
+			)
+			await sendEmailResetPassword(email, token)
+		}
+
+		return res.status(200).json({
+			message: `Un email a était envoyer à cette addresse email: ${email}`,
+		})
+
+	}
+
+	resetPassword = async (req, res) => {
+		const newPassword = req.body.newPassword
+		const token = req.body.token
+		
+
+		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(newPassword)
+		const verifyToken = await this.encrypt.verifyToken(token)
+
+		if (!isValidPassword) {
+			return res.status(401).json({ message: errorPasswordMessage })
+		}
+
+		const newUser = communInstance(this.#bddTarget)
+		const userInDb = await newUser.getUserById(verifyToken.id)
+		
+		if (!userInDb) {
+			return res.status(401).json({ message: 'Utilisateur introuvable' })
+		}
+		
+		const encryptNewPassword = this.encrypt.passwordEncrypt(newPassword)
+		const ressource = {
+			role: userInDb.dataValues.role,
+			password: encryptNewPassword,
+		}
+		const { isError, errorMessage } = newUser.updateUser(userInDb.dataValues.id, ressource)
+		if (isError){
+			return res.status(401).json({ message: errorMessage })
+		}
+		return res.status(200).json({ message: 'Mot de passe changer avec success' })
+	}
+
+	verifyToken = async (req, res) => {
+		const token = req.body.token
+		const isToken = await this.encrypt.verifyToken(token)
+		if (isToken) {
+			return res.status(200).json({ isValid: true })
+		}
+
+		return res.status(403).json({ isValid: false })
 	}
 
 	deleteUser = async (req, res) => {
