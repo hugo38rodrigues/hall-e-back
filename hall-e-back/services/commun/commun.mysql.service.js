@@ -213,19 +213,33 @@ export class CommunMysqlService extends CommunService {
 		return await db.League.findByPk(leagueId)
 	}
 
-	addFavoriteGame = async (user, game, favoriteMethode) => {
-		try {
-			const favoriteGame = await user[favoriteMethode](game)
-			if (favoriteGame) {
-				return favoriteGame
-			}
-			return false
-		} catch (error) {
-			console.log(error)
+	removeFavoriteGame = async (user, game) => {
+		const favoriteGame = await user.removeFavoritesGames(game)
+		if (favoriteGame) {
+			return favoriteGame
 		}
+		return false
 	}
 
-	removeFavoriteGame = async (user, game, favoriteMethode) => {
+	removeFavoriteTeam = async (user, team) => {
+		const favoriteTeam = await user.removeFavoritesTeams(team)
+
+		if (favoriteTeam) {
+			return favoriteTeam
+		}
+		return false
+	}
+
+	removeFavoriteLeague = async (user, league) => {
+		const favoriteLeague = await user.removeFavoritesLeagues(league)
+
+		if (favoriteLeague) {
+			return favoriteLeague
+		}
+		return false
+	}
+
+	addFavoriteGame = async (user, game, favoriteMethode) => {
 		try {
 			const favoriteGame = await user[favoriteMethode](game)
 			if (favoriteGame) {
@@ -249,22 +263,9 @@ export class CommunMysqlService extends CommunService {
 		}
 	}
 
-	removeFavoriteTeam = async (user, team, favoriteMethode) => {
+	addFavoriteLeague = async (user, league) => {
 		try {
-			const favoriteTeam = await user[favoriteMethode](team)
-
-			if (favoriteTeam) {
-				return favoriteTeam
-			}
-			return false
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	addFavoriteLeague = async (user, league, favoriteMethode) => {
-		try {
-			const favoriteLeague = await user[favoriteMethode](league)
+			const favoriteLeague = await user.addFavoriteLeagues(league)
 			if (favoriteLeague) {
 				return favoriteLeague
 			}

@@ -54,7 +54,7 @@ export const setupAssociations = () => {
 	// Bar et ses favoris
 	db.Bar.belongsToMany(db.Game, {
 		through: 'BarGameFavorites',
-		as: 'favoriteGamesBar',
+		as: 'favoritesGames',
 		foreignKey: 'barId',
 	})
 
@@ -66,7 +66,7 @@ export const setupAssociations = () => {
 
 	db.Bar.belongsToMany(db.Team, {
 		through: 'BarTeamFavorites',
-		as: 'favoriteTeamsBar',
+		as: 'favoritesTeams',
 		foreignKey: 'barId',
 	})
 
@@ -78,7 +78,7 @@ export const setupAssociations = () => {
 
 	db.Bar.belongsToMany(db.League, {
 		through: 'BarLeagueFavorites',
-		as: 'favoriteLeaguesBar',
+		as: 'favoritesLeagues',
 		foreignKey: 'barId',
 	})
 
