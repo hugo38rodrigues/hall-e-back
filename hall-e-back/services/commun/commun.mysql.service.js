@@ -97,35 +97,45 @@ export class CommunMysqlService extends CommunService {
 		}
 	}
 
-	updateUser = async (id, ressources) => {
-		if (ressources.role === 'client') {
-			try {
-				// Trouver la ressource par son identifiant
-				const resource = await db.Client.findByPk(id)
+	updateUser = async ( id, profile) => {
+	
 
-				if (!resource) {
-					// Mettre à jour les champs de la ressource
-					Error('ressource not found')
-					return {
-						isError: true,
-						errorMessage: 'ressource not found',
-					}
-				}
+		const updateModel =	profile.role === 'client' ? db.Client : profile.role === 'bar' ? db.Bar : null
 
-				return await resource.update(ressources)
-			} catch (error) {
-				return error
-			}
+		if (!updateModel) {
+			return { isError: true, message: 'Rôle utilisateur invalide' }
 		}
+		
+		try {
+			// Récupérer l'objet existant depuis la base de données
+			const profilInBdd = await updateModel.findByPk(id)
 
-		if (ressources.role === 'bar') {
-			try {
-				return await db.Bar.update(ressources, {
-					where: { id: id },
-				})
-			} catch (error) {
-				return error
+			if (!profilInBdd) {
+				throw new Error('L’utilisateur avec cet ID est introuvable.')
 			}
+
+			// Détecter les modifications
+			let hasChanges = false
+			
+			for (const key in profile) {
+
+				if (profile[key] !== profilInBdd[key] && profile[key] !== undefined) {
+					profilInBdd[key] = profile[key] // Met à jour les champs modifiés
+					hasChanges = true
+				}
+			}
+
+			// Sauvegarder uniquement s'il y a des modifications
+			if (hasChanges) {
+				await profilInBdd.save()
+				return { isError: false, message:'Le profile a été mis à jour.' }
+			}
+			else {
+			return { isError: false, message: 'Aucun changement' }
+		}
+		} catch (error) {
+				console.error('Erreur lors de la mise à jour :', error.message)
+				return { isError: false, message: error.message }
 		}
 	}
 
