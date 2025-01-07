@@ -24,7 +24,7 @@ export class Crypt {
 
 		const accessToken = jwt.sign({ id, email }, JWT_SECRET, {
 			algorithm: 'HS256',
-			expiresIn: '3d',
+			expiresIn: '1h',
 		})
 		return accessToken
 	}

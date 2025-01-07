@@ -247,11 +247,11 @@ export class CommunController {
 				this.#validationPassword(userPassword)
 
 			if (!isValidEmail) {
-				return res.status(401).json({ errorEmailMessage })
+				return res.status(401).json({ message: errorEmailMessage })
 			}
 
 			if (!isValidPassword) {
-				return res.status(401).json({ errorPasswordMessage })
+				return res.status(401).json({ message: errorPasswordMessage })
 			}
 
 			const newUser = communInstance(this.#bddTarget)
@@ -274,14 +274,14 @@ export class CommunController {
 					.json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const validToken = await this.encrypt.tokenCreation(
+			const newToken = await this.encrypt.tokenCreation(
 				userInDb.id,
 				userInDb.password
 			)
 
-			const profile = { ...userInDb.dataValues, token: validToken }
-			const { password, ...newProfile } = profile
-			return res.status(200).json({ newProfile })
+			const profile = this.#connexionProfile(userInDb, newToken)
+
+			return res.status(200).json(profile)
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ message: 'Internal server error' })
@@ -438,5 +438,4 @@ export class CommunController {
 			return res.status(500).json({ message: 'Internal error' })
 		}
 	}
-
 }
