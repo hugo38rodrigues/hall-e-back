@@ -67,26 +67,26 @@ export class MysqlDB extends Storage {
 	}
 
 	#insertMatch = async (matches) => {
-		for (const value of matches) {
+		for (const match of matches) {
 			try {
-				const leagueId = await this.#insertLeague(value.leagueName)
-				const gameId = await this.#insertGame(value.gameName)
+				const leagueId = await this.#insertLeague(match.leagueName)
+				const gameId = await this.#insertGame(match.gameName)
 				const [team1Id, team2Id] = await this.#insertTeams(
-					value.team1Name,
-					value.team2Name,
-					value.team1Acronym,
-					value.team2Acronym,
-					value.team1Logo,
-					value.team2Logo
+					match.team1Name,
+					match.team2Name,
+					match.team1Acronym,
+					match.team2Acronym,
+					match.team1Logo,
+					match.team2Logo
 				)
 
-				const [match, create] = await db.Match.findOrCreate({
+				const [value, create] = await db.Match.findOrCreate({
 					where: {
-						id_match: value.idMatch,
+						id_match: match.idMatch,
 					},
 					defaults: {
-						id_match: value.idMatch,
-						date: value.date,
+						id_match: match.idMatch,
+						date: match.date,
 						gameId: gameId,
 						leagueId: leagueId,
 						team1Id: team1Id,
@@ -95,10 +95,10 @@ export class MysqlDB extends Storage {
 				})
 
 				if (create) {
-					console.log(`Match created with ${value.idMatch}`)
+					console.log(`Match created with ${match.idMatch}`)
 				}
 			} catch (error) {
-				console.error(`Error inserting match with id ${value.idMatch}:`, error)
+				console.error(`Error inserting match with id ${match.idMatch}:`, error)
 			}
 		}
 	}
