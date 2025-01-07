@@ -18,11 +18,15 @@ export class FavorisController {
 	getFavorisController = async (req, res) => {
 		try {
 			const idUser = req.body.userId
+			const isId = IS_NUMBER.test(idUser)
+			if (!isId) {
+				return res.status(401).json({ message: 'Id manquant' })
+			}
 			const user = communInstance(this.#bddTarget)
 			const userFound = await user.getUserById(idUser)
+
 			if (userFound) {
-				const { favoritesGames, favoritesLeagues, favoritesTeams } =
-					await user.getFavorites(userFound)
+				const { favoritesGames, favoritesLeagues, favoritesTeams } = await user.getFavorites(userFound)
 				return res
 					.status(200)
 					.json({ favoritesGames, favoritesLeagues, favoritesTeams })
@@ -125,9 +129,7 @@ export class FavorisController {
 			const isvalidUserId = userId && IS_NUMBER.test(userId)
 
 			if (!isvalidTeamId || !isvalidUserId) {
-				return res
-					.status(401)
-					.json({ message: errorNotNumber('de l\'équipe') })
+				return res.status(401).json({ message: errorNotNumber('de l\'équipe') })
 			}
 
 			const newUser = communInstance(this.#bddTarget)
@@ -182,7 +184,9 @@ export class FavorisController {
 			const team = await newUser.getTeam(teamId)
 
 			if (!userIsFound || !team) {
-				return res.status(401).json({ message: userOrFavoriteNotFound('équipe') })
+				return res
+					.status(401)
+					.json({ message: userOrFavoriteNotFound('équipe') })
 			}
 
 			const isAddFavorisTeam = await newUser.removeFavoriteTeam(
@@ -191,9 +195,7 @@ export class FavorisController {
 			)
 
 			if (!isAddFavorisTeam) {
-				return res
-					.status(401)
-					.json({ message: errorDelete('l\'équipe') })
+				return res.status(401).json({ message: errorDelete('l\'équipe') })
 			}
 
 			res.status(200).json({ message: successDelete('L\'équipe') })
@@ -253,7 +255,9 @@ export class FavorisController {
 			const isvalidUserId = userId && IS_NUMBER.test(userId)
 
 			if (!isvalidLeagueId || !isvalidUserId) {
-				return res.status(401).json({ message: errorNotNumber('de la compétion') })
+				return res
+					.status(401)
+					.json({ message: errorNotNumber('de la compétion') })
 			}
 
 			const newUser = communInstance(this.#bddTarget)
@@ -262,7 +266,9 @@ export class FavorisController {
 			const league = await newUser.getLeague(leagueId)
 
 			if (!userIsFound || !league) {
-				return res.status(401).json({ message: userOrFavoriteNotFound('de la compétition') })
+				return res
+					.status(401)
+					.json({ message: userOrFavoriteNotFound('de la compétition') })
 			}
 
 			const isFavorisLeague = await newUser.removeFavoriteLeague(
@@ -271,9 +277,7 @@ export class FavorisController {
 			)
 
 			if (!isFavorisLeague) {
-				return res
-					.status(401)
-					.json({ message: errorDelete('la compétiton') })
+				return res.status(401).json({ message: errorDelete('la compétiton') })
 			}
 
 			res.status(200).json({ message: successDelete('La compétiton') })
