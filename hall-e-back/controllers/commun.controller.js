@@ -84,8 +84,7 @@ export class CommunController {
 		if (!isAddress) {
 			return {
 				isValid: false,
-				message:
-					'Address must be in number of street street, postal code, City',
+				message: 'Address is invalid',
 			}
 		}
 
@@ -93,12 +92,12 @@ export class CommunController {
 			return {
 				isValid: false,
 				message:
-					'Description is a string and must be a description of your bar',
+					'Is invalid description',
 			}
 		}
 
 		if (!isName) {
-			return { isValid: false, message: 'Missing name or name must be string' }
+			return { isValid: false, message: 'Is invalid name' }
 		}
 		const ressources = this.#formatData(body)
 
@@ -138,70 +137,70 @@ export class CommunController {
 		}
 	}
 
-	#updateFormValidation = (body, res) => {
-		const isEmail = IS_EMAIL.test(body.email)
-		const isPassword = IS_PASSWORD.test(body.password)
-
-		if (body.email && !isEmail) {
-			return res
-				.status(401)
-				.json({ message: 'Email must be in xxx@xxx.xxx or xxx.xxx@xxx.xxx' })
-		}
-
-		if (body.password && !isPassword) {
-			return res.status(401).json({ message: 'Password is not token' })
-		}
-
-		if (body.role === 'client') {
-			const isFirstName = IS_STRING.test(body.firstName)
-			const isLastName = IS_STRING.test(body.lastName)
-
-			if (!isFirstName) {
-				return res.status(401).json({ message: 'First name must be string' })
-			}
-
-			if (!isLastName) {
-				return res.status(401).json({ message: 'Last name must be string' })
-			}
-
-			const ressources = this.#formatData(body)
-
-			return {
-				ressources,
-				isValid: true,
+	#connexionProfile = (data, token) => {
+		let profileData 
+		if (data.role === 'bar'){
+			profileData = {
+				name: data.name,
+				address: data.address,
+				price: data.price,
+				description: data.description,
+				picture: data.pictures
 			}
 		}
 
-		if (body.role === 'bar') {
-			const isName = IS_BAR_NAME.test(body.name)
-			const isAddress = IS_ADDRESS.test(body.address)
-			const isDescription = IS_DESCRIPTION.test(body.description)
-
-			if (body.address) {
-				if (!isAddress) {
-					return res.status(401).json({
-						message: 'Address must be in 12 rue de la paix, 75008, Paris',
-					})
+			else {
+				profileData = {
+					firsName: data.firstName,
+					lastName: data.lastName,
+					likeBar: data.likeBar
 				}
 			}
+		
+		
+		return {
+			id: data.id,
+			email: data.email,
+			role: data.role,
+			token: token,
+			informations: profileData
+		}
+	}
 
-			if (body.description) {
-				if (!isDescription) {
-					return res
-						.status(401)
-						.json({ message: 'Description must be a description of your bar' })
-				}
-			}
+	#newDataValidation = (profile, role) => {
+		const isEmptyEmail = profile.email === undefined ? undefined : profile.email
+		const isEmptyPassword =
+			profile.password === undefined ? undefined : this.encrypt.passwordEncrypt(profile.password)
 
-			if (!isName) {
-				return res.status(401).json({ message: 'Name must be string' })
-			}
-
-			const ressources = this.#formatData(body)
+		if (role === 'client') {
+			const isEmptyLastName = profile.lastName === undefined ? undefined : profile.lastName
+			const isEmptyFirstName = profile.firstName === undefined ? undefined : profile.firstName
 
 			return {
-				ressources,
-				isValid: true,
+				email: isEmptyEmail,
+				password: isEmptyPassword,
+				lastName: isEmptyLastName,
+				firstName: isEmptyFirstName,
+				role,
+			}
+		}
+		
+		if (role === 'bar') {
+			const isEmptyName = profile.name === undefined ? undefined : profile.name
+			const isEmptyAddress = profile.address === undefined ? undefined : profile.address
+			const isEmptyDescription = profile.description === undefined ? undefined : profile.description
+			const isEmptyPicture = profile.picture === undefined ? undefined : profile.picture
+			const isEmptyPrice = profile.price === undefined ? undefined : profile.price
+
+			return {
+				email: isEmptyEmail,
+				password: isEmptyPassword,
+				name: isEmptyName,
+				address: isEmptyAddress,
+				description: isEmptyDescription,
+				picture: isEmptyPicture,
+				price: isEmptyPrice,
+				role
 			}
 		}
 	}
@@ -391,40 +390,35 @@ export class CommunController {
 
 	updateProfile = async (req, res) => {
 		try {
-			if (!req.body) {
-				return res.status(400).json({ message: 'Missing params' })
-			}
-
-			const isValidId = IS_NUMBER.test(req.body.id) && req.body.id
+			
+			const userId = req.body.id
+			const isValidId = IS_NUMBER.test(userId) && userId
 
 			if (!isValidId) {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
-
-			const { isValid, ressources } = this.#updateFormValidation(req.body, res)
-
-			if (!isValid) {
-				return
-			}
-
 			const user = communInstance(this.#bddTarget)
-			const isVerifyId = await user.getUserById(req.body.role, req.body.id)
-
-			if (!isVerifyId) {
-				return res.status(400).json({ message: 'user not found' })
+			const userFound = await user.getUserById(userId)
+			
+			if (!userFound) {
+				return res.status(404).json({ message: 'user not found' })
 			}
 
-			const { isError, errorMessage } = await user.updateUser(
-				req.body.id,
-				ressources
-			)
+			  // const files = req.files // Liste des fichiers uploadés
+				// const baseUrl = `${req.protocol}://${req.get('host')}` // URL de base du serveur
+
+			
+			const updateProfile = this.#newDataValidation(req.body, userFound.dataValues.role)
+	
+			const { isError, message } = await user.updateUser(userId, updateProfile)
 
 			if (isError) {
-				return res.status(400).json({ errorMessage })
+				return res.status(404).json({ message } )
 			}
-			return res.status(200).json({ message: 'Update  account' })
+			
+			return res.status(200).json({ message })
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 			return res.status(500).json({ message: 'Internal server error' })
 		}
 	}
@@ -444,6 +438,5 @@ export class CommunController {
 			return res.status(500).json({ message: 'Internal error' })
 		}
 	}
-
 
 }

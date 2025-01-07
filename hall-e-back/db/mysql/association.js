@@ -136,4 +136,10 @@ export const setupAssociations = () => {
 		as: 'barsScheduling',
 		foreignKey: 'matchId',
 	})
+
+	//Relation 1:N avec Bar et Image
+	db.Bar.hasMany(db.Picture, { as: 'pictures', foreignKey: 'barId' })
+	db.Picture.belongsTo(db.Bar, { as: 'bar', foreignKey: 'barId' })
+
+	
 }

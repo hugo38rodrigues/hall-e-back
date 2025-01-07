@@ -21,9 +21,6 @@ return sequelize.define(
         description: {
             type: DataTypes.STRING,
         },
-        photo: {
-            type: DataTypes.BLOB('long')
-        },
         password: {
             type: DataTypes.STRING(1234),
             allowNull: false
