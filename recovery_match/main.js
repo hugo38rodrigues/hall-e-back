@@ -2,7 +2,7 @@ import { Match } from './classes/Match.js'
 import { MysqlDB } from './classes/services/mysql-db.js'
 import { setupAssociations } from './db/mysql/association.js'
 import { db } from './db/mysql/index.js'
-import { BDD_TARGET, optionLol, optionCs, optionValorant } from './utils/constants.utils.js'
+import { BDD_TARGET, optionCs, optionLol, optionValorant } from './utils/constants.utils.js'
 
 const lol = new Match(optionLol)
 const cs = new Match(optionCs)

@@ -1,3 +1,4 @@
+import bodyParser from 'body-parser'
 import cors from 'cors'
 import express from 'express'
 import { setupAssociations } from './db/mysql/association.js'
@@ -7,11 +8,14 @@ import clientRoutes from './routes/client.route.js'
 import communRoutes from './routes/commun.route.js'
 import { BDD_TARGET } from './utils/constants.js'
 
+
 const app = express()
 
 app.use(express.json())
 app.use(cors())
 app.disable('x-powered-by')
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 switch (BDD_TARGET) {
 	case 'mysql': {

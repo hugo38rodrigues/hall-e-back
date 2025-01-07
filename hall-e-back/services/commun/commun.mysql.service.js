@@ -2,14 +2,14 @@ import { db } from '../../db/mysql/index.js'
 import { CommunService } from './commun.service.js'
 
 export class CommunMysqlService extends CommunService {
-	constructor() {
+	constructor () {
 		super()
 		this.db = db
 	}
 
 	getUserIsFound = async (email) => {
-		const foundClient = await this.db.Client.findOne({ where: { email } })
-		const foundBar = await this.db.Bar.findOne({ where: { email } })
+		const foundClient = await this.db.Client.findOne({ where: { email }})
+		const foundBar = await this.db.Bar.findOne({ where: { email }})
 		if (foundClient || foundBar) {
 			return true
 		}
@@ -32,17 +32,8 @@ export class CommunMysqlService extends CommunService {
 		})
 
 		const bar = await this.db.Bar.findOne({
-			attributes: [
-				'id',
-				'address',
-				'password',
-				'name',
-				'email',
-				'price',
-				'description',
-				'photo',
-				'role',
-			],
+			include: [{ model: this.db.Picture, as: 'pictures' }],
+			attributes: ['id', 'address', 'password', 'name', 'email', 'price', 'description', 'role'],
 			where: {
 				email: email,
 			},
@@ -138,6 +129,7 @@ export class CommunMysqlService extends CommunService {
 				return { isError: false, message: error.message }
 		}
 	}
+	
 
 	deleteUser = async (id, role) => {
 		if (role === 'client') {

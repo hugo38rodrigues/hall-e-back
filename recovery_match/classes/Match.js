@@ -22,6 +22,7 @@ export class Match {
 			return null
 		}
 	}
+	
 	#formatLeagueName = (name) => {
 		return name.replace(/-/g, ' ').replace(/^./, (char) => char.toUpperCase()) // Met la première lettre en majuscule
 	}

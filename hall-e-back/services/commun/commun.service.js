@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 export class CommunService {
-	constructor() {}
+	constructor () {}
 
 	getProfileUser = async (ressources) => {}
 
