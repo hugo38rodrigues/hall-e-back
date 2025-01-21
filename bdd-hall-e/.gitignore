@@ -1,0 +1,14 @@
+*.drawio
+.vscode/*
+!.vscode/extensions.json
+node_modules
+package-lock.json
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/*
+.env
+*.plantuml
