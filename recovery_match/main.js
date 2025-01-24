@@ -1,4 +1,4 @@
-import { databaseFactory } from 'bdd-service-hall-e/main.js'
+import { databaseFactory, connectDb, disconnectDb } from 'bdd-service-hall-e/main.js'
 import dotenv from 'dotenv'
 import { Match } from './classes/Match.js'
 import { optionCs, optionLol, optionValorant } from './utils/constants.utils.js'
@@ -17,16 +17,16 @@ console.log('############ END CREATED MATCH ############')
 console.log('############ START SAVING MATCH ############')
 
 const databaseInstance = databaseFactory()
-const recoveryMatches = await databaseInstance.database.recoveryMatchesInstance()
-await databaseInstance.connectDb()
+const recoveryMatchesInstance = await databaseInstance.recoveryMatchesInstance()
+await connectDb()
 
-await lol.processMatches(lolMatches, recoveryMatches)
-await csGo.processMatches(csMatches, recoveryMatches)
-await valorant.processMatches(valorantMatches, recoveryMatches)
+await lol.processMatches(lolMatches, recoveryMatchesInstance)
+await csGo.processMatches(csMatches, recoveryMatchesInstance)
+await valorant.processMatches(valorantMatches, recoveryMatchesInstance)
 
 
 
-await databaseInstance.disconnectDb()
+await disconnectDb()
 
 
 console.log('############ END SAVING MATCH ############')

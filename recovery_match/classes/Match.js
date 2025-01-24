@@ -93,18 +93,18 @@ export class Match {
 		return matches.filter((item) => item !== null)
 	}
 
-	processMatches = async (matches, recoveryMatches) => {
+	processMatches = async (matches, recoveryMatchesInstance) => {
 		for (const match of matches) {
-			const isVerifyLolMatch = await recoveryMatches.verifyMatchIsPresent(match)
+			const isVerifyLolMatch = await recoveryMatchesInstance.verifyMatchIsPresent(match.idMatch)
 
 			if (isVerifyLolMatch) {
 				console.error(`Match found ${match.idMatch}`)
 			} else {
-				const team1 = await recoveryMatches.insertTeam(match.team1)
-				const team2 = await recoveryMatches.insertTeam(match.team2)
+				const team1 = await recoveryMatchesInstance.insertTeam(match.team1)
+				const team2 = await recoveryMatchesInstance.insertTeam(match.team2)
 
 				const updateMatch = { ...match, team1: team1, team2: team2 }
-				await recoveryMatches.insertMatch(updateMatch)
+				await recoveryMatchesInstance.insertMatch(updateMatch)
 			}
 		}
 	}
