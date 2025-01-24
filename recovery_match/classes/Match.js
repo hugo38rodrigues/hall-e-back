@@ -22,7 +22,7 @@ export class Match {
 			return null
 		}
 	}
-	
+
 	#formatLeagueName = (name) => {
 		return name.replace(/-/g, ' ').replace(/^./, (char) => char.toUpperCase()) // Met la première lettre en majuscule
 	}
@@ -45,7 +45,7 @@ export class Match {
 	createdMatch = async () => {
 		const responseData = await this.#getData(this.#urlConnection)
 		const matches = responseData.map((data) => {
-			const idMatch = data.id
+			const idMatch = data.id.toString()
 			const date = this.#formatedDate(data.begin_at)
 			const gameName = this.#formatLeagueName(data.videogame.slug)
 			const leagueName = data.league.name
@@ -76,15 +76,36 @@ export class Match {
 				date,
 				leagueName,
 				gameName,
-				team1Name,
-				team2Name,
-				team1Acronym,
-				team2Acronym,
-				team1Logo,
-				team2Logo,
+				team1: {
+					name: team1Name,
+					acronym: team1Acronym,
+					logoUrl: team1Logo,
+				},
+
+				team2: {
+					name: team2Name,
+					acronym: team2Acronym,
+					logoUrl: team2Logo,
+				},
 			}
 		})
 
 		return matches.filter((item) => item !== null)
+	}
+
+	processMatches = async (matches, recoveryMatches) => {
+		for (const match of matches) {
+			const isVerifyLolMatch = await recoveryMatches.verifyMatchIsPresent(match)
+
+			if (isVerifyLolMatch) {
+				console.error(`Match found ${match.idMatch}`)
+			} else {
+				const team1 = await recoveryMatches.insertTeam(match.team1)
+				const team2 = await recoveryMatches.insertTeam(match.team2)
+
+				const updateMatch = { ...match, team1: team1, team2: team2 }
+				await recoveryMatches.insertMatch(updateMatch)
+			}
+		}
 	}
 }
