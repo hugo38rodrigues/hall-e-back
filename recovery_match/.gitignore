@@ -10,7 +10,7 @@ package-lock.json
 *.sln
 *.sw?
 .idea/*
-env/dev/*
-env/prod/*
-env/debugger/*
+env/dev/
+env/prod/
+env/debugger/
 *.plantuml
