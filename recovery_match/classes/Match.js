@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { format } from 'date-fns'
 
 export class Match {
 	#urlConnection
@@ -14,10 +13,9 @@ export class Match {
 
 	#formatedDate = (date) => {
 		const curentYears = new Date().getFullYear()
-		const formatedDate = format(new Date(date), 'yyyy-MM-dd HH:mm:ss')
-		const dateObj = new Date(formatedDate.replace(' ', 'T'))
-		if (dateObj.getFullYear() === curentYears) {
-			return formatedDate
+		const dateObject = new Date(date)
+		if (dateObject.getFullYear() === curentYears) {
+			return dateObject
 		} else {
 			return null
 		}
@@ -42,10 +40,12 @@ export class Match {
 		}
 	}
 
+	
 	createdMatch = async () => {
 		const responseData = await this.#getData(this.#urlConnection)
 		const matches = responseData.map((data) => {
 			const idMatch = data.id.toString()
+			const numberOfGame = data.number_of_games.toString()
 			const date = this.#formatedDate(data.begin_at)
 			const gameName = this.#formatLeagueName(data.videogame.slug)
 			const leagueName = data.league.name
@@ -59,6 +59,7 @@ export class Match {
 			const isEmptyData = [
 				idMatch,
 				date,
+				numberOfGame,
 				gameName,
 				leagueName,
 				team1Name,
@@ -70,10 +71,11 @@ export class Match {
 			if (isEmptyData) {
 				return null
 			}
-
+			
 			return {
 				idMatch,
 				date,
+				numberOfGame,
 				leagueName,
 				gameName,
 				team1: {
@@ -96,12 +98,13 @@ export class Match {
 	processMatches = async (matches, recoveryMatchesInstance) => {
 		for (const match of matches) {
 			const isVerifyLolMatch = await recoveryMatchesInstance.verifyMatchIsPresent(match.idMatch)
-
 			if (isVerifyLolMatch) {
 				console.error(`Match found ${match.idMatch}`)
 			} else {
+				
 				const team1 = await recoveryMatchesInstance.insertTeam(match.team1)
 				const team2 = await recoveryMatchesInstance.insertTeam(match.team2)
+				
 
 				const updateMatch = { ...match, team1: team1, team2: team2 }
 				await recoveryMatchesInstance.insertMatch(updateMatch)
