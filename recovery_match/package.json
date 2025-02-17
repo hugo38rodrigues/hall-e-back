@@ -1,25 +1,20 @@
 {
-  "main": "main.js",
-  "author": "Xwdrblue",
-  "type": "module",
-  "license": "ISC",
-  "scripts": {
-    "lint": "npx eslint",
-    "fix-eslint": "npx eslint --fix ",
-    "load-data": "node main.js"
-  },
-  "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.606.0",
-    "@aws-sdk/lib-dynamodb": "^3.606.0",
-    "@eslint/js": "^9.9.0",
-    "@stylistic/eslint-plugin-js": "^2.6.4",
-    "aws-sdk": "^2.1622.0",
-    "axios": "^1.7.4",
-    "bdd-service-hall-e": "github:hugo38rodrigues/bdd-hall-e",
-    "date-fns": "^3.6.0",
-    "dotenv": "^16.4.5",
-    "eslint": "^9.9.0",
-    "mysql2": "^3.11.0",
-    "sequelize": "^6.37.3"
-  }
+	"main": "main.js",
+	"author": "Xwdrblue",
+	"type": "module",
+	"license": "ISC",
+	"scripts": {
+		"lint": "npx eslint",
+		"fix-eslint": "npx eslint --fix ",
+		"load-data": "node main.js"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.9.0",
+		"@stylistic/eslint-plugin-js": "^2.6.4",
+		"axios": "^1.7.4",
+		"date-fns": "^3.6.0",
+		"dotenv": "^16.4.5",
+		"eslint": "^9.9.0",
+		"bdd-service-hall-e": "github:hugo38rodrigues/bdd-hall-e"
+	}
 }
