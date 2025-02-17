@@ -1,4 +1,3 @@
-import { barInstance } from '../utils/classes-instance-dispatcher.js'
 import { IS_NUMBER } from '../utils/regex.js'
 
 export class BarController {

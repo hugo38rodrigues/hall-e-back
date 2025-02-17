@@ -24,12 +24,11 @@
 		"express": "^4.19.2",
 		"globals": "^15.8.0",
 		"jsonwebtoken": "^9.0.2",
-		"mysql2": "^3.10.3",
 		"nodemailer": "^6.9.16",
 		"multer": "^1.4.5-lts.1",
 		"nodemon": "^3.1.7",
-		"sequelize": "^6.37.3",
 		"supertest": "^6.3.4",
-		"vitest": "^2.1.2"
+		"vitest": "^2.1.2",
+		"bdd-service-hall-e": "github:hugo38rodrigues/bdd-hall-e"
 	}
 }

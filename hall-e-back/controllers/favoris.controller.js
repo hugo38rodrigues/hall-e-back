@@ -1,4 +1,3 @@
-import { communInstance } from '../utils/classes-instance-dispatcher.js'
 import {
 	errorDelete,
 	errorNotNumber,
@@ -218,11 +217,11 @@ export class FavorisController {
 					.json({ message: 'The user id or league id is not a number.' })
 			}
 
-			const newUser = communInstance(this.#bddTarget)
+			const bdd = communInstance(this.#bddTarget)
 
-			const userIsFound = newUser.getUserById(userId)
+			const userIsFound = await bdd.getUserById(userId)
 
-			const league = await newUser.getLeague(leagueId)
+			const league = await bdd.getLeague(leagueId)
 
 			if (!userIsFound || !league) {
 				return res
@@ -230,9 +229,9 @@ export class FavorisController {
 					.json({ message: 'Unknown user or unknown league' })
 			}
 
-			const isAddFavorisLeague = await newUser.addFavoriteLeague(
+			const isAddFavorisLeague = await bdd.addFavoriteLeague(
 				userIsFound,
-				league
+				league.dataValues.id
 			)
 
 			if (!isAddFavorisLeague) {
