@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { databaseFactory, connectDb, disconnectDb } from 'bdd-service-hall-e/main.js'
 import { sendEmailResetPassword } from '../utils/email.js'
+import { errorServer } from '../utils/messages.js'
 import {
 	IS_ADDRESS,
 	IS_BAR_NAME,
@@ -91,8 +92,7 @@ export class CommunController {
 		if (!isDescription) {
 			return {
 				isValid: false,
-				message:
-					'Is invalid description',
+				message: 'Is invalid description',
 			}
 		}
 
@@ -138,26 +138,23 @@ export class CommunController {
 	}
 
 	#connexionProfile = (data, token) => {
-		let profileData 
-		if (data.role === 'bar'){
+		let profileData
+		if (data.role === 'bar') {
 			profileData = {
 				name: data.name,
 				address: data.address,
 				price: data.price,
 				description: data.description,
-				picture: data.pictures
+				picture: data.pictures,
+			}
+		} else {
+			profileData = {
+				firsName: data.firstName,
+				lastName: data.lastName,
+				likeBar: data.likeBar
 			}
 		}
 
-			else {
-				profileData = {
-					firsName: data.firstName,
-					lastName: data.lastName,
-					likeBar: data.likeBar
-				}
-			}
-		
-		
 		return {
 			id: data.id,
 			email: data.email,
@@ -184,7 +181,7 @@ export class CommunController {
 				role,
 			}
 		}
-		
+
 		if (role === 'bar') {
 			const isEmptyName = profile.name === undefined ? undefined : profile.name
 			const isEmptyAddress = profile.address === undefined ? undefined : profile.address
@@ -243,8 +240,7 @@ export class CommunController {
 			const email = req.body.email
 
 			const { isValidEmail, errorEmailMessage } = this.#validationEmail(email)
-			const { isValidPassword, errorPasswordMessage } =
-				this.#validationPassword(userPassword)
+			const { isValidPassword, errorPasswordMessage } = this.#validationPassword(userPassword)
 
 			if (!isValidEmail) {
 				return res.status(401).json({ message: errorEmailMessage })
@@ -258,26 +254,16 @@ export class CommunController {
 			const userInDb = await newUser.getProfileUser(email)
 
 			if (!userInDb) {
-				return res
-					.status(401)
-					.json({ message: 'L\'email ou le mot de passe sont invalide' })
+				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const isMatchPassword = await bcrypt.compare(
-				userPassword,
-				userInDb.password
-			)
+			const isMatchPassword = await bcrypt.compare(userPassword, userInDb.password)
 
 			if (!isMatchPassword) {
-				return res
-					.status(401)
-					.json({ message: 'L\'email ou le mot de passe sont invalide' })
+				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const newToken = await this.encrypt.tokenCreation(
-				userInDb.id,
-				userInDb.password
-			)
+			const newToken = await this.encrypt.tokenCreation(userInDb.id, userInDb.password)
 
 			const profile = this.#connexionProfile(userInDb, newToken)
 
@@ -302,23 +288,18 @@ export class CommunController {
 
 		console.log(userIsFound)
 		if (userIsFound) {
-			const token = await this.encrypt.tokenCreation(
-				userIsFound.dataValues.id,
-				email
-			)
+			const token = await this.encrypt.tokenCreation(userIsFound.dataValues.id, email)
 			await sendEmailResetPassword(email, token)
 		}
 
 		return res.status(200).json({
 			message: `Un email a était envoyer à cette addresse email: ${email}`,
 		})
-
 	}
 
 	resetPassword = async (req, res) => {
 		const newPassword = req.body.newPassword
 		const token = req.body.token
-		
 
 		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(newPassword)
 		const verifyToken = await this.encrypt.verifyToken(token)
@@ -329,18 +310,18 @@ export class CommunController {
 
 		const newUser = communInstance(this.#bddTarget)
 		const userInDb = await newUser.getUserById(verifyToken.id)
-		
+
 		if (!userInDb) {
 			return res.status(401).json({ message: 'Utilisateur introuvable' })
 		}
-		
+
 		const encryptNewPassword = this.encrypt.passwordEncrypt(newPassword)
 		const ressource = {
 			role: userInDb.dataValues.role,
 			password: encryptNewPassword,
 		}
 		const { isError, errorMessage } = newUser.updateUser(userInDb.dataValues.id, ressource)
-		if (isError){
+		if (isError) {
 			return res.status(401).json({ message: errorMessage })
 		}
 		return res.status(200).json({ message: 'Mot de passe changer avec success' })
@@ -390,7 +371,6 @@ export class CommunController {
 
 	updateProfile = async (req, res) => {
 		try {
-			
 			const userId = req.body.id
 			const isValidId = IS_NUMBER.test(userId) && userId
 
@@ -399,23 +379,22 @@ export class CommunController {
 			}
 			const user = communInstance(this.#bddTarget)
 			const userFound = await user.getUserById(userId)
-			
+
 			if (!userFound) {
 				return res.status(404).json({ message: 'user not found' })
 			}
 
-			  // const files = req.files // Liste des fichiers uploadés
-				// const baseUrl = `${req.protocol}://${req.get('host')}` // URL de base du serveur
+			// const files = req.files // Liste des fichiers uploadés
+			// const baseUrl = `${req.protocol}://${req.get('host')}` // URL de base du serveur
 
-			
 			const updateProfile = this.#newDataValidation(req.body, userFound.dataValues.role)
-	
+
 			const { isError, message } = await user.updateUser(userId, updateProfile)
 
 			if (isError) {
-				return res.status(404).json({ message } )
+				return res.status(404).json({ message })
 			}
-			
+
 			return res.status(200).json({ message })
 		} catch (error) {
 			console.error(error)
