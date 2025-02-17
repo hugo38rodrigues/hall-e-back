@@ -19,6 +19,7 @@ router.post('/favorites/league', middleware.verifyAccount, favoris.addFavorisLea
 router.delete('/favorites/league', middleware.verifyAccount, favoris.deleteFavorisLeagueController)
 
 router.get('/', user.getMatchesController)
+router.get('/filters', user.getFiltersController)
 
 router.post('/connexion', user.connexion)
 router.post('/sign-up', user.createAccount)
