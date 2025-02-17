@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import { Crypt } from '../controllers/encryption.controller.js'
-import { communInstance } from '../utils/classes-instance-dispatcher.js'
+import { databaseFactory, connectDb, disconnectDb } from 'bdd-service-hall-e/main.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import {
 	IS_ADDRESS,
