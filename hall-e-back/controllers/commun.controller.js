@@ -425,17 +425,29 @@ export class CommunController {
 
 	getMatchesController = async (req, res) => {
 		try {
-			const newUser = communInstance(this.#bddTarget)
-			const matches = await newUser.getMatches()
-			// const logo1 = await get(matches.team1.logo_url)
-			// const logo2 = await get(matches.team2.logo_url)
-			// matches.teams1.logo = logo1
-			// matches.teams2.logo = logo2
-
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await connectDb()
+			const matches = await userInstance.getMatches()
+			await disconnectDb()
 			return res.status(200).json({ data: matches })
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ message: 'Internal error' })
+		}
+	}
+
+	getFiltersController = async (req, res) => {
+		try {
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await connectDb()
+			const filters = await userInstance.getAllFilters()
+			await disconnectDb()
+			return res.status(200).json({ filters })
+		} catch (error) {
+			console.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 }
