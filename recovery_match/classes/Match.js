@@ -76,6 +76,7 @@ export class Match {
 			const date = this.#formatedDate(data.begin_at)
 			const gameName = this.#formatLeagueName(data.videogame.slug)
 			const leagueName = data.league.name
+			const reschulded = data.rescheduled
 			const getTeamData = (field) =>
 				data.opponents.map((opponent) => opponent.opponent[field]) || []
 
@@ -86,6 +87,7 @@ export class Match {
 			const isEmptyData = [
 				idMatch,
 				date,
+				reschulded,
 				numberOfGame,
 				gameName,
 				leagueName,
@@ -105,6 +107,7 @@ export class Match {
 				numberOfGame,
 				leagueName,
 				gameName,
+				reschulded,
 				team1: {
 					name: team1Name,
 					acronym: team1Acronym,
@@ -124,7 +127,46 @@ export class Match {
 
 	processMatches = async (matches, recoveryMatchesInstance) => {
 		for (const match of matches) {
-			const isVerifyLolMatch = await recoveryMatchesInstance.verifyMatchIsPresent(match.idMatch)
+		// const match = {
+		// 	idMatch: '1113222',
+		// 	date: '2025-02-20T17:00:00.000Z',
+		// 	numberOfGame: '5',
+		// 	leagueName: 'NLC',
+		// 	gameName: 'League of legends',
+		// 	reschulded: true,
+		// 	team1: {
+		// 		name: 'Verdant',
+		// 		acronym: 'VDN',
+		// 		logoUrl: 'https://cdn.pandascore.co/images/team/image/130202/verdantlogo_square.png',
+		// 	},
+		// 	team2: {
+		// 		name: 'Rich Gang',
+		// 		acronym: 'RG',
+		// 		logoUrl:
+		// 			'https://cdn.pandascore.co/images/team/image/135466/rich_gang__2528_norwegian_team_2529logo_square.png',
+		// 	},
+		// }
+		// const match = {
+		// 	idMatch: '1113222',
+		// 	date: '2025-02-21T17:00:00.000Z',
+		// 	numberOfGame: '5',
+		// 	leagueName: 'NLC',
+		// 	gameName: 'League of legends',
+		// 	reschulded: true,
+		// 	team1: {
+		// 		name: 'Verdant',
+		// 		acronym: 'VDN',
+		// 		logoUrl: 'https://cdn.pandascore.co/images/team/image/130202/verdantlogo_square.png',
+		// 	},
+		// 	team2: {
+		// 		name: 'Rich Gang',
+		// 		acronym: 'RG',
+		// 		logoUrl:
+		// 			'https://cdn.pandascore.co/images/team/image/135466/rich_gang__2528_norwegian_team_2529logo_square.png',
+		// 	},
+		// }
+
+			const isVerifyLolMatch = await recoveryMatchesInstance.verifyMatchIsPresent(match)
 			if (isVerifyLolMatch) {
 				console.error(`Match found ${match.idMatch}`)
 			} else {
@@ -139,3 +181,4 @@ export class Match {
 		}
 	}
 }
+
