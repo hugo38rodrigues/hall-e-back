@@ -34,18 +34,27 @@ export class Crypt {
 		return encryptPassword
 	}
 
-	verifyToken = async (token) => {
+	verifyToken = async (token)  => {
 		try {
-			const JWT_SECRET = await readFile(this.#jwtSecret, 'utf8') 
+			const JWT_SECRET = await readFile(this.#jwtSecret, 'utf8')
 			const decoded = jwt.verify(
 				token,
 				JWT_SECRET,
 				{ algorithms: ['HS256'] } // Spécifiez l'algorithme ici
 			)
 			return decoded // Retournez les données décodées si le token est valide
+			
 		} catch (err) {
 			console.error('Token validation failed:', err.message)
 			return false
 		}
 	}
+
+	generetedCode = () => {
+		const codeNumber = Math.floor(100000 + Math.random() * 900000).toString() // 6 chiffres
+		const expiresIn = Date.now() + 10 * 60 * 1000 // Expiration dans 5 minutes
+		return { codeNumber, expiresIn }
+	}
+
+	
 }

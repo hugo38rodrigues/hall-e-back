@@ -1,36 +1,14 @@
 import nodemailer from 'nodemailer'
 
-const emailHtml = (token) => {
+const emailHtml = (codeNumber) => {
 	return `<header style="font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction:column; align-items: center;">
   <h1 style="color: #987464;">Bienvenue sur Hall-E !</h1>
 </header>
 <body>
   <h3 style="color: #987464;">Bonjour,</h3>
-  <p style="color: #987464;">Voicis le lien pour changer votre mot de passe:</p>
+  <p style="color: #987464;">Voicis le code pour réinitialiser votre mot de passe:</p>
+  <h2 style="color: #987464;"> ${codeNumber}
   
-  <button style=" align-items: center;
-  appearance: button;
-  background-color: #987464;
-  border-radius: 8px;
-  border-style: none;
-  box-shadow: rgba(255, 255, 255, 0.26) 0 1px 2px inset;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: flex;
-  flex-direction: row;
-  flex-shrink: 0;
-  font-size: 100%;
-  line-height: 1.15;
-  margin: 0;
-  padding: 10px 21px;
-  text-align: center;
-  text-transform: none;
-  transition: color .13s ease-in-out,background .13s ease-in-out,opacity .13s ease-in-out,box-shadow .13s ease-in-out;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;">
-    <a href= http://localhost:5000/reset-password/${token} style="color: #f2e8dc;">Réinitialisé votre mot de passe</a>
-</button>
 </body>
 <footer>
   <p style="color: #987464;">Bonne journée !</p>
