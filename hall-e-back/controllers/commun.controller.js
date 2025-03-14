@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt'
+import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
-import { databaseFactory, connectDb, disconnectDb } from 'bdd-service-hall-e/main.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { errorServer } from '../utils/messages.js'
 import {
 	IS_ADDRESS,
 	IS_BAR_NAME,
+	IS_CODE_NUMBER,
 	IS_DESCRIPTION,
 	IS_EMAIL,
 	IS_NUMBER,
@@ -14,18 +15,15 @@ import {
 } from '../utils/regex.js'
 
 export class CommunController {
-	#bddTarget
-
 	constructor () {
-		this.#bddTarget = process.env.BDD_TARGET
 		this.encrypt = new Crypt()
 	}
 
 	#formatData = (body) => {
 		if (body.role === 'client') {
 			return {
-				firstName: body.firstName,
-				lastName: body.lastName,
+				firstName: body.informations.firstName,
+				lastName: body.informations.lastName,
 				email: body.email,
 				password: this.encrypt.passwordEncrypt(body.password),
 				role: body.role,
@@ -34,14 +32,14 @@ export class CommunController {
 
 		if (body.role === 'bar') {
 			return {
-				name: body.name,
-				address: body.address,
+				name: body.informations.name,
+				address: body.informations.address,
 				email: body.email,
 				password: this.encrypt.passwordEncrypt(body.password),
 				role: body.role,
-				price: body.price,
-				description: body.description,
-				photo: body.photo,
+				price: body.informations.price,
+				description: body.informations.description,
+				photo: body.informations.photo,
 			}
 		}
 	}
@@ -49,12 +47,12 @@ export class CommunController {
 	#clientAccountVerify = (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
-		const isFirstName = IS_STRING.test(body.firstName)
-		const isLastName = IS_STRING.test(body.lastName)
+		const isFirstName = IS_STRING.test(body.informations.firstName)
+		const isLastName = IS_STRING.test(body.informations.lastName)
 		const isValidEmail = body.email && isEmail
 		const isValidPassword = body.password && isPassword
-		const isValidLastName = body.lastName && isLastName
-		const isValidFirstName = body.firstName && isFirstName
+		const isValidLastName = body.informations.lastName && isLastName
+		const isValidFirstName = body.informations.firstName && isFirstName
 
 		if (!isValidEmail || !isValidPassword) {
 			return { isValid: false, message: 'Missing email or password' }
@@ -74,9 +72,9 @@ export class CommunController {
 	#barAccountVerify = (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
-		const isAddress = IS_ADDRESS.test(body.address)
-		const isName = IS_BAR_NAME.test(body.name)
-		const isDescription = IS_DESCRIPTION.test(body.description)
+		const isAddress = IS_ADDRESS.test(body.informations.address)
+		const isName = IS_BAR_NAME.test(body.informations.name)
+		const isDescription = IS_DESCRIPTION.test(body.informations.description)
 
 		if (!isEmail || !isPassword) {
 			return { isValid: false, message: 'password or email invalid' }
@@ -112,13 +110,13 @@ export class CommunController {
 
 		if (!isEmail) {
 			return {
-				isValidEmail: false,
+				isEmail: false,
 				errorEmailMessage: 'L\'email n\'est pas au bon format',
 			}
 		}
 
 		return {
-			isValidEmail: true,
+			isEmail: true,
 		}
 	}
 
@@ -128,7 +126,7 @@ export class CommunController {
 		if (!isPassword) {
 			return {
 				isValidPassword: false,
-				errorPasswordMessage: 'Le mot de passe n\'est pas au bon format',
+				errorPasswordMessage: 'Mot de passe invalide',
 			}
 		}
 		return {
@@ -146,12 +144,24 @@ export class CommunController {
 				price: data.price,
 				description: data.description,
 				picture: data.pictures,
+				favorites: data.favorites ? {
+					gameName: data.favorites.gameName,
+					leagueName: data.favorites.leagueName,
+					teams: data.favorites.teams,
+				}: {}
 			}
 		} else {
 			profileData = {
-				firsName: data.firstName,
+				firstName: data.firstName,
 				lastName: data.lastName,
-				likeBar: data.likeBar
+				likeBar: data.likeBar,
+				favorites: data.favorites
+					? {
+							gameName: data.favorites.gameName,
+							leagueName: data.favorites.leagueName,
+							teams: data.favorites.teams,
+					  }
+					: {},
 			}
 		}
 
@@ -160,7 +170,7 @@ export class CommunController {
 			email: data.email,
 			role: data.role,
 			token: token,
-			informations: profileData
+			informations: profileData,
 		}
 	}
 
@@ -197,7 +207,7 @@ export class CommunController {
 				description: isEmptyDescription,
 				picture: isEmptyPicture,
 				price: isEmptyPrice,
-				role
+				role,
 			}
 		}
 	}
@@ -218,15 +228,20 @@ export class CommunController {
 				return res.status(401).json({ message: data.message })
 			}
 
-			const user = communInstance(this.#bddTarget)
-			const userIsFound = await user.getUserIsFound(data.ressources.email)
+			await connectDb()
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await connectDb()
+			const userDb = await userInstance.getProfileUser(data.email)
+			
 
-			if (userIsFound) {
+			if (userDb) {
 				return res.status(401).json({ message: 'The user already exists' })
 			}
 
-			await user.addUser(data.ressources)
-
+			await userInstance.addUser(data.ressources)
+			
+			await disconnectDb()
 			return res.status(201).json({ message: 'Sign in success' })
 		} catch (error) {
 			console.log(error)
@@ -236,36 +251,37 @@ export class CommunController {
 
 	connexion = async (req, res) => {
 		try {
-			const userPassword = req.body.password
-			const email = req.body.email
+			const { email, password } = req.body
 
-			const { isValidEmail, errorEmailMessage } = this.#validationEmail(email)
-			const { isValidPassword, errorPasswordMessage } = this.#validationPassword(userPassword)
+			const { isEmail, errorEmailMessage } = this.#validationEmail(email)
+			const { isValidPassword, errorPasswordMessage } = this.#validationPassword(password)
 
-			if (!isValidEmail) {
+			if (!isEmail) {
 				return res.status(401).json({ message: errorEmailMessage })
 			}
 
 			if (!isValidPassword) {
 				return res.status(401).json({ message: errorPasswordMessage })
 			}
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await connectDb()
+			const userDb = await userInstance.getProfileUser(email)
+			await disconnectDb()
 
-			const newUser = communInstance(this.#bddTarget)
-			const userInDb = await newUser.getProfileUser(email)
-
-			if (!userInDb) {
+			if (!userDb) {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const isMatchPassword = await bcrypt.compare(userPassword, userInDb.password)
+			const passwordMatch = await bcrypt.compare(password, userDb.password)
 
-			if (!isMatchPassword) {
+			if (!passwordMatch) {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const newToken = await this.encrypt.tokenCreation(userInDb.id, userInDb.password)
+			const newToken = await this.encrypt.tokenCreation(userDb.id, userDb.password)
 
-			const profile = this.#connexionProfile(userInDb, newToken)
+			const profile = this.#connexionProfile(userDb, newToken)
 
 			return res.status(200).json(profile)
 		} catch (error) {
@@ -282,45 +298,89 @@ export class CommunController {
 			return res.status(401).json({ message })
 		}
 
-		const newUser = communInstance(this.#bddTarget)
+		const databaseInstance = databaseFactory()
+		const userInstance = await databaseInstance.usersInstances()
+		await connectDb()
 
-		const userIsFound = await newUser.getProfileUser(email)
+		const user = await userInstance.getProfileUser(email)
 
-		console.log(userIsFound)
-		if (userIsFound) {
-			const token = await this.encrypt.tokenCreation(userIsFound.dataValues.id, email)
-			await sendEmailResetPassword(email, token)
+		if (user) {
+			const { codeNumber, expiresIn } = this.encrypt.generetedCode()
+			await userInstance.addCodeNumber(codeNumber, expiresIn, user.id)
+			await sendEmailResetPassword(email, codeNumber)
 		}
 
-		return res.status(200).json({
-			message: `Un email a était envoyer à cette addresse email: ${email}`,
-		})
+		await disconnectDb()
+
+		return res.status(200).json({ 'id': user.id })
+	}
+
+	verifyCode = async (req, res) => {
+		const { idUser, code } = req.body 
+		const isCode = IS_CODE_NUMBER.test(parseInt(code))
+
+		if (!isCode) {
+			return res.status(401).json({ message: 'Ce n\'est pas le bon code' })
+		}
+
+		const databaseInstance = databaseFactory()
+		const userInstance = await databaseInstance.usersInstances()
+
+		await connectDb()
+
+		const user = await userInstance.getUserById(idUser)
+
+		if (user) {
+			
+			const storeCodeNumberInData = await userInstance.getCodeByNumber(code)
+			
+			if (!storeCodeNumberInData) {
+				return res.status(400).json({ message: 'Code invalide' })
+			}
+			
+			else if (Date.now() > storeCodeNumberInData.expiresIn) {
+				return res.status(400).json({ message: 'Demande expiré' })
+			} 
+			
+			else {
+				return res.status(200).json({ 'id': user.id })
+			}
+		}
+		await disconnectDb()
 	}
 
 	resetPassword = async (req, res) => {
-		const newPassword = req.body.newPassword
-		const token = req.body.token
+		let verifyToken 
+		const { password, token, id } = req.body
 
-		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(newPassword)
-		const verifyToken = await this.encrypt.verifyToken(token)
+		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(password)
+
+		if (token){
+			verifyToken = await this.encrypt.verifyToken(token)
+		}
 
 		if (!isValidPassword) {
 			return res.status(401).json({ message: errorPasswordMessage })
 		}
 
-		const newUser = communInstance(this.#bddTarget)
-		const userInDb = await newUser.getUserById(verifyToken.id)
+		const databaseInstance = databaseFactory()
+		const userInstance = await databaseInstance.usersInstances()
+
+		await connectDb()
+				
+		const idUser = verifyToken ? verifyToken.id :  id
+		const userInDb = await userInstance.getUserById(idUser)
 
 		if (!userInDb) {
 			return res.status(401).json({ message: 'Utilisateur introuvable' })
 		}
 
-		const encryptNewPassword = this.encrypt.passwordEncrypt(newPassword)
+		const encryptNewPassword = this.encrypt.passwordEncrypt(password)
 		const ressource = {
-			role: userInDb.dataValues.role,
+			role: userInDb.role,
 			password: encryptNewPassword,
 		}
-		const { isError, errorMessage } = newUser.updateUser(userInDb.dataValues.id, ressource)
+		const { isError, errorMessage } = userInstance.updateUser(userInDb.id, ressource)
 		if (isError) {
 			return res.status(401).json({ message: errorMessage })
 		}
@@ -354,7 +414,7 @@ export class CommunController {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
 
-			const user = communInstance(this.#bddTarget)
+			const user = communInstance()
 			const userIsPresent = await user.getUserById(req.body.role, req.body.id)
 
 			if (!userIsPresent) {
@@ -371,13 +431,13 @@ export class CommunController {
 
 	updateProfile = async (req, res) => {
 		try {
-			const userId = req.body.id
+			const { userId } = req.body
 			const isValidId = IS_NUMBER.test(userId) && userId
 
 			if (!isValidId) {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
-			const user = communInstance(this.#bddTarget)
+			const user = communInstance()
 			const userFound = await user.getUserById(userId)
 
 			if (!userFound) {
