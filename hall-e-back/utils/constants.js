@@ -1,1 +1,0 @@
-export const BDD_TARGET = process.env.BDD_TARGET

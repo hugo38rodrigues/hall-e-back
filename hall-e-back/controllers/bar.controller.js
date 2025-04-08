@@ -1,59 +1,35 @@
-import { IS_NUMBER } from '../utils/regex.js'
+import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e'
 
 export class BarController {
-    #bddTarget
+
 
   constructor () {
-    this.#bddTarget = process.env.BDD_TARGET
+   
   }
-
-  getMatchController= async (req, res) => {
-    try {
-      const newBar = barInstance(this.#bddTarget)
-      const allMatches = await newBar.getMatch()
-
-      if (allMatches){
-        return res.status(200).json({ data: allMatches })
-      }
-      else {
-        return res.status(404).json({ message: 'Error when retrieving matches' })
-      }
-      
-    } 
-    catch (error){
-      console.log(error)
-      return res.status(500).json({ message: 'Internal error' })
-    }
-  }
-
 
   matchesPlanningsController = async (req, res) => {
     try {
-      const matchId = req.body.matchId
-      const barId = req.body.barId
-      const isvalidMatchId = matchId && IS_NUMBER.test(matchId)
-      const isvalidBarId = barId && IS_NUMBER.test(barId)
-      
-      if (!isvalidMatchId || !isvalidBarId){
-        return res.status(401).json({ message: 'l\'id bar ou l\'id du match n\'est pas un number' })
-      }
+      const { matchId, barId } = req.body
 
-      const newBar = barInstance(this.#bddTarget)
-      
-      const bar = await newBar.getBar(barId)
-      const match = await newBar.getMatchById(matchId)
+      const databaseInstance = databaseFactory()
+      const userInstance = await databaseInstance.usersInstances()
+      const barInstance = await databaseInstance.barInstance()
 
-      if (!bar || !match){
-        return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
-      }
-    
-      const isAddFavorisLeague = await newBar.matchesPlannings(barId, matchId) 
+      await connectDb()
+      const bar = await userInstance.getUserById(barId)
+			const match = await userInstance.getMatchById(matchId)
+      if (!bar || !match) {
+				return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
+			}
+     
+      const isProgrammed = await barInstance.addProgrammedMatch({ barId, matchId }) 
       
-      if (!isAddFavorisLeague) {
-        return res.status(401).json({ message: 'Impossible de plannifié le match' })
-      }
+      if (!isProgrammed) {
+				return res.status(401).json({ message: 'Impossible de plannifié le match' })
+			}
 
       res.status(200).json({ message: 'Match planifié' })
+       await disconnectDb()
     } 
     
     catch (error) {
@@ -62,4 +38,34 @@ export class BarController {
     }
   }
 
+  deletedMatchProgramming = async (req, res) => {
+    try {
+    const { matchId, barId } = req.body
+    const databaseInstance = databaseFactory()
+
+		const userInstance = await databaseInstance.usersInstances()
+		const barInstance = await databaseInstance.barInstance()
+
+		await connectDb()
+		const bar = await userInstance.getUserById(barId)
+		const match = await userInstance.getMatchById(matchId)
+		if (!bar || !match) {
+			return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
+		}
+    const isDeleted = await barInstance.deletedProgMatch({ matchId, barId })
+
+    if (!isDeleted){
+      return res.status(401).json({ message: 'Impossible de supprimé le match' })
+		}
+
+    res.status(200).json({ message: 'Match supprimé' })
+    await disconnectDb() 
+  }    
+    catch (error) {
+      console.error(error) 
+      res.status(500).json({ message: 'Internal error' }) 
+    }
+  }
+
 }
+

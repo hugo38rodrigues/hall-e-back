@@ -6,7 +6,7 @@ const router = Router()
 const client = new ClientController()
 const middleware = new Auth()
 
-router.get('/', client.getMatchController)
+router.get('/', client.getAllBarController)
 router.post('/like', middleware.verifyAccount, client.addLikeBarController)
 // router.post('/comment',  middleware.verifyRoleInBody, client.addCommentsController)
 
