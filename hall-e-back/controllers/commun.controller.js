@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { sendEmailResetPassword } from '../utils/email.js'
+import { getCoordinatesFromAddress } from '../utils/map.js'
 import { errorServer } from '../utils/messages.js'
 import {
 	IS_ADDRESS,
@@ -19,7 +20,7 @@ export class CommunController {
 		this.encrypt = new Crypt()
 	}
 
-	#formatData = (body) => {
+	#formatData = async (body) => {
 		if (body.role === 'client') {
 			return {
 				firstName: body.informations.firstName,
@@ -31,6 +32,7 @@ export class CommunController {
 		}
 
 		if (body.role === 'bar') {
+			const { latitude, longitude } = await getCoordinatesFromAddress(body.informations.address)
 			return {
 				name: body.informations.name,
 				address: body.informations.address,
@@ -40,6 +42,8 @@ export class CommunController {
 				price: body.informations.price,
 				description: body.informations.description,
 				photo: body.informations.photo,
+				latitude: latitude,
+				longitude: longitude
 			}
 		}
 	}
@@ -69,7 +73,7 @@ export class CommunController {
 		}
 	}
 
-	#barAccountVerify = (body) => {
+	#barAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isAddress = IS_ADDRESS.test(body.informations.address)
@@ -97,7 +101,7 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = this.#formatData(body)
+		const ressources = await this.#formatData(body)
 
 		return {
 			ressources,
@@ -221,7 +225,7 @@ export class CommunController {
 			}
 
 			if (role === 'bar') {
-				data = this.#barAccountVerify(req.body, res)
+				data = await this.#barAccountVerify(req.body, res)
 			}
 
 			if (!data.isValid) {
@@ -236,13 +240,13 @@ export class CommunController {
 			
 
 			if (userDb) {
-				return res.status(401).json({ message: 'The user already exists' })
+				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
 
 			await userInstance.addUser(data.ressources)
 			
 			await disconnectDb()
-			return res.status(201).json({ message: 'Sign in success' })
+			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ message: 'Internal error' })
