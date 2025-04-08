@@ -1,27 +1,70 @@
+import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e'
 import { IS_NUMBER } from '../utils/regex.js'
 
-export class ClientController {
-	#bddTarget
 
-	constructor () {
-		this.#bddTarget = process.env.BDD_TARGET
+export class ClientController {
+	constructor () {}
+
+	#formatedDataBar = (data) => {
+		const newMap = data.map((item)=> {
+			return {
+				id: item._id,
+				email: item.email,
+				role: item.role,
+				informations: {
+					name: item.name,
+					description: item.description,
+					address: item.address,
+					pictures: item.pictures,
+				},
+				programmedMatches: item.programmedMatches,
+			}
+		})
+		return newMap
+			
+	}
+	
+
+	#filterAndSortMatches (data) {
+  const now = new Date()
+  const today = now.toISOString().split('T')[0] // YYYY-MM-DD
+  const currentTime = now.getTime() // Timestamp actuel
+
+  data.forEach(bar => {
+    bar.programmedMatches = bar.programmedMatches
+      .filter(match => {
+        const matchDate = new Date(match.date)
+        const matchDay = matchDate.toISOString().split('T')[0] // YYYY-MM-DD
+
+        // Supprime les matchs d'avant aujourd’hui
+        if (matchDay < today) return false
+
+        // Si c'est aujourd’hui, on garde uniquement les matchs futurs
+        if (matchDay === today && matchDate.getTime() < currentTime) return false
+
+        return true
+      })
+  	})
+
+  	return data
 	}
 
-	getMatchController = async (req, res) => {
-		try {
-			const client = clientInstance(this.#bddTarget)
-			const allMatches = await client.getMatch()
 
-			if (allMatches) {
-				return res.status(200).json({ data: allMatches })
-			} else {
-				return res
-					.status(404)
-					.json({ message: 'Error when retrieving matches' })
-			}
+	getAllBarController = async (req, res) => {
+		try {
+			const databaseInstance = databaseFactory()
+			const clientInstance = await databaseInstance.clientInstance()
+
+			await connectDb()
+			const barList = await clientInstance.getBars()
+			const bars = this.#filterAndSortMatches(barList)
+			const formatedDataBar = this.#formatedDataBar(bars)
+
+			await disconnectDb()
+
+			return res.status(200).json({ data: formatedDataBar })
 		} catch (error) {
-			console.error(error)
-			return res.status(500).json({ message: 'Internal error' })
+			console.error(error.message)
 		}
 	}
 
@@ -32,20 +75,16 @@ export class ClientController {
 		const clientIdIsInteger = clientId && IS_NUMBER.test(clientId)
 
 		if (!barIdIsInteger || !clientIdIsInteger) {
-			return res
-				.status(401)
-				.json({ message: 'L\'id client ou l\'id du bar n\'est pas un number' })
+			return res.status(401).json({ message: 'L\'id client ou l\'id du bar n\'est pas un number' })
 		}
 
-		const newClient = clientInstance(this.#bddTarget)
+		const newClient = clientInstance()
 
 		const clientIdIsValid = await newClient.getClient(clientId)
 		const barIdIsValid = await newClient.getBar(barId)
 
 		if (!clientIdIsValid || !barIdIsValid) {
-			return res
-				.status(401)
-				.json({ message: 'l\'id client ou l\'id du bar est introuvable' })
+			return res.status(401).json({ message: 'l\'id client ou l\'id du bar est introuvable' })
 		}
 
 		const isLikedBar = await newClient.addLikeBar(clientId, barId)
