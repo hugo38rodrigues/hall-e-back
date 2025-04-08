@@ -16,6 +16,8 @@ export class ClientController {
 					description: item.description,
 					address: item.address,
 					pictures: item.pictures,
+					longitude: item.longitude,
+					latitude: item.latitude
 				},
 				programmedMatches: item.programmedMatches,
 			}
