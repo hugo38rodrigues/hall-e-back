@@ -140,41 +140,39 @@ export class CommunController {
 	}
 
 	#connexionProfile = (data, token) => {
-		let profileData
+		let informationsData
 		if (data.role === 'bar') {
-			profileData = {
+			informationsData = {
 				name: data.name,
 				address: data.address,
 				price: data.price,
 				description: data.description,
-				picture: data.pictures,
-				favorites: data.favorites ? {
-					gameName: data.favorites.gameName,
-					leagueName: data.favorites.leagueName,
-					teams: data.favorites.teams,
-				}: {}
+				pictures: data.pictures,
+				longitude: data.longitude,
+				latitude: data.latitude
 			}
 		} else {
-			profileData = {
+			informationsData = {
 				firstName: data.firstName,
 				lastName: data.lastName,
 				likeBar: data.likeBar,
-				favorites: data.favorites
-					? {
-							gameName: data.favorites.gameName,
-							leagueName: data.favorites.leagueName,
-							teams: data.favorites.teams,
-					  }
-					: {},
 			}
 		}
 
 		return {
-			id: data.id,
+			id: data._id,
 			email: data.email,
 			role: data.role,
 			token: token,
-			informations: profileData,
+			favorites: data.favorites
+				? {
+						gameName: data.favorites.gameName,
+						leagueName: data.favorites.leagueName,
+						teams: data.favorites.teams,
+						barName: data.role === 'client' ? data.favorites.barName : ''
+				  }
+				: {},
+			informations: informationsData,
 		}
 	}
 
@@ -221,7 +219,7 @@ export class CommunController {
 		let data
 		try {
 			if (role === 'client') {
-				data = this.#clientAccountVerify(req.body, res)
+				data = await this.#clientAccountVerify(req.body, res)
 			}
 
 			if (role === 'bar') {
