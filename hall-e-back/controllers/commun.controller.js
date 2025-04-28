@@ -386,17 +386,7 @@ export class CommunController {
 		if (isError) {
 			return res.status(401).json({ message: errorMessage })
 		}
-		return res.status(200).json({ message: 'Mot de passe changer avec success' })
-	}
-
-	verifyToken = async (req, res) => {
-		const token = req.body.token
-		const isToken = await this.encrypt.verifyToken(token)
-		if (isToken) {
-			return res.status(200).json({ isValid: true })
-		}
-
-		return res.status(403).json({ isValid: false })
+		return res.status(200).json({ message: 'Mot de passe changé avec succès' })
 	}
 
 	deleteUser = async (req, res) => {
