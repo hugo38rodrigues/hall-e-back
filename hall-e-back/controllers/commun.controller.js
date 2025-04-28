@@ -20,7 +20,7 @@ export class CommunController {
 		this.encrypt = new Crypt()
 	}
 
-	#formatData = async (body) => {
+	#formatedData = async (body) => {
 		if (body.role === 'client') {
 			return {
 				firstName: body.informations.firstName,
@@ -48,7 +48,7 @@ export class CommunController {
 		}
 	}
 
-	#clientAccountVerify = (body) => {
+	#clientAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isFirstName = IS_STRING.test(body.informations.firstName)
@@ -65,7 +65,7 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const ressources = this.#formatData(body)
+		const ressources = await this.#formatedData(body)
 
 		return {
 			ressources,
@@ -101,7 +101,7 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = await this.#formatData(body)
+		const ressources = await this.#formatedData(body)
 
 		return {
 			ressources,
@@ -310,7 +310,7 @@ export class CommunController {
 
 		if (user) {
 			const { codeNumber, expiresIn } = this.encrypt.generetedCode()
-			await userInstance.addCodeNumber(codeNumber, expiresIn, user.id)
+			await userInstance.addCodeNumber(codeNumber, expiresIn, user._id)
 			await sendEmailResetPassword(email, codeNumber)
 		}
 
