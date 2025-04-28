@@ -15,6 +15,8 @@ router.post('/favorites/team', favoris.addFavorisTeamController)
 router.delete('/favorites/team', favoris.deleteFavorisTeamController)
 router.post('/favorites/league', favoris.addFavorisLeagueController)
 router.delete('/favorites/league',  favoris.deleteFavorisLeagueController)
+router.post('/favorites/bar-name', favoris.addFavorisBarNameController)
+router.delete('/favorites/bar-name', favoris.deleteFavorisBarNameController)
 
 router.get('/', user.getMatchesController)
 router.get('/filters', user.getFiltersController)
