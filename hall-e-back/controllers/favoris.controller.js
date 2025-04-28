@@ -13,9 +13,9 @@ export class FavorisController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await connectDb()
-			await userInstance.addFavoriteGame(idUser, gameName)
+			const addGame = await userInstance.addFavoriteGame(idUser, gameName)
 			await disconnectDb()
-			res.status(200).json({ isAdded: true })
+			res.status(200).json({ gameName: addGame.gameName })
 		} catch (error) {
 			console.log(error.message)
 			res.status(500).json({ message: errorServer })
@@ -28,9 +28,9 @@ export class FavorisController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await connectDb()
-			await userInstance.removeFavoriteGame(idUser, gameName)
+			const deletedGame = await userInstance.removeFavoriteGame(idUser, gameName)
 			await disconnectDb()
-			return res.status(200).json({ isDeled: true })
+			res.status(200).json({ gameName: deletedGame.gameName })
 		} catch (error) {
 			console.log(error.message)
 			return res.status(500).json({ message: errorServer })
@@ -43,9 +43,9 @@ export class FavorisController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await connectDb()
-			await userInstance.addFavoriteLeague(idUser, leagueName)
+			const addLeague = await userInstance.addFavoriteLeague(idUser, leagueName)
 			await disconnectDb()
-			res.status(200).json({ isAdded: true })
+			res.status(200).json({ leagueName: addLeague.leagueName })
 		} catch (error) {
 			console.log(error.message)
 			res.status(500).json({ message: errorServer })
@@ -58,9 +58,9 @@ export class FavorisController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await connectDb()
-			await userInstance.removeFavoriteLeague(idUser, leagueName)
+			const deleteLeague = await userInstance.removeFavoriteLeague(idUser, leagueName)
 			await disconnectDb()
-			return res.status(200).json({ isDeled: true })
+			res.status(200).json({ leagueName: deleteLeague.leagueName })
 		} catch (error) {
 			console.log(error.message)
 			return res.status(500).json({ message: errorServer })
@@ -69,14 +69,14 @@ export class FavorisController {
 
 	addFavorisTeamController = async (req, res) => {
 		try {
-				const { idUser, idTeam } = req.body
-				const databaseInstance = databaseFactory()
-				const userInstance = await databaseInstance.usersInstances()
-				await connectDb()
-				const favoris = await userInstance.addFavoriteTeam(idUser, idTeam)
-				console.log(favoris)
-				await disconnectDb()
-				res.status(200).json({ isAdded: true })
+			const { idUser, idTeam } = req.body
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await connectDb()
+			const addTeam = await userInstance.addFavoriteTeam(idUser, idTeam)
+			await disconnectDb()
+			const teams = addTeam.teams
+			res.status(200).json({ teams })
 		} catch (error) {
 			console.log(error.message)
 			res.status(500).json({ message: errorServer })
@@ -89,9 +89,47 @@ export class FavorisController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await connectDb()
-			await userInstance.removeFavoriteTeam(idUser, idTeam)
+			const deleteTeam = await userInstance.removeFavoriteTeam(idUser, idTeam)
 			await disconnectDb()
-			return res.status(200).json({ isDeled: true })
+			const teams = deleteTeam.teams
+			res.status(200).json({ teams })
+		} catch (error) {
+			console.log(error.message)
+			return res.status(500).json({ message: errorServer })
+		}
+	}
+
+	addFavorisBarNameController = async (req, res) => {
+		try {
+			const { idUser, idBar } = req.body
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+		
+			await connectDb()
+			const userInDb = await userInstance.getUserById(idUser)
+
+			if (userInDb.role !== 'client') {
+				return res.status(401).json({ message: 'Vous n\'avez pas le bon rôle' })
+			} 
+			const addBarName = await userInstance.addFavoriteBar(idUser, idBar)
+			await disconnectDb()
+			
+			res.status(200).json({ barName: addBarName })
+		} catch (error) {
+			console.log(error.message)
+			res.status(500).json({ message: errorServer })
+		}
+	}
+
+	deleteFavorisBarNameController = async (req, res) => {
+		try {
+			const { idUser, idBar } = req.body
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await connectDb()
+			const deleteBarName = await userInstance.removeFavoriteBar(idUser, idBar)
+			await disconnectDb()
+			return res.status(200).json({ barName: deleteBarName })
 		} catch (error) {
 			console.log(error.message)
 			return res.status(500).json({ message: errorServer })

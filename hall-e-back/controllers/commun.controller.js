@@ -20,7 +20,7 @@ export class CommunController {
 		this.encrypt = new Crypt()
 	}
 
-	#formatData = async (body) => {
+	#formatedData = async (body) => {
 		if (body.role === 'client') {
 			return {
 				firstName: body.informations.firstName,
@@ -48,7 +48,7 @@ export class CommunController {
 		}
 	}
 
-	#clientAccountVerify = (body) => {
+	#clientAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isFirstName = IS_STRING.test(body.informations.firstName)
@@ -65,7 +65,7 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const ressources = this.#formatData(body)
+		const ressources = await this.#formatedData(body)
 
 		return {
 			ressources,
@@ -101,7 +101,7 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = await this.#formatData(body)
+		const ressources = await this.#formatedData(body)
 
 		return {
 			ressources,
@@ -140,41 +140,39 @@ export class CommunController {
 	}
 
 	#connexionProfile = (data, token) => {
-		let profileData
+		let informationsData
 		if (data.role === 'bar') {
-			profileData = {
+			informationsData = {
 				name: data.name,
 				address: data.address,
 				price: data.price,
 				description: data.description,
-				picture: data.pictures,
-				favorites: data.favorites ? {
-					gameName: data.favorites.gameName,
-					leagueName: data.favorites.leagueName,
-					teams: data.favorites.teams,
-				}: {}
+				pictures: data.pictures,
+				longitude: data.longitude,
+				latitude: data.latitude
 			}
 		} else {
-			profileData = {
+			informationsData = {
 				firstName: data.firstName,
 				lastName: data.lastName,
 				likeBar: data.likeBar,
-				favorites: data.favorites
-					? {
-							gameName: data.favorites.gameName,
-							leagueName: data.favorites.leagueName,
-							teams: data.favorites.teams,
-					  }
-					: {},
 			}
 		}
 
 		return {
-			id: data.id,
+			id: data._id,
 			email: data.email,
 			role: data.role,
 			token: token,
-			informations: profileData,
+			favorites: data.favorites
+				? {
+						gameName: data.favorites.gameName,
+						leagueName: data.favorites.leagueName,
+						teams: data.favorites.teams,
+						barName: data.role === 'client' ? data.favorites.barName : ''
+				  }
+				: {},
+			informations: informationsData,
 		}
 	}
 
@@ -221,7 +219,7 @@ export class CommunController {
 		let data
 		try {
 			if (role === 'client') {
-				data = this.#clientAccountVerify(req.body, res)
+				data = await this.#clientAccountVerify(req.body, res)
 			}
 
 			if (role === 'bar') {
@@ -310,7 +308,7 @@ export class CommunController {
 
 		if (user) {
 			const { codeNumber, expiresIn } = this.encrypt.generetedCode()
-			await userInstance.addCodeNumber(codeNumber, expiresIn, user.id)
+			await userInstance.addCodeNumber(codeNumber, expiresIn, user._id)
 			await sendEmailResetPassword(email, codeNumber)
 		}
 
@@ -388,17 +386,7 @@ export class CommunController {
 		if (isError) {
 			return res.status(401).json({ message: errorMessage })
 		}
-		return res.status(200).json({ message: 'Mot de passe changer avec success' })
-	}
-
-	verifyToken = async (req, res) => {
-		const token = req.body.token
-		const isToken = await this.encrypt.verifyToken(token)
-		if (isToken) {
-			return res.status(200).json({ isValid: true })
-		}
-
-		return res.status(403).json({ isValid: false })
+		return res.status(200).json({ message: 'Mot de passe changé avec succès' })
 	}
 
 	deleteUser = async (req, res) => {
