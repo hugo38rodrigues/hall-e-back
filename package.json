@@ -7,7 +7,6 @@
 	"author": "Xwdrblue",
 	"license": "ISC",
 	"scripts": {
-		"test": "vitest",
 		"start": "nodemon server.js",
 		"lint": "npx eslint",
 		"fix-eslint": "npx eslint --fix"
