@@ -2,9 +2,13 @@ name: CI/CD for hall-e API
 
 on:
   push:
-    branches: ["main", "feature/*"]
+    branches:  
+    - main 
+    - feature/**
   pull_request:
-   branches: ["main", "feature/*"]
+   branches: 
+    - main 
+    - feature/**
 
 jobs:
   build:
