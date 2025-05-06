@@ -75,4 +75,4 @@ jobs:
         run: docker build -t xwdrblue/api-hall-e:${{ env.IMAGE_TAG }}
 
       - name: 📦 Push to registry
-        run: docker pushxwdrblue/api-hall-e:${{ env.IMAGE_TAG }}
+        run: docker push xwdrblue/api-hall-e:${{ env.IMAGE_TAG }}
