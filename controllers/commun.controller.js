@@ -176,44 +176,6 @@ export class CommunController {
 		}
 	}
 
-	#newDataValidation = (profile, role) => {
-		const isEmptyEmail = profile.email === undefined ? undefined : profile.email
-		const isEmptyPassword =
-			profile.password === undefined ? undefined : this.encrypt.passwordEncrypt(profile.password)
-
-		if (role === 'client') {
-			const isEmptyLastName = profile.lastName === undefined ? undefined : profile.lastName
-			const isEmptyFirstName = profile.firstName === undefined ? undefined : profile.firstName
-
-			return {
-				email: isEmptyEmail,
-				password: isEmptyPassword,
-				lastName: isEmptyLastName,
-				firstName: isEmptyFirstName,
-				role,
-			}
-		}
-
-		if (role === 'bar') {
-			const isEmptyName = profile.name === undefined ? undefined : profile.name
-			const isEmptyAddress = profile.address === undefined ? undefined : profile.address
-			const isEmptyDescription = profile.description === undefined ? undefined : profile.description
-			const isEmptyPicture = profile.picture === undefined ? undefined : profile.picture
-			const isEmptyPrice = profile.price === undefined ? undefined : profile.price
-
-			return {
-				email: isEmptyEmail,
-				password: isEmptyPassword,
-				name: isEmptyName,
-				address: isEmptyAddress,
-				description: isEmptyDescription,
-				picture: isEmptyPicture,
-				price: isEmptyPrice,
-				role,
-			}
-		}
-	}
-
 	createAccount = async (req, res) => {
 		const role = req.body.role
 		let data
@@ -406,14 +368,6 @@ export class CommunController {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
 
-			const user = communInstance()
-			const userIsPresent = await user.getUserById(req.body.role, req.body.id)
-
-			if (!userIsPresent) {
-				return res.status(400).json({ message: 'error delete user not found' })
-			}
-
-			await user.deleteUser(req.body.id, req.body.role)
 			return res.status(200).json({ message: 'delete user' })
 		} catch (error) {
 			console.log(error)
@@ -429,23 +383,7 @@ export class CommunController {
 			if (!isValidId) {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
-			const user = communInstance()
-			const userFound = await user.getUserById(userId)
-
-			if (!userFound) {
-				return res.status(404).json({ message: 'user not found' })
-			}
-
-			// const files = req.files // Liste des fichiers uploadés
-			// const baseUrl = `${req.protocol}://${req.get('host')}` // URL de base du serveur
-
-			const updateProfile = this.#newDataValidation(req.body, userFound.dataValues.role)
-
-			const { isError, message } = await user.updateUser(userId, updateProfile)
-
-			if (isError) {
-				return res.status(404).json({ message })
-			}
+			const message = 'Pas implementé'
 
 			return res.status(200).json({ message })
 		} catch (error) {
