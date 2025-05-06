@@ -45,14 +45,17 @@ jobs:
 
   deploy:
     name: 🚀 Push images in docker Hub
+
     needs: build
+
     if: |
       github.ref == 'refs/heads/main' &&
       contains(github.event.head_commit.message, 'Merge pull request') &&
       contains(github.event.head_commit.message, 'feature/')
 
+    runs-on: ubuntu-latest
+
     steps:
-    
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: Lire version de package.json
