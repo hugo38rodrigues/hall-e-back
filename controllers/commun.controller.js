@@ -456,12 +456,13 @@ export class CommunController {
 
 	getMatchesController = async (req, res) => {
 		try {
+			
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await connectDb()
 			const matches = await userInstance.getMatches()
 			await disconnectDb()
-			return res.status(200).json({ data: matches })
+			return res.status(200).json(matches)
 		} catch (error) {
 			console.log(error)
 			return res.status(500).json({ message: 'Internal error' })
