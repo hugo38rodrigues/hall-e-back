@@ -6,7 +6,7 @@ export class Crypt {
 	#jwtSecret
 
 	constructor () {
-		this.#jwtSecret = process.env.SECRET_KEY
+		this.#jwtSecret = process.env.SECRET_JWT_KEY
 	}
 
 	tokenCreation = async (id, email) => {
