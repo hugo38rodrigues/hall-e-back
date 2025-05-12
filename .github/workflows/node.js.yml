@@ -17,19 +17,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: 🔐 GitHub Token pour dépendances privées
-      run: |
-        # Configure Git pour remplacer les URLs SSH par HTTPS avec le token
-        git config --global url."https://${{ secrets.ACCESS_TOKEN_GITHUB }}:@github.com/".insteadOf "git@github.com:"
-        git config --global url."https://${{ secrets.ACCESS_TOKEN_GITHUB }}:@github.com/".insteadOf "https://github.com/"
-
-    - name: 🔧 Setup .npmrc pour GitHub Packages
-      run: |
-        # Créer un fichier .npmrc pour authentifier les accès à GitHub Packages avec le token
-        echo "@xwdrblue:registry=https://npm.pkg.github.com" > .npmrc
-        echo "//npm.pkg.github.com/:_authToken=${{ secrets.ACCESS_TOKEN_GITHUB }}" >> .npmrc
-      working-directory: ./app
-
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
