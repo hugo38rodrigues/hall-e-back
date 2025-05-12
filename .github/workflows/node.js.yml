@@ -17,6 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: 🔧 Setup .npmrc pour GitHub Packages
+      run: |
+        # Créer un fichier .npmrc pour authentifier les accès à GitHub Packages avec le token
+        echo "//npm.pkg.github.com/:_authToken=${{ secrets.ACCESS_TOKEN_GITHUB }}" >> .npmrc
+      working-directory: ./app
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
