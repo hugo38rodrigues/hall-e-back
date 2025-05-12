@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [23.x]
+        node-version: [20.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -23,6 +23,7 @@ jobs:
         echo "//npm.pkg.github.com/:_authToken=${ACCESS_TOKEN_GITHUB}" >> .npmrc
       env:
         NPM_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+      working-directory: ./app
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -32,17 +33,19 @@ jobs:
 
     - name: Inject GitHub token dans package.json
       run: |
-       git config --global url."https://${{ secrets.ACCESS_TOKEN_GITHUB }}:@github.com/".insteadOf "https://github.com/"
-
+        git config --global url."https://${{ secrets.ACCESS_TOKEN_GITHUB }}:@github.com/".insteadOf "https://github.com/"
 
     - name: 🧪 Install dependencies
       run: npm ci
+      working-directory: ./app
 
     - name: 🧹 Lint
       run: npm run lint
+      working-directory: ./app
 
     - name: 🧪 Test
       run: npm test
+      working-directory: ./app
 
   deploy:
     name: 🚀 Push images in docker Hub
@@ -57,7 +60,7 @@ jobs:
       - name: Lire version de package.json
         id: get_version
         run: |
-          VERSION=$(jq -r .version package.json)
+          VERSION=$(jq -r .version app/package.json)
           echo "IMAGE_TAG=version-$VERSION" >> $GITHUB_ENV
 
       - name: 🐳 Login to Docker Hub
@@ -69,7 +72,7 @@ jobs:
       - name: ⚙️ build docker image 
         run: docker build \
           --build-arg ACCESS_TOKEN_GITHUB=${{ secrets.ACCESS_TOKEN_GITHUB }} \
-          -t xwdrblue/api-hall-e:${{ env.IMAGE_TAG }} .
+          -t xwdrblue/api-hall-e:${{ env.IMAGE_TAG }} ./app
 
       - name: 📦 Push to registry
         run: docker push xwdrblue/api-hall-e:${{ env.IMAGE_TAG }}
