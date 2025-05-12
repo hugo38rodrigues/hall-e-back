@@ -20,7 +20,9 @@ jobs:
       - name: Use GitHub token for private repo
         env:
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
-        run: echo "//github.com/:_authToken=$TOKEN_GITHUB" > ~/.npmrc
+        run: | 
+          echo "$TOKEN_GITHUB" 
+          echo "//github.com/:_authToken=$TOKEN_GITHUB" > ~/.npmrc
         working-directory: ./app
 
       - name: Use Node.js ${{ matrix.node-version }}
