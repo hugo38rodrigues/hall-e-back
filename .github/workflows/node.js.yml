@@ -17,14 +17,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: 🔐 Setup .npmrc for GitHub Packages
-      run: |
-        echo "@xwdrblue:registry=https://npm.pkg.github.com" > .npmrc
-        echo "//npm.pkg.github.com/:_authToken=${ACCESS_TOKEN_GITHUB}" >> .npmrc
-      env:
-        NPM_TOKEN: ${{ secrets.ACCESS_TOKEN_GITHUB }}
-      working-directory: ./app
-
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
