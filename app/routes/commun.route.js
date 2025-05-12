@@ -2,7 +2,6 @@ import { Router } from 'express'
 import { CommunController } from '../controllers/commun.controller.js'
 import { FavorisController } from '../controllers/favoris.controller.js'
 import { Auth } from '../midleware/auth.js'
-import { upload } from '../midleware/multer.js'
 
 const router = Router()
 const user = new CommunController()
@@ -28,6 +27,6 @@ router.post('/verify-code', user.verifyCode)
 router.post('/reset-password', user.resetPassword)
 
 router.delete('/', middleware.verifyAccount, user.deleteUser)
-router.put('/', middleware.verifyAccount, upload.array('images', 10), user.updateProfile)
+router.put('/', middleware.verifyAccount, user.updateProfile)
 
 export default router
