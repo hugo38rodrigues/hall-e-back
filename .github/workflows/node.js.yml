@@ -19,9 +19,9 @@ jobs:
 
     - name: Use GitHub token for private repo
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
       run: |
-        echo "//github.com/:_authToken=${GITHUB_TOKEN}" > ~/.npmrc
+        echo "//github.com/:_authToken=${TOKEN_GITHUB}" > ~/.npmrc
       working-directory: ./app
 
     - name: Use Node.js ${{ matrix.node-version }}
@@ -67,7 +67,7 @@ jobs:
 
       - name: ⚙️ Build docker image 
         run: docker build \
-          --build-arg ACCESS_TOKEN_GITHUB=${{ secrets.GITHUB_TOKEN }} \
+          --build-arg ACCESS_TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }} \
           -t xwdrblue/api-hall-e:${{ env.IMAGE_TAG }} ./app
 
       - name: 📦 Push to registry

@@ -5,6 +5,6 @@
 *.key
 # node files
 /app/node_modules
-/app/.npmrc
+.npmrc
 # env folder
 env
