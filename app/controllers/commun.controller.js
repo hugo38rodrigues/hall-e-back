@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcryptjs from 'bcryptjs'
 import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { sendEmailResetPassword } from '../utils/email.js'
@@ -237,7 +237,7 @@ export class CommunController {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const passwordMatch = await bcrypt.compare(password, userDb.password)
+			const passwordMatch = await bcryptjs.compare(password, userDb.password)
 
 			if (!passwordMatch) {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
