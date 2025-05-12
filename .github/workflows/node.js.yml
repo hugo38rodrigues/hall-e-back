@@ -22,7 +22,7 @@ jobs:
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: | 
           echo $TOKEN_GITHUB 
-          echo "//github.com/:_authToken=$TOKEN_GITHUB" > ~/.npmrc
+          echo "//github.com/:_authToken=$TOKEN_GITHUB" > ~/app/.npmrc
           cat ~/.npmrc
         working-directory: ./app
 
