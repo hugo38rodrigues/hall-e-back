@@ -4,9 +4,7 @@
 .vscode
 *.key
 # node files
-node_modules
-
+./app/node_module
+.npmrc
 # env folder
-env/debugger
-env/dev
-env/test
+./env/*
