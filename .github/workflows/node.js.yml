@@ -21,10 +21,8 @@ jobs:
         env:
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: | 
-          pwd
-          ls
-          echo $TOKEN_GITHUB 
           echo "//github.com/:_authToken=$TOKEN_GITHUB" > ./app/.npmrc
+          cat ./app/.npmrc
 
 
       - name: Use Node.js ${{ matrix.node-version }}
