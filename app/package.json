@@ -19,7 +19,7 @@
 		"@stylistic/eslint-plugin-js": "^2.6.4",
 		"axios": "^1.7.7",
 		"bcryptjs": "^3.0.2",
-		"bdd-service-hall-e": "https://${ACCESS_TOKEN_GITHUB}@github.com/hugo38rodrigues/bdd-hall-e.git",
+ 		"bdd-service-hall-e": "git+https://github.com/hugo38rodrigues/bdd-hall-e.git",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.7",
 		"express": "^4.19.2",

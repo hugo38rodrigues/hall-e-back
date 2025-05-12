@@ -17,10 +17,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: 🔧 Setup .npmrc pour GitHub Packages
+    - name: Use GitHub token for private repo
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_GITHUB_TOKEN }}
       run: |
-        # Créer un fichier .npmrc pour authentifier les accès à GitHub Packages avec le token
-        echo "//npm.pkg.github.com/:_authToken=${{ secrets.ACCESS_TOKEN_GITHUB }}" >> .npmrc
+        echo "//github.com/:_authToken=${ACCESS_GITHUB_TOKEN}" > ~/.npmrc
       working-directory: ./app
 
     - name: Use Node.js ${{ matrix.node-version }}
@@ -66,7 +67,7 @@ jobs:
 
       - name: ⚙️ Build docker image 
         run: docker build \
-          --build-arg ACCESS_TOKEN_GITHUB=${{ secrets.ACCESS_TOKEN_GITHUB }} \
+          --build-arg ACCESS_TOKEN_GITHUB=${{ secrets.ACCESS_GITHUB_TOKEN }} \
           -t xwdrblue/api-hall-e:${{ env.IMAGE_TAG }} ./app
 
       - name: 📦 Push to registry

@@ -4,7 +4,7 @@
 .vscode
 *.key
 # node files
-./app/node_module
+/app/node_modules
 .npmrc
 # env folder
-./env/*
+env
