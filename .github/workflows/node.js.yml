@@ -22,6 +22,7 @@ jobs:
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: | 
           pwd
+          ls
           echo $TOKEN_GITHUB 
           echo "//github.com/:_authToken=$TOKEN_GITHUB" > ./app/.npmrc
 
