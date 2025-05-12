@@ -23,6 +23,8 @@ jobs:
         run: | 
           echo "//github.com/:_authToken=$TOKEN_GITHUB" > ./app/.npmrc
           cat ./app/.npmrc
+          cd app
+          ls
 
 
       - name: Use Node.js ${{ matrix.node-version }}
