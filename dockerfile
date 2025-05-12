@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copie les fichiers nécessaires
 COPY ./app/package*.json ./
-COPY /app/.npmrc .npmrc
+COPY .npmrc .npmrc
 
 # Injecte les variables d'environnement si nécessaire (ex. via ARG)
 ARG NODE_ENV=production
