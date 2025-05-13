@@ -45,7 +45,7 @@ jobs:
             ${{ runner.os }}-node-modules-
 
       - name: 🧪 Install dependencies
-        run: npm ci
+        run: npm ci --verbose
         working-directory: ./app
 
       - name: 🧹 Lint
