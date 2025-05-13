@@ -23,6 +23,7 @@ jobs:
         run: |
           # Forcer l'usage de HTTPS au lieu de SSH
           git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://${TOKEN_GITHUB}@github.com/".insteadOf "git@github.com:"
           git config --global url."https://".insteadOf "ssh://git@"
 
           # Authentifier avec le token GitHub
