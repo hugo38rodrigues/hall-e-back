@@ -15,7 +15,7 @@ jobs:
         node-version: [20.x]
 
     steps:
-      # - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Use GitHub token for private repo
         env:
@@ -34,8 +34,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
           cache-dependency-path: ./app/package-lock.json
+
       - name: Cache npm dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-modules-${{ hashFiles('./app/package-lock.json') }}
