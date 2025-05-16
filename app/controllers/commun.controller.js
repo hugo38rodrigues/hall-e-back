@@ -1,18 +1,18 @@
 import bcryptjs from 'bcryptjs'
-import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e/main.js'
+import { databaseFactory } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import { errorServer } from '../utils/messages.js'
 import {
-	IS_ADDRESS,
-	IS_BAR_NAME,
-	IS_CODE_NUMBER,
-	IS_DESCRIPTION,
-	IS_EMAIL,
-	IS_NUMBER,
-	IS_PASSWORD,
-	IS_STRING,
+    IS_ADDRESS,
+    IS_BAR_NAME,
+    IS_CODE_NUMBER,
+    IS_DESCRIPTION,
+    IS_EMAIL,
+    IS_NUMBER,
+    IS_PASSWORD,
+    IS_STRING,
 } from '../utils/regex.js'
 
 export class CommunController {
@@ -192,10 +192,10 @@ export class CommunController {
 				return res.status(401).json({ message: data.message })
 			}
 
-			await connectDb()
+			await databaseInstance.connectDb()
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const userDb = await userInstance.getProfileUser(data.email)
 			
 
@@ -205,7 +205,7 @@ export class CommunController {
 
 			await userInstance.addUser(data.ressources)
 			
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
 			console.log(error)
@@ -229,9 +229,9 @@ export class CommunController {
 			}
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const userDb = await userInstance.getProfileUser(email)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 
 			if (!userDb) {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
@@ -264,7 +264,7 @@ export class CommunController {
 
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
-		await connectDb()
+		await databaseInstance.connectDb()
 
 		const user = await userInstance.getProfileUser(email)
 
@@ -274,7 +274,7 @@ export class CommunController {
 			await sendEmailResetPassword(email, codeNumber)
 		}
 
-		await disconnectDb()
+		await databaseInstance.disconnectDb()
 
 		return res.status(200).json({ 'id': user.id })
 	}
@@ -290,7 +290,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await connectDb()
+		await databaseInstance.connectDb()
 
 		const user = await userInstance.getUserById(idUser)
 
@@ -310,7 +310,7 @@ export class CommunController {
 				return res.status(200).json({ 'id': user.id })
 			}
 		}
-		await disconnectDb()
+		await databaseInstance.disconnectDb()
 	}
 
 	resetPassword = async (req, res) => {
@@ -330,7 +330,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await connectDb()
+		await databaseInstance.connectDb()
 				
 		const idUser = verifyToken ? verifyToken.id :  id
 		const userInDb = await userInstance.getUserById(idUser)
@@ -397,9 +397,9 @@ export class CommunController {
 			
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const matches = await userInstance.getMatches()
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(200).json(matches)
 		} catch (error) {
 			console.log(error)
@@ -411,9 +411,9 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const filters = await userInstance.getAllFilters()
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(200).json({ filters })
 		} catch (error) {
 			console.error(error)

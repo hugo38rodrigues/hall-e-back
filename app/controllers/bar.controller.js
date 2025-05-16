@@ -1,4 +1,4 @@
-import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e'
+import { databaseFactory } from 'bdd-service-hall-e'
 
 export class BarController {
 
@@ -15,7 +15,7 @@ export class BarController {
       const userInstance = await databaseInstance.usersInstances()
       const barInstance = await databaseInstance.barInstance()
 
-      await connectDb()
+      await databaseInstance.connectDb()
       const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
       if (!bar || !match) {
@@ -29,7 +29,7 @@ export class BarController {
 			}
 
       res.status(200).json({ message: 'Match planifié' })
-       await disconnectDb()
+       await databaseInstance.disconnectDb()
     } 
     
     catch (error) {
@@ -46,7 +46,7 @@ export class BarController {
 		const userInstance = await databaseInstance.usersInstances()
 		const barInstance = await databaseInstance.barInstance()
 
-		await connectDb()
+		await databaseInstance.connectDb()
 		const bar = await userInstance.getUserById(barId)
 		const match = await userInstance.getMatchById(matchId)
 		if (!bar || !match) {
@@ -59,7 +59,7 @@ export class BarController {
 		}
 
     res.status(200).json({ message: 'Match supprimé' })
-    await disconnectDb() 
+    await databaseInstance.disconnectDb() 
   }    
     catch (error) {
       console.error(error) 

@@ -1,4 +1,4 @@
-import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e'
+import { databaseFactory } from 'bdd-service-hall-e'
 
 
 export class ClientController {
@@ -51,12 +51,12 @@ export class ClientController {
 			const databaseInstance = databaseFactory()
 			const clientInstance = await databaseInstance.clientInstance()
 
-			await connectDb()
+			await databaseInstance.connectDb()
 			const barList = await clientInstance.getBars()
 			const bars = this.#filterAndSortMatches(barList)
 			const formatedDataBar = this.#formatedDataBar(bars)
 
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 
 			return res.status(200).json({ data: formatedDataBar })
 		} catch (error) {
