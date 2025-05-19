@@ -5,14 +5,14 @@ import { sendEmailResetPassword } from '../utils/email.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import { errorServer } from '../utils/messages.js'
 import {
-    IS_ADDRESS,
-    IS_BAR_NAME,
-    IS_CODE_NUMBER,
-    IS_DESCRIPTION,
-    IS_EMAIL,
-    IS_NUMBER,
-    IS_PASSWORD,
-    IS_STRING,
+	IS_ADDRESS,
+	IS_BAR_NAME,
+	IS_CODE_NUMBER,
+	IS_DESCRIPTION,
+	IS_EMAIL,
+	IS_NUMBER,
+	IS_PASSWORD,
+	IS_STRING,
 } from '../utils/regex.js'
 
 export class CommunController {
@@ -217,16 +217,6 @@ export class CommunController {
 		try {
 			const { email, password } = req.body
 
-			const { isEmail, errorEmailMessage } = this.#validationEmail(email)
-			const { isValidPassword, errorPasswordMessage } = this.#validationPassword(password)
-
-			if (!isEmail) {
-				return res.status(401).json({ message: errorEmailMessage })
-			}
-
-			if (!isValidPassword) {
-				return res.status(401).json({ message: errorPasswordMessage })
-			}
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
@@ -234,7 +224,9 @@ export class CommunController {
 			await databaseInstance.disconnectDb()
 
 			if (!userDb) {
-				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
+				
+				res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
+				
 			}
 
 			const passwordMatch = await bcryptjs.compare(password, userDb.password)
@@ -249,8 +241,8 @@ export class CommunController {
 
 			return res.status(200).json(profile)
 		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ message: 'Internal server error' })
+			res.status(500).json({ message: 'Internal server error' })
+			throw new Error(error)
 		}
 	}
 
