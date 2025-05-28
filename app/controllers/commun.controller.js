@@ -169,7 +169,7 @@ export class CommunController {
 						gameName: data.favorites.gameName,
 						leagueName: data.favorites.leagueName,
 						teams: data.favorites.teams,
-						barName: data.role === 'client' ? data.favorites.barName : ''
+						barName: data.role === 'client' ? data.favorites.barName : []
 				  }
 				: {},
 			informations: informationsData,
