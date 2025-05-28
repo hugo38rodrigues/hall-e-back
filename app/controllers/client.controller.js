@@ -58,7 +58,7 @@ export class ClientController {
 
 			await databaseInstance.disconnectDb()
 
-			return res.status(200).json({ data: formatedDataBar })
+			return res.status(200).json(formatedDataBar)
 		} catch (error) {
 			console.error(error.message)
 			return res.status(500).json({ message: 'Erreur Serveur' })

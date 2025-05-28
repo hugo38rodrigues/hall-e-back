@@ -37,3 +37,9 @@ docker run  \
   --name api-hall-e-v1 \
   api-hall-e
 
+
+kubectl create secret docker-registry regcred \
+  --docker-username=TON_USERNAME \
+  --docker-password=TON_PASSWORD \
+  --docker-email=TON_EMAIL \
+  --docker-server=https://index.docker.io/v1/

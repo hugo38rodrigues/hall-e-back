@@ -8,3 +8,5 @@
 .npmrc
 # env folder
 env
+k8s
+logs

@@ -192,7 +192,6 @@ export class CommunController {
 				return res.status(401).json({ message: data.message })
 			}
 
-			await databaseInstance.connectDb()
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
@@ -225,7 +224,7 @@ export class CommunController {
 
 			if (!userDb) {
 				
-				res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
+				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 				
 			}
 
@@ -241,8 +240,7 @@ export class CommunController {
 
 			return res.status(200).json(profile)
 		} catch (error) {
-			res.status(500).json({ message: 'Internal server error' })
-			throw new Error(error)
+			return res.status(500).json({ message: 'Internal server error' })
 		}
 	}
 
