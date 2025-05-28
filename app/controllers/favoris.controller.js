@@ -1,6 +1,6 @@
-import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e/main.js'
+import { databaseFactory } from 'bdd-service-hall-e/main.js'
 import {
-	errorServer
+    errorServer
 } from '../utils/messages.js'
 
 
@@ -12,9 +12,9 @@ export class FavorisController {
 			const { idUser, gameName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const addGame = await userInstance.addFavoriteGame(idUser, gameName)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			res.status(200).json({ gameName: addGame.gameName })
 		} catch (error) {
 			console.log(error.message)
@@ -27,9 +27,9 @@ export class FavorisController {
 			const { idUser, gameName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const deletedGame = await userInstance.removeFavoriteGame(idUser, gameName)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			res.status(200).json({ gameName: deletedGame.gameName })
 		} catch (error) {
 			console.log(error.message)
@@ -42,9 +42,9 @@ export class FavorisController {
 			const { idUser, leagueName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const addLeague = await userInstance.addFavoriteLeague(idUser, leagueName)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			res.status(200).json({ leagueName: addLeague.leagueName })
 		} catch (error) {
 			console.log(error.message)
@@ -57,9 +57,9 @@ export class FavorisController {
 			const { idUser, leagueName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const deleteLeague = await userInstance.removeFavoriteLeague(idUser, leagueName)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			res.status(200).json({ leagueName: deleteLeague.leagueName })
 		} catch (error) {
 			console.log(error.message)
@@ -72,9 +72,9 @@ export class FavorisController {
 			const { idUser, idTeam } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const addTeam = await userInstance.addFavoriteTeam(idUser, idTeam)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			const teams = addTeam.teams
 			res.status(200).json({ teams })
 		} catch (error) {
@@ -88,9 +88,9 @@ export class FavorisController {
 			const { idUser, idTeam } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const deleteTeam = await userInstance.removeFavoriteTeam(idUser, idTeam)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			const teams = deleteTeam.teams
 			res.status(200).json({ teams })
 		} catch (error) {
@@ -105,14 +105,14 @@ export class FavorisController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 		
-			await connectDb()
+			await databaseInstance.connectDb()
 			const userInDb = await userInstance.getUserById(idUser)
 
 			if (userInDb.role !== 'client') {
 				return res.status(401).json({ message: 'Vous n\'avez pas le bon rôle' })
 			} 
 			const addBarName = await userInstance.addFavoriteBar(idUser, idBar)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			
 			res.status(200).json({ barName: addBarName })
 		} catch (error) {
@@ -126,9 +126,9 @@ export class FavorisController {
 			const { idUser, idBar } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const deleteBarName = await userInstance.removeFavoriteBar(idUser, idBar)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(200).json({ barName: deleteBarName })
 		} catch (error) {
 			console.log(error.message)

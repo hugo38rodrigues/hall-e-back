@@ -1,4 +1,4 @@
-import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e'
+import { databaseFactory } from 'bdd-service-hall-e'
 
 export class BarController {
 
@@ -15,21 +15,22 @@ export class BarController {
       const userInstance = await databaseInstance.usersInstances()
       const barInstance = await databaseInstance.barInstance()
 
-      await connectDb()
+      await databaseInstance.connectDb()
       const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
+
       if (!bar || !match) {
 				return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
 			}
      
-      const isProgrammed = await barInstance.addProgrammedMatch({ barId, matchId }) 
+      const addProgrammed = await barInstance.addProgrammedMatch({ barId, matchId }) 
       
-      if (!isProgrammed) {
+      if (!addProgrammed) {
 				return res.status(401).json({ message: 'Impossible de plannifié le match' })
 			}
 
       res.status(200).json({ message: 'Match planifié' })
-       await disconnectDb()
+       await databaseInstance.disconnectDb()
     } 
     
     catch (error) {
@@ -46,20 +47,19 @@ export class BarController {
 		const userInstance = await databaseInstance.usersInstances()
 		const barInstance = await databaseInstance.barInstance()
 
-		await connectDb()
+		await databaseInstance.connectDb()
 		const bar = await userInstance.getUserById(barId)
 		const match = await userInstance.getMatchById(matchId)
 		if (!bar || !match) {
 			return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
 		}
     const isDeleted = await barInstance.deletedProgMatch({ matchId, barId })
-
     if (!isDeleted){
       return res.status(401).json({ message: 'Impossible de supprimé le match' })
 		}
-
-    res.status(200).json({ message: 'Match supprimé' })
-    await disconnectDb() 
+    console.log(isDeleted)
+    res.status(200).json(matchId)
+    await databaseInstance.disconnectDb() 
   }    
     catch (error) {
       console.error(error) 

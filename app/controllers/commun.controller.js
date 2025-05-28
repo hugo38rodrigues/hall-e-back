@@ -1,5 +1,5 @@
-import bcrypt from 'bcrypt'
-import { connectDb, databaseFactory, disconnectDb } from 'bdd-service-hall-e/main.js'
+import bcryptjs from 'bcryptjs'
+import { databaseFactory } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
@@ -169,48 +169,10 @@ export class CommunController {
 						gameName: data.favorites.gameName,
 						leagueName: data.favorites.leagueName,
 						teams: data.favorites.teams,
-						barName: data.role === 'client' ? data.favorites.barName : ''
+						barName: data.role === 'client' ? data.favorites.barName : []
 				  }
 				: {},
 			informations: informationsData,
-		}
-	}
-
-	#newDataValidation = (profile, role) => {
-		const isEmptyEmail = profile.email === undefined ? undefined : profile.email
-		const isEmptyPassword =
-			profile.password === undefined ? undefined : this.encrypt.passwordEncrypt(profile.password)
-
-		if (role === 'client') {
-			const isEmptyLastName = profile.lastName === undefined ? undefined : profile.lastName
-			const isEmptyFirstName = profile.firstName === undefined ? undefined : profile.firstName
-
-			return {
-				email: isEmptyEmail,
-				password: isEmptyPassword,
-				lastName: isEmptyLastName,
-				firstName: isEmptyFirstName,
-				role,
-			}
-		}
-
-		if (role === 'bar') {
-			const isEmptyName = profile.name === undefined ? undefined : profile.name
-			const isEmptyAddress = profile.address === undefined ? undefined : profile.address
-			const isEmptyDescription = profile.description === undefined ? undefined : profile.description
-			const isEmptyPicture = profile.picture === undefined ? undefined : profile.picture
-			const isEmptyPrice = profile.price === undefined ? undefined : profile.price
-
-			return {
-				email: isEmptyEmail,
-				password: isEmptyPassword,
-				name: isEmptyName,
-				address: isEmptyAddress,
-				description: isEmptyDescription,
-				picture: isEmptyPicture,
-				price: isEmptyPrice,
-				role,
-			}
 		}
 	}
 
@@ -230,10 +192,9 @@ export class CommunController {
 				return res.status(401).json({ message: data.message })
 			}
 
-			await connectDb()
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const userDb = await userInstance.getProfileUser(data.email)
 			
 
@@ -243,7 +204,7 @@ export class CommunController {
 
 			await userInstance.addUser(data.ressources)
 			
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
 			console.log(error)
@@ -255,27 +216,19 @@ export class CommunController {
 		try {
 			const { email, password } = req.body
 
-			const { isEmail, errorEmailMessage } = this.#validationEmail(email)
-			const { isValidPassword, errorPasswordMessage } = this.#validationPassword(password)
-
-			if (!isEmail) {
-				return res.status(401).json({ message: errorEmailMessage })
-			}
-
-			if (!isValidPassword) {
-				return res.status(401).json({ message: errorPasswordMessage })
-			}
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const userDb = await userInstance.getProfileUser(email)
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 
 			if (!userDb) {
+				
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
+				
 			}
 
-			const passwordMatch = await bcrypt.compare(password, userDb.password)
+			const passwordMatch = await bcryptjs.compare(password, userDb.password)
 
 			if (!passwordMatch) {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
@@ -287,7 +240,6 @@ export class CommunController {
 
 			return res.status(200).json(profile)
 		} catch (error) {
-			console.log(error)
 			return res.status(500).json({ message: 'Internal server error' })
 		}
 	}
@@ -302,7 +254,7 @@ export class CommunController {
 
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
-		await connectDb()
+		await databaseInstance.connectDb()
 
 		const user = await userInstance.getProfileUser(email)
 
@@ -312,7 +264,7 @@ export class CommunController {
 			await sendEmailResetPassword(email, codeNumber)
 		}
 
-		await disconnectDb()
+		await databaseInstance.disconnectDb()
 
 		return res.status(200).json({ 'id': user.id })
 	}
@@ -328,7 +280,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await connectDb()
+		await databaseInstance.connectDb()
 
 		const user = await userInstance.getUserById(idUser)
 
@@ -348,7 +300,7 @@ export class CommunController {
 				return res.status(200).json({ 'id': user.id })
 			}
 		}
-		await disconnectDb()
+		await databaseInstance.disconnectDb()
 	}
 
 	resetPassword = async (req, res) => {
@@ -368,7 +320,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await connectDb()
+		await databaseInstance.connectDb()
 				
 		const idUser = verifyToken ? verifyToken.id :  id
 		const userInDb = await userInstance.getUserById(idUser)
@@ -406,14 +358,6 @@ export class CommunController {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
 
-			const user = communInstance()
-			const userIsPresent = await user.getUserById(req.body.role, req.body.id)
-
-			if (!userIsPresent) {
-				return res.status(400).json({ message: 'error delete user not found' })
-			}
-
-			await user.deleteUser(req.body.id, req.body.role)
 			return res.status(200).json({ message: 'delete user' })
 		} catch (error) {
 			console.log(error)
@@ -429,23 +373,7 @@ export class CommunController {
 			if (!isValidId) {
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
-			const user = communInstance()
-			const userFound = await user.getUserById(userId)
-
-			if (!userFound) {
-				return res.status(404).json({ message: 'user not found' })
-			}
-
-			// const files = req.files // Liste des fichiers uploadés
-			// const baseUrl = `${req.protocol}://${req.get('host')}` // URL de base du serveur
-
-			const updateProfile = this.#newDataValidation(req.body, userFound.dataValues.role)
-
-			const { isError, message } = await user.updateUser(userId, updateProfile)
-
-			if (isError) {
-				return res.status(404).json({ message })
-			}
+			const message = 'Pas implementé'
 
 			return res.status(200).json({ message })
 		} catch (error) {
@@ -459,9 +387,9 @@ export class CommunController {
 			
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const matches = await userInstance.getMatches()
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(200).json(matches)
 		} catch (error) {
 			console.log(error)
@@ -473,9 +401,9 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await connectDb()
+			await databaseInstance.connectDb()
 			const filters = await userInstance.getAllFilters()
-			await disconnectDb()
+			await databaseInstance.disconnectDb()
 			return res.status(200).json({ filters })
 		} catch (error) {
 			console.error(error)

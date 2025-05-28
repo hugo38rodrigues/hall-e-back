@@ -27,4 +27,19 @@ Téléchargez Hall-E et faites de chaque sortie un événement que vous n’oubl
 
 ---
 
+docker build \
+  --build-arg GITHUB_TOKEN=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 \
+  -t api-hall-e .
 
+docker run  \
+  -p 3000:3000 \
+  --env-file ./env/prod/.env \
+  --name api-hall-e-v1 \
+  api-hall-e
+
+
+kubectl create secret docker-registry regcred \
+  --docker-username=TON_USERNAME \
+  --docker-password=TON_PASSWORD \
+  --docker-email=TON_EMAIL \
+  --docker-server=https://index.docker.io/v1/
