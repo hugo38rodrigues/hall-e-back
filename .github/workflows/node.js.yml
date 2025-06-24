@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" > ~/.npmrc
-          npm ci
+          cd ./app && npm ci
 
       - name: Run linter
         run: npm run lint
