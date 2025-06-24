@@ -1,6 +1,7 @@
 import bcryptjs from 'bcryptjs'
 import { databaseFactory } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
+import { Logger } from '../midleware/logger.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import { errorServer } from '../utils/messages.js'
@@ -18,6 +19,7 @@ import {
 export class CommunController {
 	constructor () {
 		this.encrypt = new Crypt()
+		this.newLogger = new Logger()
 	}
 
 	#formatedData = async (body) => {
@@ -65,10 +67,10 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const ressources = await this.#formatedData(body)
+		const profil = await this.#formatedData(body)
 
 		return {
-			ressources,
+			profil,
 			isValid: true,
 		}
 	}
@@ -177,6 +179,7 @@ export class CommunController {
 	}
 
 	createAccount = async (req, res) => {
+		
 		const role = req.body.role
 		let data
 		try {
@@ -189,30 +192,33 @@ export class CommunController {
 			}
 
 			if (!data.isValid) {
+				this.newLogger.error(data.message)
 				return res.status(401).json({ message: data.message })
 			}
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const userDb = await userInstance.getProfileUser(data.email)
+			const userDb = await userInstance.getUser(data.profil.email)
 			
-
-			if (userDb) {
+			if (userDb !== null) {
+				this.newLogger.error(`user exist: ${data.profil.email}`)
 				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
 
-			await userInstance.addUser(data.ressources)
+			await userInstance.addUser(data.profil)
 			
+			this.newLogger.info(`user insert successful ${data.profil.email}`)
 			await databaseInstance.disconnectDb()
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ message: 'Internal error' })
+      this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer  })
 		}
 	}
 
 	connexion = async (req, res) => {
+		
 		try {
 			const { email, password } = req.body
 
@@ -221,16 +227,15 @@ export class CommunController {
 			await databaseInstance.connectDb()
 			const userDb = await userInstance.getProfileUser(email)
 			await databaseInstance.disconnectDb()
-
-			if (!userDb) {
-				
+			if (userDb === null) {
+				this.newLogger.error('email is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
-				
 			}
 
 			const passwordMatch = await bcryptjs.compare(password, userDb.password)
 
 			if (!passwordMatch) {
+				this.newLogger.error('password is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
@@ -240,15 +245,17 @@ export class CommunController {
 
 			return res.status(200).json(profile)
 		} catch (error) {
-			return res.status(500).json({ message: 'Internal server error' })
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 
 	forgotPassword = async (req, res) => {
 		const email = req.body.email
 		const { isValidCredentiel, message } = this.#validationEmail(email)
-
+				
 		if (isValidCredentiel) {
+			this.newLogger.error(message)
 			return res.status(401).json({ message })
 		}
 
@@ -270,10 +277,12 @@ export class CommunController {
 	}
 
 	verifyCode = async (req, res) => {
+		
 		const { idUser, code } = req.body 
 		const isCode = IS_CODE_NUMBER.test(parseInt(code))
 
 		if (!isCode) {
+			this.newLogger.error('Is not a good code')
 			return res.status(401).json({ message: 'Ce n\'est pas le bon code' })
 		}
 
@@ -289,10 +298,12 @@ export class CommunController {
 			const storeCodeNumberInData = await userInstance.getCodeByNumber(code)
 			
 			if (!storeCodeNumberInData) {
+				this.newLogger.error('invalid code')
 				return res.status(400).json({ message: 'Code invalide' })
 			}
 			
 			else if (Date.now() > storeCodeNumberInData.expiresIn) {
+				this.newLogger.error('request expired')
 				return res.status(400).json({ message: 'Demande expiré' })
 			} 
 			
@@ -304,6 +315,7 @@ export class CommunController {
 	}
 
 	resetPassword = async (req, res) => {
+		
 		let verifyToken 
 		const { password, token, id } = req.body
 
@@ -314,6 +326,7 @@ export class CommunController {
 		}
 
 		if (!isValidPassword) {
+			this.newLogger.error(errorPasswordMessage)
 			return res.status(401).json({ message: errorPasswordMessage })
 		}
 
@@ -326,6 +339,7 @@ export class CommunController {
 		const userInDb = await userInstance.getUserById(idUser)
 
 		if (!userInDb) {
+			this.newLogger.error('user not exist')
 			return res.status(401).json({ message: 'Utilisateur introuvable' })
 		}
 
@@ -336,6 +350,7 @@ export class CommunController {
 		}
 		const { isError, errorMessage } = userInstance.updateUser(userInDb.id, ressource)
 		if (isError) {
+			this.newLogger.error(errorMessage)
 			return res.status(401).json({ message: errorMessage })
 		}
 		return res.status(200).json({ message: 'Mot de passe changé avec succès' })
@@ -344,6 +359,7 @@ export class CommunController {
 	deleteUser = async (req, res) => {
 		try {
 			if (!req.body) {
+				this.newLogger.error('Missing body params')
 				return res.status(401).json({ message: 'Missing body params' })
 			}
 
@@ -351,21 +367,25 @@ export class CommunController {
 			const isIdUser = IS_NUMBER.test(req.body.id)
 
 			if (!isRole) {
+				this.newLogger.error('Role must be string')
 				return res.status(401).json({ message: 'Role must be string' })
 			}
 
 			if (!isIdUser) {
+				this.newLogger.error('Id must be integer')
 				return res.status(401).json({ message: 'Id must be integer' })
 			}
 
 			return res.status(200).json({ message: 'delete user' })
 		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ message: 'Internal server error' })
+			
+      this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 
 	updateProfile = async (req, res) => {
+		
 		try {
 			const { userId } = req.body
 			const isValidId = IS_NUMBER.test(userId) && userId
@@ -377,8 +397,9 @@ export class CommunController {
 
 			return res.status(200).json({ message })
 		} catch (error) {
-			console.error(error)
-			return res.status(500).json({ message: 'Internal server error' })
+			
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 
@@ -392,8 +413,9 @@ export class CommunController {
 			await databaseInstance.disconnectDb()
 			return res.status(200).json(matches)
 		} catch (error) {
-			console.log(error)
-			return res.status(500).json({ message: 'Internal error' })
+			
+      this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer  })
 		}
 	}
 
@@ -406,7 +428,8 @@ export class CommunController {
 			await databaseInstance.disconnectDb()
 			return res.status(200).json({ filters })
 		} catch (error) {
-			console.error(error)
+			
+			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
 	}

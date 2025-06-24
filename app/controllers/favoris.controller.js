@@ -1,13 +1,17 @@
 import { databaseFactory } from 'bdd-service-hall-e/main.js'
+import { Logger } from '../midleware/logger.js'
 import {
-    errorServer
+	errorServer
 } from '../utils/messages.js'
 
 
 export class FavorisController {
-	constructor () {}
+	constructor () {
+		this.newLogger = new Logger()
+	}
 
 	addFavorisGameController = async (req, res) => {
+		
 		try {
 			const { idUser, gameName } = req.body
 			const databaseInstance = databaseFactory()
@@ -17,12 +21,13 @@ export class FavorisController {
 			await databaseInstance.disconnectDb()
 			res.status(200).json({ gameName: addGame.gameName })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			res.status(500).json({ message: errorServer })
 		}
 	}
 
 	deleteFavorisGameController = async (req, res) => {
+	
 		try {
 			const { idUser, gameName } = req.body
 			const databaseInstance = databaseFactory()
@@ -32,7 +37,7 @@ export class FavorisController {
 			await databaseInstance.disconnectDb()
 			res.status(200).json({ gameName: deletedGame.gameName })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
 	}
@@ -47,7 +52,7 @@ export class FavorisController {
 			await databaseInstance.disconnectDb()
 			res.status(200).json({ leagueName: addLeague.leagueName })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			res.status(500).json({ message: errorServer })
 		}
 	}
@@ -62,7 +67,7 @@ export class FavorisController {
 			await databaseInstance.disconnectDb()
 			res.status(200).json({ leagueName: deleteLeague.leagueName })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
 	}
@@ -78,7 +83,7 @@ export class FavorisController {
 			const teams = addTeam.teams
 			res.status(200).json({ teams })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			res.status(500).json({ message: errorServer })
 		}
 	}
@@ -94,7 +99,7 @@ export class FavorisController {
 			const teams = deleteTeam.teams
 			res.status(200).json({ teams })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
 	}
@@ -109,6 +114,7 @@ export class FavorisController {
 			const userInDb = await userInstance.getUserById(idUser)
 
 			if (userInDb.role !== 'client') {
+				this.newLogger.error('Has the wrong role')
 				return res.status(401).json({ message: 'Vous n\'avez pas le bon rôle' })
 			} 
 			const addBarName = await userInstance.addFavoriteBar(idUser, idBar)
@@ -116,7 +122,7 @@ export class FavorisController {
 			
 			res.status(200).json({ barName: addBarName })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			res.status(500).json({ message: errorServer })
 		}
 	}
@@ -131,7 +137,7 @@ export class FavorisController {
 			await databaseInstance.disconnectDb()
 			return res.status(200).json({ barName: deleteBarName })
 		} catch (error) {
-			console.log(error.message)
+			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
 	}
