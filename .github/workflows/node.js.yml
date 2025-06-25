@@ -2,10 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches: ['feature/**', bugFix/**]
   pull_request:
-    branches: [main]
+    branches: [ 'feature/**', bugFix/** ]
 
 jobs:
   lint-and-test:
