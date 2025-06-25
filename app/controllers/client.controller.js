@@ -1,8 +1,11 @@
-import { databaseFactory } from 'bdd-service-hall-e'
+import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e'
+import { Logger } from '../midleware/logger.js'
 
 
 export class ClientController {
-	constructor () {}
+	constructor () {
+		this.newLogger = new Logger()
+	}
 
 	#formatedDataBar = (data) => {
 		const newMap = data.map((item) => {
@@ -60,7 +63,7 @@ export class ClientController {
 
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {
-			console.error(error.message)
+			this.newLogger.error(error)
 			return res.status(500).json({ message: 'Erreur Serveur' })
 		}
 	}

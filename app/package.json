@@ -1,6 +1,6 @@
 {
 	"name": "api-hall-e",
-	"version": "1.0.0",
+	"version": "1.2.0",
 	"description": "",
 	"main": "server.js",
 	"type": "module",
@@ -19,7 +19,6 @@
 		"@stylistic/eslint-plugin-js": "^2.6.4",
 		"axios": "^1.7.7",
 		"bcryptjs": "^3.0.2",
-		"bdd-service-hall-e": "https://github.com/hugo38rodrigues/bdd-hall-e.git",
 		"cors": "^2.8.5",
 		"dotenv": "^16.4.7",
 		"express": "^4.19.2",
@@ -28,10 +27,9 @@
 		"nodemailer": "^6.9.16",
 		"nodemon": "^3.1.7",
 		"supertest": "^7.1.1",
-		"vitest": "^3.0.6"
-	},
-	"dependencies": {
+		"vitest": "^3.0.6",
 		"winston": "^3.17.0",
-		"winston-daily-rotate-file": "^5.0.0"
+		"winston-daily-rotate-file": "^5.0.0",
+		"@hugo38rodrigues/bdd-service-hall-e": "^1.0.1"
 	}
 }

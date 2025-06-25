@@ -1,5 +1,6 @@
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { Logger } from '../midleware/logger.js'
 
 
 export class Crypt {
@@ -7,6 +8,7 @@ export class Crypt {
 
 	constructor () {
 		this.#jwtSecret = process.env.SECRET_JWT_KEY
+		this.newLogger = new Logger()
 	}
 
 	tokenCreation = async (id, email) => {
@@ -34,6 +36,7 @@ export class Crypt {
 			return decoded // Retournez les données décodées si le token est valide
 			
 		} catch (err) {
+			this.newLogger.error('Token validation failed:', err.message)
 			console.error('Token validation failed:', err.message)
 			return false
 		}
