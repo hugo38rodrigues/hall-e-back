@@ -71,6 +71,7 @@ jobs:
       - name: Log in to Docker
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }} .
 
