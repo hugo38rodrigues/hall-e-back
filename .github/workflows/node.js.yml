@@ -44,7 +44,6 @@ jobs:
     defaults: 
       run:
         working-directory: ./app
-    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
