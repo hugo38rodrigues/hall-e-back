@@ -33,15 +33,15 @@ export const sendEmailResetPassword = async (email, token) => {
 	const newLogger = new Logger()
 
 	try {
-		const info = await transporter.sendMail({
+		await transporter.sendMail({
 			from: 'hall-e.noreply@gmail.com>', // Expéditeur
 			to: email, // Destinataire
 			subject: 'Réinitialisation du mot de passe', // Sujet
 			html: emailHtml(token), // Corps de l'e-mail
 		})
-		newLogger.log.info(`send Email at ${email}`)
+		newLogger.info(`send Email at ${email}`)
 	} catch (error) {
-		newLogger.log.error(error)
+		newLogger.error(error)
 		console.error('Erreur lors de l’envoi :', error)
 	}
 }

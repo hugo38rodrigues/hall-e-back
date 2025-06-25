@@ -1,5 +1,6 @@
 import { databaseFactory } from 'bdd-service-hall-e'
 import { Logger } from '../midleware/logger.js'
+import { errorServer } from '../utils/messages.js'
 
 export class BarController {
 

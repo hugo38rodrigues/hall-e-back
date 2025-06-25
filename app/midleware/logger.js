@@ -3,7 +3,7 @@ import winston from 'winston'
 
 const { combine, timestamp, printf, errors, splat, json } = winston.format
 
-const customFormat = printf(({ level, message, timestamp, label, ...meta }) => {
+const customFormat = printf(({ level, message, timestamp }) => {
 	// On gère ici les objets (message peut être un string ou un objet)
 	const msg = typeof message === 'object' ? JSON.stringify(message, null, 2) : message
 
@@ -11,7 +11,7 @@ const customFormat = printf(({ level, message, timestamp, label, ...meta }) => {
 })
 
 export class Logger {
-	constructor(context = '') {
+	constructor (context = '') {
 		this.logger = winston.createLogger({
 			level: 'info',
 			format: combine(
@@ -29,23 +29,23 @@ export class Logger {
 		this.context = context
 	}
 
-	log(level, message, meta = {}) {
+	log (level, message, meta = {}) {
 		this.logger.log(level, message, meta)
 	}
 
-	info(message, meta = {}) {
+	info (message, meta = {}) {
 		this.logger.info(message, meta)
 	}
 
-	error(message, meta = {}) {
+	error (message, meta = {}) {
 		this.logger.error(message, meta)
 	}
 
-	warn(message, meta = {}) {
+	warn (message, meta = {}) {
 		this.logger.warn(message, meta)
 	}
 
-	debug(message, meta = {}) {
+	debug (message, meta = {}) {
 		this.logger.debug(message, meta)
 	}
 }

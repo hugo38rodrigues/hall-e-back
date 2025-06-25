@@ -15,8 +15,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api/v1/client', clientRoutes)
-app.use('/api/v1',communRoutes)
-app.use('/api/v1/bar',barRoutes)
+app.use('/api/v1', communRoutes)
+app.use('/api/v1/bar', barRoutes)
 
 app.get('/api/v1/test', (req, res) => {
 	res.send('Hello World!')
