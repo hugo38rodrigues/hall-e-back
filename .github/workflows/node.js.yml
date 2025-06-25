@@ -11,6 +11,9 @@ jobs:
   lint-and-test:
     name: 🔍 Lint & Test
     runs-on: ubuntu-latest
+    defaults: 
+      run:
+        working-directory: ./app
 
     steps:
       - name: Checkout code
@@ -25,7 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ./app
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" > ~/.npmrc
           npm ci
 
