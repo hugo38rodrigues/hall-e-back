@@ -40,6 +40,7 @@ jobs:
   build-and-push:
     name: 🐳 Build & Push Docker Image
     needs: lint-and-test
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults: 
       run:
@@ -54,7 +55,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 23
 
       - name: Install dependencies
         run: |
