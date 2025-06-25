@@ -1,4 +1,4 @@
-import { databaseFactory } from 'bdd-service-hall-e/main.js'
+import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import { Logger } from '../midleware/logger.js'
 import {
 	errorServer

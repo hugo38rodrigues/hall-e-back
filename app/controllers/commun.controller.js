@@ -1,5 +1,5 @@
+import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import bcryptjs from 'bcryptjs'
-import { databaseFactory } from 'bdd-service-hall-e/main.js'
 import { Crypt } from '../controllers/encryption.controller.js'
 import { Logger } from '../midleware/logger.js'
 import { sendEmailResetPassword } from '../utils/email.js'
