@@ -41,6 +41,9 @@ jobs:
     name: 🐳 Build & Push Docker Image
     needs: lint-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults: 
+      run:
+        working-directory: ./app
     runs-on: ubuntu-latest
 
     steps:
@@ -57,7 +60,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" > ~/.npmrc
-          cd /app && npm ci
+          npm ci
 
       - name: Get version from package.json
         id: version
