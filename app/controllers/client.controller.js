@@ -49,7 +49,7 @@ export class ClientController {
 		return data
 	}
 
-	getAllBarController = async (req, res) => {
+	getAllBarController = async (res) => {
 		try {
 			const databaseInstance = databaseFactory()
 			const clientInstance = await databaseInstance.clientInstance()

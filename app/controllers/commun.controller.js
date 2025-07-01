@@ -22,7 +22,7 @@ export class CommunController {
 		this.newLogger = new Logger()
 	}
 
-	#formatedData = async (body) => {
+	_formatedData = async (body) => {
 		if (body.role === 'client') {
 			return {
 				firstName: body.informations.firstName,
@@ -50,7 +50,7 @@ export class CommunController {
 		}
 	}
 
-	#clientAccountVerify = async (body) => {
+	_clientAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isFirstName = IS_STRING.test(body.informations.firstName)
@@ -67,7 +67,7 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const profil = await this.#formatedData(body)
+		const profil = await this._formatedData(body)
 
 		return {
 			profil,
@@ -75,7 +75,7 @@ export class CommunController {
 		}
 	}
 
-	#barAccountVerify = async (body) => {
+	_barAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isAddress = IS_ADDRESS.test(body.informations.address)
@@ -103,7 +103,7 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = await this.#formatedData(body)
+		const ressources = await this._formatedData(body)
 
 		return {
 			ressources,
@@ -111,7 +111,7 @@ export class CommunController {
 		}
 	}
 
-	#validationEmail = (email) => {
+	_validationEmail = (email) => {
 		const isEmail = IS_EMAIL.test(email)
 
 		if (!isEmail) {
@@ -126,7 +126,7 @@ export class CommunController {
 		}
 	}
 
-	#validationPassword = (password) => {
+	_validationPassword = (password) => {
 		const isPassword = IS_PASSWORD.test(password)
 
 		if (!isPassword) {
@@ -141,7 +141,7 @@ export class CommunController {
 		}
 	}
 
-	#connexionProfile = (data, token) => {
+	_connexionProfile = (data, token) => {
 		let informationsData
 		if (data.role === 'bar') {
 			informationsData = {
@@ -184,11 +184,11 @@ export class CommunController {
 		let data
 		try {
 			if (role === 'client') {
-				data = await this.#clientAccountVerify(req.body, res)
+				data = await this._clientAccountVerify(req.body, res)
 			}
 
 			if (role === 'bar') {
-				data = await this.#barAccountVerify(req.body, res)
+				data = await this._barAccountVerify(req.body, res)
 			}
 
 			if (!data.isValid) {
@@ -241,7 +241,7 @@ export class CommunController {
 
 			const newToken = await this.encrypt.tokenCreation(userDb.id, userDb.password)
 
-			const profile = this.#connexionProfile(userDb, newToken)
+			const profile = this._connexionProfile(userDb, newToken)
 
 			return res.status(200).json(profile)
 		} catch (error) {
@@ -252,7 +252,7 @@ export class CommunController {
 
 	forgotPassword = async (req, res) => {
 		const email = req.body.email
-		const { isValidCredentiel, message } = this.#validationEmail(email)
+		const { isValidCredentiel, message } = this._validationEmail(email)
 				
 		if (isValidCredentiel) {
 			this.newLogger.error(message)
@@ -263,17 +263,19 @@ export class CommunController {
 		const userInstance = await databaseInstance.usersInstances()
 		await databaseInstance.connectDb()
 
-		const user = await userInstance.getProfileUser(email)
+		const userExist = await userInstance.getProfileUser(email)
 
-		if (user) {
+		if (userExist) {
 			const { codeNumber, expiresIn } = this.encrypt.generetedCode()
-			await userInstance.addCodeNumber(codeNumber, expiresIn, user._id)
+			await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
 			await sendEmailResetPassword(email, codeNumber)
+			await databaseInstance.disconnectDb()
+			return res.status(200).json({ id: userExist._id })
 		}
 
 		await databaseInstance.disconnectDb()
-
-		return res.status(200).json({ 'id': user.id })
+		return res.status(200)
+		
 	}
 
 	verifyCode = async (req, res) => {
@@ -319,7 +321,7 @@ export class CommunController {
 		let verifyToken 
 		const { password, token, id } = req.body
 
-		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(password)
+		const { isValidPassword, errorPasswordMessage } = this._validationPassword(password)
 
 		if (token){
 			verifyToken = await this.encrypt.verifyToken(token)

@@ -1,11 +1,10 @@
 export const validBar = {
-	id: 10,
 	role: 'bar',
 	password:
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-	address: '5 rue victor hugo, 25555, Limoge',
+	address: '5 rue victor hugo, 38600, Grenoble',
 	name: 'Tonneaux de limoge',
-	email: 'hugoBar@gmail.com',
+	email: 'testBar@gmail.com',
 	description: 'Le meilleur bar de limoge',
 	photo: '',
 }
@@ -20,7 +19,6 @@ export const missingPasswordBar = {
 	address: '5 rue victor hugo, 25555, Limoge',
 	name: 'Tonneaux de limoge',
 	email: 'hugoBar@gmail.com',
-
 	description: 'Le meilleur bar de limoge',
 	photo: '',
 }

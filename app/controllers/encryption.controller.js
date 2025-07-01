@@ -12,8 +12,6 @@ export class Crypt {
 	}
 
 	tokenCreation = async (id, email) => {
-	// Assurez-vous que le chemin est correct
-
 		const accessToken = jwt.sign({ id, email }, this.#jwtSecret, {
 			algorithm: 'HS256',
 			expiresIn: '1h',
@@ -31,9 +29,9 @@ export class Crypt {
 			const decoded = jwt.verify(
 				token,
 				this.#jwtSecret,
-				{ algorithms: ['HS256'] } // Spécifiez l'algorithme ici
+				{ algorithms: ['HS256'] } 
 			)
-			return decoded // Retournez les données décodées si le token est valide
+			return decoded
 			
 		} catch (err) {
 			this.newLogger.error('Token validation failed:', err.message)
