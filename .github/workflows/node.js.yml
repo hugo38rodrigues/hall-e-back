@@ -77,5 +77,6 @@ jobs:
           docker buildx inspect --bootstrap
           docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }} .
 
+
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }}
