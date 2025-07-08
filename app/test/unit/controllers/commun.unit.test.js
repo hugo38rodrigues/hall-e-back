@@ -541,11 +541,8 @@ describe('updateProfile', () => {
 			password: 'encryptedPassword',
 		})
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({
-			updateProfile: {
-				username: 'updatedUser',
-				other: 'otherField',
-			},
+		expect(res.json).toHaveBeenCalledWith({	username: 'updatedUser',other: 'otherField',
+
 		})
 	})
 
@@ -563,9 +560,7 @@ describe('updateProfile', () => {
 		})
 		expect(res.status).toHaveBeenCalledWith(200)
 		expect(res.json).toHaveBeenCalledWith({
-			updateProfile: {
 				username: 'newName',
-			},
 		})
 	})
 
