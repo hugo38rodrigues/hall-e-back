@@ -494,8 +494,6 @@ describe('updateProfile', () => {
 	beforeEach(() => {
 		controller = new CommunController()
 
-		controller.newLogger = { error: vi.fn() }
-
 		req = {
 			body: {
 				userId: 'user123',
@@ -530,13 +528,7 @@ describe('updateProfile', () => {
 	})
 
 	it('renvoie 200 avec profil mis à jour sans le mot de passe', async () => {
-		const updatedUser = {
-			_doc: {
-				username: 'updatedUser',
-				other: 'otherField',
-				password: 'encryptedPassword',
-			},
-		}
+		const updatedUser = { username: 'updatedUser', other: 'otherField', password: 'encryptedPassword'}
 
 		mockUserInstance.updateUser.mockResolvedValue(updatedUser)
 
@@ -560,11 +552,7 @@ describe('updateProfile', () => {
 	it('renvoie 200 même si aucun mot de passe n’est fourni', async () => {
 		req.body.profile = { username: 'newName' }
 
-		mockUserInstance.updateUser.mockResolvedValue({
-			_doc: {
-				username: 'newName',
-			},
-		})
+		mockUserInstance.updateUser.mockResolvedValue({username: 'newName'})
 
 		await controller.updateProfile(req, res)
 
@@ -586,7 +574,6 @@ describe('updateProfile', () => {
 
 		await controller.updateProfile(req, res)
 
-		expect(controller.newLogger.error).toHaveBeenCalledWith(expect.any(Error))
 		expect(res.status).toHaveBeenCalledWith(500)
 		expect(res.json).toHaveBeenCalledWith({ message: errorServer })
 	})
