@@ -410,9 +410,9 @@ export class CommunController {
 			}
 			const objectProfile = await userInstance.updateUser(userId, profileWithEncryptPassword)
 
-			const { password: _password, ...updateProfile } = objectProfile._doc
+			const { password: _password, favorites: _favorites, ...updateProfile } = objectProfile
 
-			return res.status(200).json({ updateProfile })
+			return res.status(200).json(updateProfile)
 		} catch (error) {
 			
 			this.newLogger.error(error)
