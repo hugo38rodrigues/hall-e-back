@@ -277,7 +277,7 @@ export class CommunController {
 
 		await databaseInstance.disconnectDb()
 		return res.status(200)
-		} catch(error){
+		} catch (error){
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
