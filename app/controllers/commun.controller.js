@@ -390,15 +390,23 @@ export class CommunController {
 	updateProfile = async (req, res) => {
 		
 		try {
-			const { userId } = req.body
-			const isValidId = IS_NUMBER.test(userId) && userId
-
-			if (!isValidId) {
-				return res.status(401).json({ message: 'Id must be integer' })
+			const { userId, profile } = req.body
+			
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await databaseInstance.connectDb()
+			let encryptPassword
+			if (profile.password){
+				encryptPassword = this.encrypt.passwordEncrypt(profile.password)
 			}
-			const message = 'Pas implementé'
+			const profileWithEncryptPassword ={
+				...profile,
+				password : encryptPassword
+			}
+			const objectProfile = await userInstance.updateUser(userId, profileWithEncryptPassword)
+			const { password, ...updateProfile } = objectProfile._doc
 
-			return res.status(200).json({ message })
+			return res.status(200).json({ updateProfile })
 		} catch (error) {
 			
 			this.newLogger.error(error)
@@ -414,7 +422,7 @@ export class CommunController {
 			await databaseInstance.connectDb()
 			const matches = await userInstance.getMatches()
 			await databaseInstance.disconnectDb()
-			return res.status(200).json(matches)
+			return res.status(200).send(matches)
 		} catch (error) {
 			
       this.newLogger.error(error)
