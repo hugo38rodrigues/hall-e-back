@@ -404,8 +404,8 @@ export class CommunController {
 				password : encryptPassword
 			}
 			const objectProfile = await userInstance.updateUser(userId, profileWithEncryptPassword)
-			// eslint-disable-next-line no-unused-vars
-			const { password, ...updateProfile } = objectProfile._doc
+
+			const { password: _password, ...updateProfile } = objectProfile._doc
 
 			return res.status(200).json({ updateProfile })
 		} catch (error) {
