@@ -250,6 +250,7 @@ export class CommunController {
 	}
 
 	forgotPassword = async (req, res) => {
+		try {
 		const email = req.body.email
 		const { isValidCredentiel, message } = this._validationEmail(email)
 				
@@ -276,6 +277,10 @@ export class CommunController {
 
 		await databaseInstance.disconnectDb()
 		return res.status(200)
+		} catch(error){
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
+		}
 		
 	}
 
@@ -397,7 +402,7 @@ export class CommunController {
 			await databaseInstance.connectDb()
 			let encryptPassword
 			if (profile.password){
-				encryptPassword = this.encrypt.passwordEncrypt(profile.password)
+				encryptPassword = await this.encrypt.passwordEncrypt(profile.password)
 			}
 			const profileWithEncryptPassword ={
 				...profile,

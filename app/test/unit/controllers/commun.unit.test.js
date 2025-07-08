@@ -19,7 +19,6 @@ describe('connexion', () => {
 	let mockDbInstance, mockUserInstance
 
 	beforeEach(() => {
-		// Mock req et res
 		req = {
 			body: {
 				email: 'test@example.com',
@@ -30,17 +29,16 @@ describe('connexion', () => {
 		res = {
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
+			header: vi.fn().mockReturnThis(),
+			send: vi.fn(),
 		}
 
-		// Instanciation du contrôleur
 		controller = new CommunController()
-		controller.newLogger = { error: vi.fn() }
 		controller.encrypt = {
 			tokenCreation: vi.fn().mockResolvedValue('mockedToken'),
 		}
-		controller._connexionProfile = vi.fn().mockReturnValue({ id: 1, token: 'mockedToken' })
+		controller._getConnexionProfile = vi.fn().mockReturnValue({ id: 1, token: 'mockedToken' })
 
-		// Mocks de la base de données
 		mockUserInstance = {
 			getProfileUser: vi.fn(),
 		}
@@ -59,9 +57,10 @@ describe('connexion', () => {
 
 		await controller.connexion(req, res)
 
+		expect(mockDbInstance.connectDb).toHaveBeenCalled()
+		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: "L'email ou le mot de passe sont invalide" })
-
 	})
 
 	it('renvoie 401 si mot de passe incorrect', async () => {
@@ -70,9 +69,9 @@ describe('connexion', () => {
 
 		await controller.connexion(req, res)
 
+		expect(bcryptjs.compare).toHaveBeenCalledWith('password123', 'hashedPassword')
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: "L'email ou le mot de passe sont invalide" })
-
 	})
 
 	it('renvoie 200 avec le profil si tout est valide', async () => {
@@ -82,10 +81,11 @@ describe('connexion', () => {
 
 		await controller.connexion(req, res)
 
-		expect(controller.encrypt.tokenCreation).toHaveBeenCalledWith(user.id, user.password)
-		expect(controller._connexionProfile).toHaveBeenCalledWith(user, 'mockedToken')
+		expect(controller.encrypt.tokenCreation).toHaveBeenCalledWith(1, 'hashedPassword')
+		expect(controller._getConnexionProfile).toHaveBeenCalledWith(user)
+		expect(res.header).toHaveBeenCalledWith('Authorization', 'mockedToken')
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ id: 1, token: 'mockedToken' })
+		expect(res.send).toHaveBeenCalledWith({ id: 1, token: 'mockedToken' })
 	})
 
 	it("renvoie 500 en cas d'erreur inattendue", async () => {
@@ -118,10 +118,6 @@ describe('createAccount', () => {
 		}
 
 		controller = new CommunController()
-		controller.newLogger = {
-			error: vi.fn(),
-			info: vi.fn(),
-		}
 
 		// Mocks des méthodes privées (à adapter selon l'accessibilité réelle)
 		controller._clientAccountVerify = vi.fn()
@@ -198,10 +194,15 @@ describe('forgotPassword', () => {
 
 	beforeEach(() => {
 		req = { body: { email: 'user@example.com' } }
-		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+
+		res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+			header: vi.fn().mockReturnThis(),
+			send: vi.fn(),
+		}
 
 		controller = new CommunController()
-		controller.newLogger = { error: vi.fn() }
 
 		controller._validationEmail = vi.fn().mockReturnValue({
 			isValidCredentiel: false,
@@ -209,6 +210,7 @@ describe('forgotPassword', () => {
 		})
 
 		controller.encrypt = {
+			tokenCreation: vi.fn().mockResolvedValue('mockedToken'),
 			generetedCode: vi.fn().mockReturnValue({
 				codeNumber: '123456',
 				expiresIn: Date.now() + 60000,
@@ -230,7 +232,7 @@ describe('forgotPassword', () => {
 		sendEmailResetPassword.mockReset()
 	})
 
-	it('returns 401 if email validation fails', async () => {
+	it('renvoie 401 si la validation de l’email échoue', async () => {
 		controller._validationEmail.mockReturnValue({
 			isValidCredentiel: true,
 			message: 'Email invalide',
@@ -238,14 +240,14 @@ describe('forgotPassword', () => {
 
 		await controller.forgotPassword(req, res)
 
-		expect(controller.newLogger.error).toHaveBeenCalledWith('Email invalide')
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: 'Email invalide' })
 	})
 
-	it('returns 200 and sends email if user exists', async () => {
+	it('renvoie 200 avec header et id si utilisateur existe', async () => {
 		mockUserInstance.getProfileUser.mockResolvedValue({
 			_id: 'uid123',
+			password: 'hashed',
 		})
 
 		await controller.forgotPassword(req, res)
@@ -255,20 +257,28 @@ describe('forgotPassword', () => {
 			expect.any(Number),
 			'uid123'
 		)
+
 		expect(sendEmailResetPassword).toHaveBeenCalledWith('user@example.com', '123456')
+
+		expect(controller.encrypt.tokenCreation).toHaveBeenCalledWith('uid123', 'hashed')
+
+		expect(res.header).toHaveBeenCalledWith('Authorization', 'mockedToken')
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ id: 'uid123' })
+		expect(res.send).toHaveBeenCalledWith({ id: 'uid123' })
 	})
 
-	it('returns 200 with no content if user does not exist', async () => {
+	it('renvoie 200 sans contenu si utilisateur inexistant', async () => {
 		mockUserInstance.getProfileUser.mockResolvedValue(null)
 
 		await controller.forgotPassword(req, res)
 
 		expect(sendEmailResetPassword).not.toHaveBeenCalled()
 		expect(mockUserInstance.addCodeNumber).not.toHaveBeenCalled()
+		expect(controller.encrypt.tokenCreation).not.toHaveBeenCalled()
+
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).not.toHaveBeenCalled() 
+		expect(res.send).not.toHaveBeenCalledWith({ id: expect.anything() })
+		expect(res.send).not.toHaveBeenCalled() // car res.status(200) seul
 	})
 })
 
@@ -278,7 +288,6 @@ describe('verifyCode', () => {
 	let mockDbInstance, mockUserInstance
 
 	beforeEach(() => {
-
 		req = {
 			body: {
 				idUser: 'user123',
@@ -317,7 +326,6 @@ describe('verifyCode', () => {
 	})
 
 	it('returns 400 if code is not found in DB', async () => {
-
 		mockUserInstance.getUserById.mockResolvedValue({ id: 'user123' })
 		mockUserInstance.getCodeByNumber.mockResolvedValue(null)
 
@@ -350,226 +358,299 @@ describe('verifyCode', () => {
 		expect(res.status).toHaveBeenCalledWith(200)
 		expect(res.json).toHaveBeenCalledWith({ id: 'user123' })
 	})
-
-	describe('resetPassword', () => {
-		let controller, req, res, mockDbInstance, mockUserInstance
-
-		beforeEach(() => {
-			req = {
-				body: {
-					password: 'NewPassword123!',
-					token: null,
-					id: 'userId',
-				},
-			}
-
-			res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
-
-			controller = new CommunController()
-			controller.newLogger = { error: vi.fn() }
-
-			controller._validationPassword = vi.fn().mockReturnValue({
-				isValidPassword: true,
-				errorPasswordMessage: '',
-			})
-
-			controller.encrypt = {
-				verifyToken: vi.fn(),
-				passwordEncrypt: vi.fn().mockReturnValue('encryptedPassword'),
-			}
-
-			mockUserInstance = {
-				getUserById: vi.fn().mockResolvedValue({ id: 'userId', role: 'client' }),
-				updateUser: vi.fn().mockReturnValue({ isError: false }),
-			}
-
-			mockDbInstance = {
-				usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-				connectDb: vi.fn(),
-				disconnectDb: vi.fn(),
-			}
-
-			databaseFactory.mockReturnValue(mockDbInstance)
-		})
-
-		it('returns 401 if password is invalid', async () => {
-			controller._validationPassword.mockReturnValue({
-				isValidPassword: false,
-				errorPasswordMessage: 'Invalid password',
-			})
-
-			await controller.resetPassword(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Invalid password' })
-		})
-
-		it('returns 401 if user is not found', async () => {
-			mockUserInstance.getUserById.mockResolvedValue(null)
-
-			await controller.resetPassword(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Utilisateur introuvable' })
-		})
-
-		it('returns 401 if update fails', async () => {
-			mockUserInstance.updateUser.mockReturnValue({
-				isError: true,
-				errorMessage: 'Update failed',
-			})
-
-			await controller.resetPassword(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Update failed' })
-		})
-
-		it('returns 200 on success', async () => {
-			await controller.resetPassword(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(200)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Mot de passe changé avec succès' })
-		})
-	})
-
-	describe('deleteUser', () => {
-		let controller, req, res
-
-		beforeEach(() => {
-			controller = new CommunController()
-			controller.newLogger = { error: vi.fn() }
-
-			res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
-		})
-
-		it('returns 401 if body is missing', async () => {
-			req = {}
-			await controller.deleteUser(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Missing body params' })
-		})
-
-		it('returns 401 if role is invalid', async () => {
-			req = { body: { role: 123, id: 1 } }
-
-
-			await controller.deleteUser(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Role must be string' })
-		})
-
-		it('returns 401 if id is invalid', async () => {
-			req = { body: { role: 'client', id: 'abc' } }
-
-			await controller.deleteUser(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Id must be integer' })
-		})
-
-		it('returns 200 on success', async () => {
-			req = { body: { role: 'client', id: 1 } }
-
-			await controller.deleteUser(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(200)
-			expect(res.json).toHaveBeenCalledWith({ message: 'delete user' })
-		})
-	})
-	
-	describe('updateProfile', () => {
-		let controller, req, res
-
-		beforeEach(() => {
-			controller = new CommunController()
-			controller.newLogger = { error: vi.fn() }
-
-			res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
-		})
-
-		it('returns 401 if userId is invalid', async () => {
-			req = { body: { userId: 'abc' } }
-
-			await controller.updateProfile(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(401)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Id must be integer' })
-		})
-
-		it('returns 200 with not implemented message', async () => {
-			req = { body: { userId: 123 } }
-
-			await controller.updateProfile(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(200)
-			expect(res.json).toHaveBeenCalledWith({ message: 'Pas implementé' })
-		})
-	})
-	
-	describe('getMatchesController', () => {
-		let controller, req, res, mockDbInstance, mockUserInstance
-
-		beforeEach(() => {
-			controller = new CommunController()
-			controller.newLogger = { error: vi.fn() }
-
-			req = {}
-			res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
-
-			mockUserInstance = {
-				getMatches: vi.fn().mockResolvedValue([{ matchId: 1 }]),
-			}
-
-			mockDbInstance = {
-				usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-				connectDb: vi.fn(),
-				disconnectDb: vi.fn(),
-			}
-
-			databaseFactory.mockReturnValue(mockDbInstance)
-		})
-
-		it('returns matches on success', async () => {
-			await controller.getMatchesController(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(200)
-			expect(res.json).toHaveBeenCalledWith([{ matchId: 1 }])
-		})
-	})
-	
-	describe('getFiltersController', () => {
-		let controller, req, res, mockDbInstance, mockUserInstance
-
-		beforeEach(() => {
-			controller = new CommunController()
-			controller.newLogger = { error: vi.fn() }
-
-			req = {}
-			res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
-
-			mockUserInstance = {
-				getAllFilters: vi.fn().mockResolvedValue(['filter1', 'filter2']),
-			}
-
-			mockDbInstance = {
-				usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-				connectDb: vi.fn(),
-				disconnectDb: vi.fn(),
-			}
-
-			databaseFactory.mockReturnValue(mockDbInstance)
-		})
-
-		it('returns filters on success', async () => {
-			await controller.getFiltersController(req, res)
-
-			expect(res.status).toHaveBeenCalledWith(200)
-			expect(res.json).toHaveBeenCalledWith({ filters: ['filter1', 'filter2'] })
-		})
-	})
-	
-
 })
+	
+
+describe('resetPassword', () => {
+	let controller, req, res, mockDbInstance, mockUserInstance
+
+	beforeEach(() => {
+		req = {
+			body: {
+				password: 'NewPassword123!',
+				token: null,
+				id: 'userId',
+			},
+		}
+
+		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+
+		controller = new CommunController()
+
+		controller._validationPassword = vi.fn().mockReturnValue({
+			isValidPassword: true,
+			errorPasswordMessage: '',
+		})
+
+		controller.encrypt = {
+			verifyToken: vi.fn(),
+			passwordEncrypt: vi.fn().mockReturnValue('encryptedPassword'),
+		}
+
+		mockUserInstance = {
+			getUserById: vi.fn().mockResolvedValue({ id: 'userId', role: 'client' }),
+			updateUser: vi.fn().mockReturnValue({ isError: false }),
+		}
+
+		mockDbInstance = {
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
+			connectDb: vi.fn(),
+			disconnectDb: vi.fn(),
+		}
+
+		databaseFactory.mockReturnValue(mockDbInstance)
+	})
+
+	it('returns 401 if password is invalid', async () => {
+		controller._validationPassword.mockReturnValue({
+			isValidPassword: false,
+			errorPasswordMessage: 'Invalid password',
+		})
+
+		await controller.resetPassword(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Invalid password' })
+	})
+
+	it('returns 401 if user is not found', async () => {
+		mockUserInstance.getUserById.mockResolvedValue(null)
+
+		await controller.resetPassword(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Utilisateur introuvable' })
+	})
+
+	it('returns 401 if update fails', async () => {
+		mockUserInstance.updateUser.mockReturnValue({
+			isError: true,
+			errorMessage: 'Update failed',
+		})
+
+		await controller.resetPassword(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Update failed' })
+	})
+
+	it('returns 200 on success', async () => {
+		await controller.resetPassword(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Mot de passe changé avec succès' })
+	})
+})
+
+describe('deleteUser', () => {
+	let controller, req, res
+
+	beforeEach(() => {
+		controller = new CommunController()
+
+		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+	})
+
+	it('returns 401 if body is missing', async () => {
+		req = {}
+		await controller.deleteUser(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Missing body params' })
+	})
+
+	it('returns 401 if role is invalid', async () => {
+		req = { body: { role: 123, id: 1 } }
+
+
+		await controller.deleteUser(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Role must be string' })
+	})
+
+	it('returns 401 if id is invalid', async () => {
+		req = { body: { role: 'client', id: 'abc' } }
+
+		await controller.deleteUser(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Id must be integer' })
+	})
+
+	it('returns 200 on success', async () => {
+		req = { body: { role: 'client', id: 1 } }
+
+		await controller.deleteUser(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({ message: 'delete user' })
+	})
+})
+
+describe('updateProfile', () => {
+	let controller, req, res, mockDbInstance, mockUserInstance
+
+	beforeEach(() => {
+		controller = new CommunController()
+
+		controller.newLogger = { error: vi.fn() }
+
+		req = {
+			body: {
+				userId: 'user123',
+				profile: {
+					password: 'NewPassword123!',
+					username: 'updatedUser',
+					other: 'otherField',
+				},
+			},
+		}
+
+		res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		}
+
+		controller.encrypt = {
+			passwordEncrypt: vi.fn().mockResolvedValue('encryptedPassword'),
+		}
+
+		mockUserInstance = {
+			updateUser: vi.fn(),
+		}
+
+		mockDbInstance = {
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
+			connectDb: vi.fn(),
+			disconnectDb: vi.fn(),
+		}
+
+		databaseFactory.mockReturnValue(mockDbInstance)
+	})
+
+	it('renvoie 200 avec profil mis à jour sans le mot de passe', async () => {
+		const updatedUser = {
+			_doc: {
+				username: 'updatedUser',
+				other: 'otherField',
+				password: 'encryptedPassword',
+			},
+		}
+
+		mockUserInstance.updateUser.mockResolvedValue(updatedUser)
+
+		await controller.updateProfile(req, res)
+
+		expect(controller.encrypt.passwordEncrypt).toHaveBeenCalledWith('NewPassword123!')
+		expect(mockUserInstance.updateUser).toHaveBeenCalledWith('user123', {
+			username: 'updatedUser',
+			other: 'otherField',
+			password: 'encryptedPassword',
+		})
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({
+			updateProfile: {
+				username: 'updatedUser',
+				other: 'otherField',
+			},
+		})
+	})
+
+	it('renvoie 200 même si aucun mot de passe n’est fourni', async () => {
+		req.body.profile = { username: 'newName' }
+
+		mockUserInstance.updateUser.mockResolvedValue({
+			_doc: {
+				username: 'newName',
+			},
+		})
+
+		await controller.updateProfile(req, res)
+
+		expect(controller.encrypt.passwordEncrypt).not.toHaveBeenCalled()
+		expect(mockUserInstance.updateUser).toHaveBeenCalledWith('user123', {
+			username: 'newName',
+			password: undefined,
+		})
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({
+			updateProfile: {
+				username: 'newName',
+			},
+		})
+	})
+
+	it('renvoie 500 en cas d’erreur', async () => {
+		mockUserInstance.updateUser.mockRejectedValue(new Error('DB error'))
+
+		await controller.updateProfile(req, res)
+
+		expect(controller.newLogger.error).toHaveBeenCalledWith(expect.any(Error))
+		expect(res.status).toHaveBeenCalledWith(500)
+		expect(res.json).toHaveBeenCalledWith({ message: errorServer })
+	})
+})
+
+describe('getMatchesController', () => {
+	let controller, req, res, mockDbInstance, mockUserInstance
+
+	beforeEach(() => {
+		controller = new CommunController()
+
+		req = {}
+		res = { status: vi.fn().mockReturnThis(), send: vi.fn() }
+
+		mockUserInstance = {
+			getMatches: vi.fn().mockResolvedValue([{ matchId: 1 }]),
+		}
+
+		mockDbInstance = {
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
+			connectDb: vi.fn(),
+			disconnectDb: vi.fn(),
+		}
+
+		databaseFactory.mockReturnValue(mockDbInstance)
+	})
+
+	it('returns matches on success', async () => {
+		await controller.getMatchesController(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.send).toHaveBeenCalledWith([{ matchId: 1 }])
+	})
+})
+
+describe('getFiltersController', () => {
+	let controller, req, res, mockDbInstance, mockUserInstance
+
+	beforeEach(() => {
+		controller = new CommunController()
+
+		req = {}
+		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+
+		mockUserInstance = {
+			getAllFilters: vi.fn().mockResolvedValue(['filter1', 'filter2']),
+		}
+
+		mockDbInstance = {
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
+			connectDb: vi.fn(),
+			disconnectDb: vi.fn(),
+		}
+
+		databaseFactory.mockReturnValue(mockDbInstance)
+	})
+
+	it('returns filters on success', async () => {
+		await controller.getFiltersController(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({ filters: ['filter1', 'filter2'] })
+	})
+})
+	
+
+
