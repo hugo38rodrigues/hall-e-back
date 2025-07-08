@@ -11,7 +11,10 @@ export default [
         files: ['**/*.js'],
         ignores: ['node_modules/**/*', 'test/**/*'],
         rules: {
-            'no-unused-vars': 'error',
+            'no-unused-vars': ['error', { 
+                argsIgnorePattern: '^_',        // ignore les arguments inutilisés s’ils commencent par "_"
+                varsIgnorePattern: '^_'         // ignore les variables inutilisées s’ils commencent par "_"
+                }],
             'semi': ['error', 'never'],
             'no-case-declarations': 'off',
             'no-undef': 'warn',
