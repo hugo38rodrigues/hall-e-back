@@ -141,7 +141,7 @@ export class CommunController {
 		}
 	}
 
-	_connexionProfile = (data, token) => {
+	_getConnexionProfile = (data) => {
 		let informationsData
 		if (data.role === 'bar') {
 			informationsData = {
@@ -165,7 +165,6 @@ export class CommunController {
 			id: data._id,
 			email: data.email,
 			role: data.role,
-			token: token,
 			favorites: data.favorites
 				? {
 						gameName: data.favorites.gameName,
@@ -239,11 +238,11 @@ export class CommunController {
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const newToken = await this.encrypt.tokenCreation(userDb.id, userDb.password)
+			const token = await this.encrypt.tokenCreation(userDb.id, userDb.password)
 
-			const profile = this._connexionProfile(userDb, newToken)
+			const profile = this._getConnexionProfile(userDb)
 
-			return res.status(200).json(profile)
+			return res.header('Authorization', token).status(200).send(profile)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
@@ -270,7 +269,9 @@ export class CommunController {
 			await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
 			await sendEmailResetPassword(email, codeNumber)
 			await databaseInstance.disconnectDb()
-			return res.status(200).json({ id: userExist._id })
+			const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
+
+			return res.header('Authorization', token).status(200).send({ id: userExist._id })
 		}
 
 		await databaseInstance.disconnectDb()
