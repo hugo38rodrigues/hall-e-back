@@ -480,10 +480,10 @@ export class CommunController {
 	getAllBarController = async (res) => {
 		try {
 			const databaseInstance = databaseFactory()
-			const clientInstance = await databaseInstance.clientInstance()
+			const userInstance = await databaseInstance.usersInstances()
 
 			await databaseInstance.connectDb()
-			const barList = await clientInstance.getBars()
+			const barList = await userInstance.getBars()
 			const bars = this._filterAndSortMatches(barList)
 			const formatedDataBar = this._formatedDataBar(bars)
 
@@ -492,7 +492,7 @@ export class CommunController {
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: 'Erreur Serveur' })
+			return res.status(500).json(errorServer)
 		}
 	}
 }
