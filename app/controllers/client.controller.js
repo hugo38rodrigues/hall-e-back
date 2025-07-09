@@ -1,4 +1,3 @@
-import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e'
 import { Logger } from '../midleware/logger.js'
 
 
@@ -7,66 +6,7 @@ export class ClientController {
 		this.newLogger = new Logger()
 	}
 
-	#formatedDataBar = (data) => {
-		const newMap = data.map((item) => {
-			return {
-				id: item._id,
-				role: item.role,
-				informations: {
-					name: item.name,
-					description: item.description,
-					address: item.address,
-					pictures: item.pictures,
-					longitude: item.longitude,
-					latitude: item.latitude,
-				},
-				programmedMatches: item.programmedMatches,
-			}
-		})
-		return newMap
-	}
-
-	#filterAndSortMatches = (data) => {
-		const now = new Date()
-		const today = now.toISOString().split('T')[0] // YYYY-MM-DD
-		const currentTime = now.getTime() // Timestamp actuel
-
-		data.forEach((bar) => {
-			bar.programmedMatches = bar.programmedMatches.filter((match) => {
-				const matchDate = new Date(match.date)
-				const matchDay = matchDate.toISOString().split('T')[0] // YYYY-MM-DD
-
-				// Supprime les matchs d'avant aujourd’hui
-				if (matchDay < today) return false
-
-				// Si c'est aujourd’hui, on garde uniquement les matchs futurs
-				if (matchDay === today && matchDate.getTime() < currentTime) return false
-
-				return true
-			})
-		})
-
-		return data
-	}
-
-	getAllBarController = async (res) => {
-		try {
-			const databaseInstance = databaseFactory()
-			const clientInstance = await databaseInstance.clientInstance()
-
-			await databaseInstance.connectDb()
-			const barList = await clientInstance.getBars()
-			const bars = this.#filterAndSortMatches(barList)
-			const formatedDataBar = this.#formatedDataBar(bars)
-
-			await databaseInstance.disconnectDb()
-
-			return res.status(200).json(formatedDataBar)
-		} catch (error) {
-			this.newLogger.error(error)
-			return res.status(500).json({ message: 'Erreur Serveur' })
-		}
-	}
+	
 
 	// Code a ajouter pour la v2
 	// addLikeBarController = async (req, res) => {
