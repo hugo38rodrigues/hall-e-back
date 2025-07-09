@@ -22,7 +22,7 @@ export class CommunController {
 		this.newLogger = new Logger()
 	}
 
-	_formatedData = async (body) => {
+	_formatedDataProfile = async (body) => {
 		if (body.role === 'client') {
 			return {
 				firstName: body.informations.firstName,
@@ -45,9 +45,51 @@ export class CommunController {
 				description: body.informations.description,
 				photo: body.informations.photo,
 				latitude: latitude,
-				longitude: longitude
+				longitude: longitude,
 			}
 		}
+	}
+
+	_formatedDataBar = (data) => {
+		const newMap = data.map((item) => {
+			return {
+				id: item._id,
+				role: item.role,
+				informations: {
+					name: item.name,
+					description: item.description,
+					address: item.address,
+					pictures: item.pictures,
+					longitude: item.longitude,
+					latitude: item.latitude,
+				},
+				programmedMatches: item.programmedMatches,
+			}
+		})
+		return newMap
+	}
+
+	_filterAndSortMatches = (data) => {
+		const now = new Date()
+		const today = now.toISOString().split('T')[0] // YYYY-MM-DD
+		const currentTime = now.getTime() // Timestamp actuel
+
+		data.forEach((bar) => {
+			bar.programmedMatches = bar.programmedMatches.filter((match) => {
+				const matchDate = new Date(match.date)
+				const matchDay = matchDate.toISOString().split('T')[0] // YYYY-MM-DD
+
+				// Supprime les matchs d'avant aujourd’hui
+				if (matchDay < today) return false
+
+				// Si c'est aujourd’hui, on garde uniquement les matchs futurs
+				if (matchDay === today && matchDate.getTime() < currentTime) return false
+
+				return true
+			})
+		})
+
+		return data
 	}
 
 	_clientAccountVerify = async (body) => {
@@ -67,7 +109,7 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const profil = await this._formatedData(body)
+		const profil = await this._formatedDataProfile(body)
 
 		return {
 			profil,
@@ -103,7 +145,7 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = await this._formatedData(body)
+		const ressources = await this._formatedDataProfile(body)
 
 		return {
 			ressources,
@@ -151,7 +193,7 @@ export class CommunController {
 				description: data.description,
 				pictures: data.pictures,
 				longitude: data.longitude,
-				latitude: data.latitude
+				latitude: data.latitude,
 			}
 		} else {
 			informationsData = {
@@ -170,7 +212,7 @@ export class CommunController {
 						gameName: data.favorites.gameName,
 						leagueName: data.favorites.leagueName,
 						teams: data.favorites.teams,
-						barName: data.role === 'client' ? data.favorites.barName : []
+						barName: data.role === 'client' ? data.favorites.barName : [],
 				  }
 				: {},
 			informations: informationsData,
@@ -178,7 +220,6 @@ export class CommunController {
 	}
 
 	createAccount = async (req, res) => {
-		
 		const role = req.body.role
 		let data
 		try {
@@ -199,25 +240,24 @@ export class CommunController {
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
 			const userDb = await userInstance.getUser(data.profil.email)
-			
+
 			if (userDb !== null) {
 				this.newLogger.error(`user exist: ${data.profil.email}`)
 				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
 
 			await userInstance.addUser(data.profil)
-			
+
 			this.newLogger.info(`user insert successful ${data.profil.email}`)
 			await databaseInstance.disconnectDb()
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
-      this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer  })
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 
 	connexion = async (req, res) => {
-		
 		try {
 			const { email, password } = req.body
 
@@ -251,42 +291,40 @@ export class CommunController {
 
 	forgotPassword = async (req, res) => {
 		try {
-		const email = req.body.email
-		const { isValidCredentiel, message } = this._validationEmail(email)
-				
-		if (isValidCredentiel) {
-			this.newLogger.error(message)
-			return res.status(401).json({ message })
-		}
+			const email = req.body.email
+			const { isValidCredentiel, message } = this._validationEmail(email)
 
-		const databaseInstance = databaseFactory()
-		const userInstance = await databaseInstance.usersInstances()
-		await databaseInstance.connectDb()
+			if (isValidCredentiel) {
+				this.newLogger.error(message)
+				return res.status(401).json({ message })
+			}
 
-		const userExist = await userInstance.getProfileUser(email)
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await databaseInstance.connectDb()
 
-		if (userExist) {
-			const { codeNumber, expiresIn } = this.encrypt.generetedCode()
-			await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
-			await sendEmailResetPassword(email, codeNumber)
+			const userExist = await userInstance.getProfileUser(email)
+
+			if (userExist) {
+				const { codeNumber, expiresIn } = this.encrypt.generetedCode()
+				await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
+				await sendEmailResetPassword(email, codeNumber)
+				await databaseInstance.disconnectDb()
+				const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
+
+				return res.header('Authorization', token).status(200).send({ id: userExist._id })
+			}
+
 			await databaseInstance.disconnectDb()
-			const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
-
-			return res.header('Authorization', token).status(200).send({ id: userExist._id })
-		}
-
-		await databaseInstance.disconnectDb()
-		return res.status(200)
-		} catch (error){
+			return res.status(200)
+		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
-		
 	}
 
 	verifyCode = async (req, res) => {
-		
-		const { idUser, code } = req.body 
+		const { idUser, code } = req.body
 		const isCode = IS_CODE_NUMBER.test(parseInt(code))
 
 		if (!isCode) {
@@ -302,34 +340,28 @@ export class CommunController {
 		const user = await userInstance.getUserById(idUser)
 
 		if (user) {
-			
 			const storeCodeNumberInData = await userInstance.getCodeByNumber(code)
-			
+
 			if (!storeCodeNumberInData) {
 				this.newLogger.error('invalid code')
 				return res.status(400).json({ message: 'Code invalide' })
-			}
-			
-			else if (Date.now() > storeCodeNumberInData.expiresIn) {
+			} else if (Date.now() > storeCodeNumberInData.expiresIn) {
 				this.newLogger.error('request expired')
 				return res.status(400).json({ message: 'Demande expiré' })
-			} 
-			
-			else {
-				return res.status(200).json({ 'id': user.id })
+			} else {
+				return res.status(200).json({ id: user.id })
 			}
 		}
 		await databaseInstance.disconnectDb()
 	}
 
 	resetPassword = async (req, res) => {
-		
-		let verifyToken 
+		let verifyToken
 		const { password, token, id } = req.body
 
 		const { isValidPassword, errorPasswordMessage } = this._validationPassword(password)
 
-		if (token){
+		if (token) {
 			verifyToken = await this.encrypt.verifyToken(token)
 		}
 
@@ -342,8 +374,8 @@ export class CommunController {
 		const userInstance = await databaseInstance.usersInstances()
 
 		await databaseInstance.connectDb()
-				
-		const idUser = verifyToken ? verifyToken.id :  id
+
+		const idUser = verifyToken ? verifyToken.id : id
 		const userInDb = await userInstance.getUserById(idUser)
 
 		if (!userInDb) {
@@ -386,27 +418,25 @@ export class CommunController {
 
 			return res.status(200).json({ message: 'delete user' })
 		} catch (error) {
-			
-      this.newLogger.error(error)
+			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
 	}
 
 	updateProfile = async (req, res) => {
-		
 		try {
 			const { userId, profile } = req.body
-			
+
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
 			let encryptPassword
-			if (profile.password){
+			if (profile.password) {
 				encryptPassword = await this.encrypt.passwordEncrypt(profile.password)
 			}
-			const profileWithEncryptPassword ={
+			const profileWithEncryptPassword = {
 				...profile,
-				password : encryptPassword
+				password: encryptPassword,
 			}
 			const objectProfile = await userInstance.updateUser(userId, profileWithEncryptPassword)
 
@@ -414,7 +444,6 @@ export class CommunController {
 
 			return res.status(200).json(updateProfile)
 		} catch (error) {
-			
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
 		}
@@ -422,7 +451,6 @@ export class CommunController {
 
 	getMatchesController = async (req, res) => {
 		try {
-			
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
@@ -430,9 +458,8 @@ export class CommunController {
 			await databaseInstance.disconnectDb()
 			return res.status(200).send(matches)
 		} catch (error) {
-			
-      this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer  })
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 
@@ -445,9 +472,27 @@ export class CommunController {
 			await databaseInstance.disconnectDb()
 			return res.status(200).json({ filters })
 		} catch (error) {
-			
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
+		}
+	}
+
+	getAllBarController = async (res) => {
+		try {
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+
+			await databaseInstance.connectDb()
+			const barList = await userInstance.getBars()
+			const bars = this._filterAndSortMatches(barList)
+			const formatedDataBar = this._formatedDataBar(bars)
+
+			await databaseInstance.disconnectDb()
+
+			return res.status(200).json(formatedDataBar)
+		} catch (error) {
+			this.newLogger.error(error)
+			return res.status(500).json(errorServer)
 		}
 	}
 }

@@ -634,5 +634,81 @@ describe('getFiltersController', () => {
 	})
 })
 	
+describe('getAllBarController', () => {
+	let controller, mockDbInstance, mockUserInstance, res
+	
 
+	const fakeBars = [
+		{
+			_id: 'bar1',
+			name: 'Le Bar',
+			description: 'Un bar sympa',
+			address: 'Rue du test',
+			pictures: ['img.jpg'],
+			latitude: 45.0,
+			longitude: 5.0,
+			role: 'bar',
+			programmedMatches: [
+				{ date: new Date(Date.now() + 3600000).toISOString() }, // match dans 1h
+				{ date: new Date(Date.now() - 3600000).toISOString() }, // match dans le passé
+			],
+		},
+	]
 
+	beforeEach(() => {
+		res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		}
+	
+		mockUserInstance = {
+			getBars: vi.fn().mockResolvedValue(fakeBars),
+		}		
+		mockDbInstance = {
+			connectDb: vi.fn(),
+			disconnectDb: vi.fn(),
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
+		}		
+
+		databaseFactory.mockReturnValue(mockDbInstance)
+
+		controller = new CommunController()
+	})
+
+	it('retourne les bars correctement filtrés et formatés', async () => {
+		await controller.getAllBarController(res)
+		expect(mockDbInstance.connectDb).toHaveBeenCalled()
+		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
+		expect(mockUserInstance.getBars).toHaveBeenCalled()
+
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith([
+			{
+				id: 'bar1',
+				role: 'bar',
+				informations: {
+					name: 'Le Bar',
+					description: 'Un bar sympa',
+					address: 'Rue du test',
+					pictures: ['img.jpg'],
+					longitude: 5.0,
+					latitude: 45.0,
+				},
+				programmedMatches: [
+					{ date: expect.any(String) },
+				],
+			},
+		])
+	})
+
+	it('retourne une erreur 500 si un problème survient', async () => {
+		databaseFactory.mockImplementation(() => {
+			throw new Error('Crash')
+		})
+
+		await controller.getAllBarController(res)
+
+		expect(res.status).toHaveBeenCalledWith(500)
+		expect(res.json).toHaveBeenCalledWith(errorServer)
+	})
+})
