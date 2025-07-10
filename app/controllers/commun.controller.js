@@ -145,10 +145,10 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = await this._formatedDataProfile(body)
+		const profile = await this._formatedDataProfile(body)
 
 		return {
-			ressources,
+			profile,
 			isValid: true,
 		}
 	}
@@ -239,16 +239,17 @@ export class CommunController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const userDb = await userInstance.getUser(data.profil.email)
+			console.log(data.profile.email)
+			const userDb = await userInstance.getUser(data.profile.email)
 
 			if (userDb !== null) {
-				this.newLogger.error(`user exist: ${data.profil.email}`)
+				this.newLogger.error(`user exist: ${data.profile.email}`)
 				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
 
-			await userInstance.addUser(data.profil)
+			await userInstance.addUser(data.profile)
 
-			this.newLogger.info(`user insert successful ${data.profil.email}`)
+			this.newLogger.info(`user insert successful ${data.profile.email}`)
 			await databaseInstance.disconnectDb()
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
@@ -477,7 +478,7 @@ export class CommunController {
 		}
 	}
 
-	getAllBarController = async (res) => {
+	getAllBarController = async (req, res) => {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
@@ -492,7 +493,7 @@ export class CommunController {
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json(errorServer)
+			return res.status(500).json({ message:errorServer })
 		}
 	}
 }
