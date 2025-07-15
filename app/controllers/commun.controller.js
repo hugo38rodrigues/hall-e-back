@@ -192,8 +192,6 @@ export class CommunController {
 				price: data.price,
 				description: data.description,
 				pictures: data.pictures,
-				longitude: data.longitude,
-				latitude: data.latitude,
 			}
 		} else {
 			informationsData = {
@@ -216,6 +214,10 @@ export class CommunController {
 				  }
 				: {},
 			informations: informationsData,
+			userLocation: data.role === 'bar' ? {
+				longitude: data.longitude,
+				latitude: data.latitude,
+			} : null,
 		}
 	}
 
@@ -239,7 +241,6 @@ export class CommunController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			console.log(data.profile.email)
 			const userDb = await userInstance.getUser(data.profile.email)
 
 			if (userDb !== null) {
