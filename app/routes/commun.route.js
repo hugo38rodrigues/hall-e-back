@@ -25,7 +25,7 @@ router.post('/registe', user.createAccount)
 router.post('/forgot-password', auth.verifyAccount, user.forgotPassword)
 router.post('/verify-code', auth.verifyAccount, user.verifyCode)
 router.post('/reset-password', auth.verifyAccount, user.resetPassword)
-router.get('/bar', user.getAllBarController)
+router.get('/bars', user.getAllBarController)
 router.delete('/', auth.verifyAccount, user.deleteUser)
 router.put('/', auth.verifyAccount, user.updateProfile)
 
