@@ -76,5 +76,16 @@ export class BarController {
     }
   }
 
+  getProgrammationsMatch = async (req, res) => {
+    const id = req.params.userId
+    const databaseInstance = databaseFactory()
+    const barInstance = await databaseInstance.barInstance()
+    await databaseInstance.connectDb()
+    const bar = await barInstance.getProgrammedMatches(id)
+    await databaseInstance.disconnectDb()
+    return res.status(200).json(bar.programmedMatches) 
+
+  }
+
 }
 

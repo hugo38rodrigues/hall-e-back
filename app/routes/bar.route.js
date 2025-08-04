@@ -8,6 +8,7 @@ const auth = new Auth()
 
 router.post('/', auth.verifyAccount, bar.matchesPlanningsController)
 router.delete('/', auth.verifyAccount, bar.deletedMatchProgramming)
+router.get('/:userId', auth.verifyAccount, bar.getProgrammationsMatch)
 
 
 

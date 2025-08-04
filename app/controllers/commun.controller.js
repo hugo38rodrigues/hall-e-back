@@ -15,11 +15,18 @@ import {
 	IS_PASSWORD,
 	IS_STRING,
 } from '../utils/regex.js'
+import { FavorisController } from './favoris.controller.js'
 
 export class CommunController {
 	constructor () {
 		this.encrypt = new Crypt()
 		this.newLogger = new Logger()
+	}
+
+	_filterProfile = (profile) => {
+		return Object.fromEntries(
+			Object.entries(profile).filter(([_, value]) => value !== null && value !== '')
+		)
 	}
 
 	_formatedDataProfile = async (body) => {
@@ -60,14 +67,45 @@ export class CommunController {
 					description: item.description,
 					address: item.address,
 					pictures: item.pictures,
-					longitude: item.longitude,
-					latitude: item.latitude,
 				},
 				programmedMatches: item.programmedMatches,
+				userLocation: { longitude: item.longitude, latitude: item.latitude },
 			}
 		})
 		return newMap
 	}
+
+	_computeAdditionalHours = (gameName, bo) => {
+		const normalizedGame = gameName.toLowerCase()
+
+		// Stockage des durées en minutes pour simplifier
+		const gameDurations = {
+			'league of legends': {
+				'1': 33,
+				'3': 110, // 1h50 = 110 min
+				'5': 230, // 3h50 = 230 min
+			},
+			'cs go': {
+				'1': 50,
+				'3': 150, // 2h30 = 150 min
+				'5': 300, // 5h00 = 300 min
+			},
+			'valorant': {
+				'1': 45,
+				'3': 135, // 2h15 = 135 min
+				'5': 270, // 4h30 = 270 min
+			},
+		}
+
+		const durations = gameDurations[normalizedGame]
+		if (durations && bo in durations) {
+			return durations[bo] // Retourne la durée en minutes
+		}
+
+		// Durée par défaut si jeu ou BO non reconnu (2h = 120 minutes)
+		return 120
+	}
+
 
 	_filterAndSortMatches = (data) => {
 		const now = new Date()
@@ -83,7 +121,7 @@ export class CommunController {
 				if (matchDay < today) return false
 
 				// Si c'est aujourd’hui, on garde uniquement les matchs futurs
-				if (matchDay === today && matchDate.getTime() < currentTime) return false
+				if (matchDay === today && matchDate.getHours < currentTime + this._computeAdditionalHours(match.gameName, match.numberOfGame) ) return false
 
 				return true
 			})
@@ -109,10 +147,10 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const profil = await this._formatedDataProfile(body)
+		const profile = await this._formatedDataProfile(body)
 
 		return {
-			profil,
+			profile,
 			isValid: true,
 		}
 	}
@@ -145,10 +183,10 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const ressources = await this._formatedDataProfile(body)
+		const profile = await this._formatedDataProfile(body)
 
 		return {
-			ressources,
+			profile,
 			isValid: true,
 		}
 	}
@@ -192,8 +230,6 @@ export class CommunController {
 				price: data.price,
 				description: data.description,
 				pictures: data.pictures,
-				longitude: data.longitude,
-				latitude: data.latitude,
 			}
 		} else {
 			informationsData = {
@@ -216,6 +252,13 @@ export class CommunController {
 				  }
 				: {},
 			informations: informationsData,
+			userLocation:
+				data.role === 'bar'
+					? {
+							longitude: data.longitude,
+							latitude: data.latitude,
+					  }
+					: null,
 		}
 	}
 
@@ -239,16 +282,16 @@ export class CommunController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const userDb = await userInstance.getUser(data.profil.email)
+			const userDb = await userInstance.getUser(data.profile.email)
 
 			if (userDb !== null) {
-				this.newLogger.error(`user exist: ${data.profil.email}`)
+				this.newLogger.error(`user exist: ${data.profile.email}`)
 				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
 
-			await userInstance.addUser(data.profil)
+			await userInstance.addUser(data.profile)
 
-			this.newLogger.info(`user insert successful ${data.profil.email}`)
+			this.newLogger.info(`user insert successful ${data.profile.email}`)
 			await databaseInstance.disconnectDb()
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
@@ -426,23 +469,26 @@ export class CommunController {
 	updateProfile = async (req, res) => {
 		try {
 			const { userId, profile } = req.body
+			if (!userId || !profile) {
+				return res.status(400).json({ message: 'userId et profile sont requis.' })
+			}
 
 			const databaseInstance = databaseFactory()
+			await databaseInstance.connectDb() // on connecte avant d'appeler les instances
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
-			let encryptPassword
+
+			let newProfile = { ...profile }
+
 			if (profile.password) {
-				encryptPassword = await this.encrypt.passwordEncrypt(profile.password)
+				const encryptPassword = await this.encrypt.passwordEncrypt(profile.password)
+				newProfile.password = encryptPassword
 			}
-			const profileWithEncryptPassword = {
-				...profile,
-				password: encryptPassword,
-			}
-			const objectProfile = await userInstance.updateUser(userId, profileWithEncryptPassword)
 
-			const { password: _password, favorites: _favorites, ...updateProfile } = objectProfile
+			const objectProfile = await userInstance.updateUser(userId, this._filterProfile(newProfile))
 
-			return res.status(200).json(updateProfile)
+			const { password: _password, favorites: _favorites, ...sanitizedProfile } = objectProfile
+
+			return res.status(200).json(sanitizedProfile)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
@@ -455,6 +501,7 @@ export class CommunController {
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
 			const matches = await userInstance.getMatches()
+
 			await databaseInstance.disconnectDb()
 			return res.status(200).send(matches)
 		} catch (error) {
@@ -477,7 +524,7 @@ export class CommunController {
 		}
 	}
 
-	getAllBarController = async (res) => {
+	getAllBarController = async (req, res) => {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
@@ -492,7 +539,69 @@ export class CommunController {
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json(errorServer)
+			return res.status(500).json({ message: errorServer })
+		}
+	}
+
+	addFavorites = async (req, res) => {
+		try {
+			const { type, idUser, data } = req.body
+			const favoris = new FavorisController()
+			let addFavoris
+			switch (type) {
+				case 'gameName':
+					addFavoris = await favoris.addFavorisGameController(idUser, data, type)
+					break
+				case 'leagueName':
+					addFavoris = await favoris.addFavorisLeagueController(idUser, data, type)
+					break
+				case 'teams':
+					addFavoris = await favoris.addFavorisTeamController(idUser, data, type)
+					break
+				case 'barName':
+					addFavoris = await favoris.addFavorisBarNameController(idUser, data, type)
+					break
+				default:
+			}
+			if (addFavoris.message) {
+				res.status(500).json(addFavoris)
+			}
+			res.status(200).json(addFavoris)
+		} catch (error) {
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
+		}
+	}
+
+	deleteFavorites = async (req, res) => {
+		try {
+			const { type, idUser, data } = req.body
+			const favoris = new FavorisController()
+			let deleteFavoris
+			switch (type) {
+				case 'gameName':
+					deleteFavoris = await favoris.deleteFavorisGameController(idUser, data)
+					break
+				case 'leagueName':
+					deleteFavoris = await favoris.deleteFavorisLeagueController(idUser, data)
+					break
+				case 'teams':
+					deleteFavoris = await favoris.deleteFavorisTeamController(idUser, data)
+					break
+				case 'barName':
+					deleteFavoris = await favoris.deleteFavorisBarNameController(idUser, data)
+					break
+				default:
+			}
+
+			if (deleteFavoris.message){
+				res.status(500).json(deleteFavoris)
+			}
+			
+			res.status(200).json(deleteFavoris)
+		} catch (error) {
+			this.newLogger.error(error)
+			return res.status(500).json({ message: errorServer })
 		}
 	}
 }

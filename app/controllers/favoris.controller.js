@@ -10,103 +10,94 @@ export class FavorisController {
 		this.newLogger = new Logger()
 	}
 
-	addFavorisGameController = async (req, res) => {
+	addFavorisGameController = async (idUser, gameName, type) => {
+		try {
+			const databaseInstance = databaseFactory()
+			const userInstance = await databaseInstance.usersInstances()
+			await databaseInstance.connectDb()
+			const addGame = await userInstance.addFavoriteGame(idUser, gameName, type)
+			await databaseInstance.disconnectDb()
 		
-		try {
-			const { idUser, gameName } = req.body
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
-			const addGame = await userInstance.addFavoriteGame(idUser, gameName)
-			await databaseInstance.disconnectDb()
-			res.status(200).json({ gameName: addGame.gameName })
+			return addGame
 		} catch (error) {
 			this.newLogger.error(error)
-			res.status(500).json({ message: errorServer })
+			return errorServer
 		}
 	}
 
-	deleteFavorisGameController = async (req, res) => {
-	
+	deleteFavorisGameController = async (idUser, gameName, type) => {
 		try {
-			const { idUser, gameName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const deletedGame = await userInstance.removeFavoriteGame(idUser, gameName)
+			const deletedGame = await userInstance.removeFavoriteGame(idUser, gameName, type)
 			await databaseInstance.disconnectDb()
-			res.status(200).json({ gameName: deletedGame.gameName })
+			return deletedGame
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return  errorServer 
 		}
 	}
 
-	addFavorisLeagueController = async (req, res) => {
+	addFavorisLeagueController = async (idUser, leagueName, type) => {
 		try {
-			const { idUser, leagueName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const addLeague = await userInstance.addFavoriteLeague(idUser, leagueName)
+			const addLeague = await userInstance.addFavoriteLeague(idUser, leagueName, type)
 			await databaseInstance.disconnectDb()
-			res.status(200).json({ leagueName: addLeague.leagueName })
+			return addLeague
 		} catch (error) {
 			this.newLogger.error(error)
-			res.status(500).json({ message: errorServer })
+			return { message: errorServer }
 		}
 	}
 
-	deleteFavorisLeagueController = async (req, res) => {
+	deleteFavorisLeagueController = async (idUser, leagueName, type) => {
 		try {
-			const { idUser, leagueName } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const deleteLeague = await userInstance.removeFavoriteLeague(idUser, leagueName)
+			const deleteLeague = await userInstance.removeFavoriteLeague(idUser, leagueName, type)
 			await databaseInstance.disconnectDb()
-			res.status(200).json({ leagueName: deleteLeague.leagueName })
+			return deleteLeague
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return { message: errorServer }
 		}
 	}
 
-	addFavorisTeamController = async (req, res) => {
+	addFavorisTeamController = async (idUser, idTeam, type) => {
 		try {
-			const { idUser, idTeam } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const addTeam = await userInstance.addFavoriteTeam(idUser, idTeam)
+			const addTeam = await userInstance.addFavoriteTeam(idUser, idTeam, type)
 			await databaseInstance.disconnectDb()
-			const teams = addTeam.teams
-			res.status(200).json({ teams })
+			const teams = addTeam
+			return teams 
 		} catch (error) {
 			this.newLogger.error(error)
-			res.status(500).json({ message: errorServer })
+			return { message: errorServer }
 		}
 	}
 
-	deleteFavorisTeamController = async (req, res) => {
+	deleteFavorisTeamController = async (idUser, idTeam, type) => {
 		try {
-			const { idUser, idTeam } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const deleteTeam = await userInstance.removeFavoriteTeam(idUser, idTeam)
+			const deleteTeam = await userInstance.removeFavoriteTeam(idUser, idTeam, type)
 			await databaseInstance.disconnectDb()
-			const teams = deleteTeam.teams
-			res.status(200).json({ teams })
+			return deleteTeam
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return { message: errorServer }
 		}
 	}
 
-	addFavorisBarNameController = async (req, res) => {
+	addFavorisBarNameController = async (idUser, idBar, type) => {
 		try {
-			const { idUser, idBar } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 		
@@ -115,30 +106,35 @@ export class FavorisController {
 
 			if (userInDb.role !== 'client') {
 				this.newLogger.error('Has the wrong role')
-				return res.status(401).json({ message: 'Vous n\'avez pas le bon rôle' })
+				return  { message:'Vous n\'avez pas le bon rôle' }
 			} 
-			const addBarName = await userInstance.addFavoriteBar(idUser, idBar)
+			const addBarName = await userInstance.addFavoriteBar(idUser, idBar, type)
 			await databaseInstance.disconnectDb()
 			
-			res.status(200).json({ barName: addBarName })
+			return addBarName
 		} catch (error) {
 			this.newLogger.error(error)
-			res.status(500).json({ message: errorServer })
+			return { message: errorServer }
 		}
 	}
 
-	deleteFavorisBarNameController = async (req, res) => {
+	deleteFavorisBarNameController = async (idUser, idBar, type) => {
 		try {
-			const { idUser, idBar } = req.body
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 			await databaseInstance.connectDb()
-			const deleteBarName = await userInstance.removeFavoriteBar(idUser, idBar)
+			const userInDb = await userInstance.getUserById(idUser)
+
+			if (userInDb.role !== 'client') {
+				this.newLogger.error('Has the wrong role')
+				return { message:'Vous n\'avez pas le bon rôle' }
+			} 
+			const deleteBarName = await userInstance.removeFavoriteBar(idUser, idBar, type)
 			await databaseInstance.disconnectDb()
-			return res.status(200).json({ barName: deleteBarName })
+			return deleteBarName
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return { message: errorServer }
 		}
 	}
 }

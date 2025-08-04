@@ -2,16 +2,16 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, 'feature/**', bugFix/** ]
+    branches: [main, 'feature/**', bugFix/**]
 
   pull_request:
-    branches: [ 'feature/**', bugFix/** ]
+    branches: ['feature/**', bugFix/**]
 
 jobs:
   lint-and-test:
     name: 🔍 Lint & Test
     runs-on: ubuntu-latest
-    defaults: 
+    defaults:
       run:
         working-directory: ./app
 
@@ -42,7 +42,7 @@ jobs:
     needs: lint-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    defaults: 
+    defaults:
       run:
         working-directory: ./app
 
@@ -76,4 +76,3 @@ jobs:
           docker buildx create --use
           docker buildx inspect --bootstrap
           docker buildx build --platform linux/amd64,linux/arm64 -t ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }} --push .
-
