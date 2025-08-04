@@ -9,15 +9,12 @@ vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => ({
 	databaseFactory: vi.fn(),
 }))
 
-describe('FavorisController (200 OK tests)', () => {
-	let controller, req, res, mockDbInstance, mockUserInstance
+describe('FavorisController - méthodes internes', () => {
+	let controller, mockDbInstance, mockUserInstance
 
 	beforeEach(() => {
 		controller = new FavorisController()
 		controller.newLogger = { error: vi.fn() }
-
-		req = { body: {} }
-		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
 
 		mockUserInstance = {
 			addFavoriteGame: vi.fn().mockResolvedValue({ gameName: 'FIFA' }),
@@ -40,59 +37,45 @@ describe('FavorisController (200 OK tests)', () => {
 		databaseFactory.mockReturnValue(mockDbInstance)
 	})
 
-	it('addFavorisGameController returns 200 with gameName', async () => {
-		req.body = { idUser: 1, gameName: 'FIFA' }
-		await controller.addFavorisGameController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ gameName: 'FIFA' })
+	it('addFavorisGameController retourne un objet gameName', async () => {
+		const result = await controller.addFavorisGameController(1, 'FIFA', 'gameName')
+		expect(result).toEqual({ gameName: 'FIFA' })
 	})
 
-	it('deleteFavorisGameController returns 200 with gameName', async () => {
-		req.body = { idUser: 1, gameName: 'FIFA' }
-		await controller.deleteFavorisGameController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ gameName: 'FIFA' })
+	it('deleteFavorisGameController retourne un objet gameName', async () => {
+		const result = await controller.deleteFavorisGameController(1, 'FIFA', 'gameName')
+		expect(result).toEqual({ gameName: 'FIFA' })
 	})
 
-	it('addFavorisLeagueController returns 200 with leagueName', async () => {
-		req.body = { idUser: 1, leagueName: 'Ligue 1' }
-		await controller.addFavorisLeagueController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ leagueName: 'Ligue 1' })
+	it('addFavorisLeagueController retourne un objet leagueName', async () => {
+		const result = await controller.addFavorisLeagueController(1, 'Ligue 1', 'leagueName')
+		expect(result).toEqual({ leagueName: 'Ligue 1' })
 	})
 
-	it('deleteFavorisLeagueController returns 200 with leagueName', async () => {
-		req.body = { idUser: 1, leagueName: 'Ligue 1' }
-		await controller.deleteFavorisLeagueController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ leagueName: 'Ligue 1' })
+	it('deleteFavorisLeagueController retourne un objet leagueName', async () => {
+		const result = await controller.deleteFavorisLeagueController(1, 'Ligue 1', 'leagueName')
+		expect(result).toEqual({ leagueName: 'Ligue 1' })
 	})
 
-	it('addFavorisTeamController returns 200 with teams', async () => {
-		req.body = { idUser: 1, idTeam: 10 }
-		await controller.addFavorisTeamController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ teams: ['Team A'] })
+	it('addFavorisTeamController retourne un objet teams', async () => {
+		const result = await controller.addFavorisTeamController(1, 10, 'teams')
+		expect(result).toEqual({ teams: ['Team A'] })
 	})
 
-	it('deleteFavorisTeamController returns 200 with teams', async () => {
-		req.body = { idUser: 1, idTeam: 10 }
-		await controller.deleteFavorisTeamController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ teams: [] })
+	it('deleteFavorisTeamController retourne un objet vide teams', async () => {
+		const result = await controller.deleteFavorisTeamController(1, 10, 'teams')
+		expect(result).toEqual({ teams: [] })
 	})
 
-	it('addFavorisBarNameController returns 200 if user is client', async () => {
-		req.body = { idUser: 1, idBar: 99 }
-		await controller.addFavorisBarNameController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ barName: 'Le Bar' })
+	it('addFavorisBarNameController retourne "Le Bar"', async () => {
+		const result = await controller.addFavorisBarNameController(1, 99, 'barName')
+		expect(result).toBe('Le Bar')
 	})
 
-	it('deleteFavorisBarNameController returns 200 with barName', async () => {
-		req.body = { idUser: 1, idBar: 99 }
-		await controller.deleteFavorisBarNameController(req, res)
-		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ barName: 'Le Bar' })
+	it('deleteFavorisBarNameController retourne "Le Bar"', async () => {
+		const result = await controller.deleteFavorisBarNameController(1, 99, 'barName')
+		expect(result).toBe('Le Bar')
 	})
+
 })
+

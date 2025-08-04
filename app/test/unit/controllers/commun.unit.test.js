@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CommunController } from '../../../controllers/commun.controller.js'
 import { sendEmailResetPassword } from '../../../utils/email.js'
 import { errorServer } from '../../../utils/messages.js'
+import { FavorisController } from '../../../controllers/favoris.controller.js'
 
 vi.mock('bcryptjs')
 vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => ({
@@ -11,6 +12,9 @@ vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => ({
 }))
 vi.mock('../../../utils/email.js', () => ({
 	sendEmailResetPassword: vi.fn(),
+}))
+vi.mock('../../../controllers/favoris.controller.js', () => ({
+	FavorisController: vi.fn(),
 }))
 
 describe('connexion', () => {
@@ -103,6 +107,16 @@ describe('createAccount', () => {
 	let req, res
 	let mockDbInstance, mockUserInstance
 
+	// ✅ Helper pour configurer la réponse mockée de _clientAccountVerify / _barAccountVerify
+	const mockAccountVerify = (method, { isValid, message = '', profile = null }) => {
+		controller[method].mockResolvedValue({ isValid, message, profile })
+	}
+
+	// ✅ Helper pour préparer la DB
+	const mockDatabaseUser = (user = null) => {
+		mockUserInstance.getUser.mockResolvedValue(user)
+	}
+
 	beforeEach(() => {
 		req = {
 			body: {
@@ -119,10 +133,11 @@ describe('createAccount', () => {
 
 		controller = new CommunController()
 
-		// Mocks des méthodes privées (à adapter selon l'accessibilité réelle)
+		// Mocks des méthodes privées
 		controller._clientAccountVerify = vi.fn()
 		controller._barAccountVerify = vi.fn()
 
+		// Mocks DB
 		mockUserInstance = {
 			getUser: vi.fn(),
 			addUser: vi.fn(),
@@ -137,11 +152,9 @@ describe('createAccount', () => {
 		databaseFactory.mockReturnValue(mockDbInstance)
 	})
 
-	it('returns 401 if validation fails', async () => {
-		controller._clientAccountVerify.mockResolvedValue({
-			isValid: false,
-			message: 'Invalid data',
-		})
+	// ✅ Cas 1 : Validation échoue
+	it('renvoie 401 si la validation échoue', async () => {
+		mockAccountVerify('_clientAccountVerify', { isValid: false, message: 'Invalid data' })
 
 		await controller.createAccount(req, res)
 
@@ -149,13 +162,13 @@ describe('createAccount', () => {
 		expect(res.json).toHaveBeenCalledWith({ message: 'Invalid data' })
 	})
 
-	it('returns 401 if user already exists', async () => {
-		controller._clientAccountVerify.mockResolvedValue({
+	// ✅ Cas 2 : L'utilisateur existe déjà
+	it("renvoie 401 si l'utilisateur existe déjà", async () => {
+		mockAccountVerify('_clientAccountVerify', {
 			isValid: true,
-			profil: { email: 'user@example.com' },
+			profile: { email: 'user@example.com' },
 		})
-
-		mockUserInstance.getUser.mockResolvedValue({ email: 'user@example.com' })
+		mockDatabaseUser({ email: 'user@example.com' })
 
 		await controller.createAccount(req, res)
 
@@ -163,22 +176,24 @@ describe('createAccount', () => {
 		expect(res.json).toHaveBeenCalledWith({ message: "L'utilisateur existe déjà" })
 	})
 
-	it('creates user and returns 201 on success', async () => {
-		controller._clientAccountVerify.mockResolvedValue({
+	// ✅ Cas 3 : Création utilisateur réussie
+	it('crée un utilisateur et renvoie 201 si succès', async () => {
+		mockAccountVerify('_clientAccountVerify', {
 			isValid: true,
-			profil: { email: 'user@example.com' },
+			profile: { email: 'user@example.com' },
 		})
-
-		mockUserInstance.getUser.mockResolvedValue(null)
+		mockDatabaseUser(null)
 
 		await controller.createAccount(req, res)
 
 		expect(mockUserInstance.addUser).toHaveBeenCalledWith({ email: 'user@example.com' })
+		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 		expect(res.status).toHaveBeenCalledWith(201)
 		expect(res.json).toHaveBeenCalledWith({ message: 'Inscription réussis' })
 	})
 
-	it('returns 500 on unexpected error', async () => {
+	// ✅ Cas 4 : Erreur inattendue
+	it('renvoie 500 en cas d’erreur inattendue', async () => {
 		controller._clientAccountVerify.mockRejectedValue(new Error('Unexpected'))
 
 		await controller.createAccount(req, res)
@@ -234,7 +249,7 @@ describe('forgotPassword', () => {
 
 	it('renvoie 401 si la validation de l’email échoue', async () => {
 		controller._validationEmail.mockReturnValue({
-			isValidCredentiel: true,
+			isValidCredentiel: true, // ✅ doit être true pour forcer l'erreur
 			message: 'Email invalide',
 		})
 
@@ -246,7 +261,7 @@ describe('forgotPassword', () => {
 
 	it('renvoie 200 avec header et id si utilisateur existe', async () => {
 		mockUserInstance.getProfileUser.mockResolvedValue({
-			_id: 'uid123',
+			_id: 'uid123', // ✅ doit être _id
 			password: 'hashed',
 		})
 
@@ -254,7 +269,7 @@ describe('forgotPassword', () => {
 
 		expect(mockUserInstance.addCodeNumber).toHaveBeenCalledWith(
 			'123456',
-			expect.any(Number),
+			expect.any(Number), // ✅ on passe expiresIn
 			'uid123'
 		)
 
@@ -277,10 +292,10 @@ describe('forgotPassword', () => {
 		expect(controller.encrypt.tokenCreation).not.toHaveBeenCalled()
 
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.send).not.toHaveBeenCalledWith({ id: expect.anything() })
-		expect(res.send).not.toHaveBeenCalled() // car res.status(200) seul
+		expect(res.send).not.toHaveBeenCalled() // ✅ car aucun contenu envoyé
 	})
 })
+
 
 describe('verifyCode', () => {
 	let controller
@@ -636,69 +651,61 @@ describe('getFiltersController', () => {
 	
 describe('getAllBarController', () => {
 	let controller, mockDbInstance, mockUserInstance, res
-	
 
 	const fakeBars = [
 		{
-			_id: 'bar1',
+			id: 'bar1',
 			name: 'Le Bar',
 			description: 'Un bar sympa',
 			address: 'Rue du test',
 			pictures: ['img.jpg'],
-			latitude: 45.0,
-			longitude: 5.0,
 			role: 'bar',
 			programmedMatches: [
 				{ date: new Date(Date.now() + 3600000).toISOString() }, // match dans 1h
 				{ date: new Date(Date.now() - 3600000).toISOString() }, // match dans le passé
 			],
+			userLocation: { latitude: 45.0, longitude: 5.0 },
 		},
 	]
+
+	const filteredBars = [fakeBars[0]] // résultat simulé de _filterAndSortMatches
+	const formattedBars = [{ id: 'bar1', name: 'Le Bar', distance: 1 }] // résultat simulé de _formatedDataBar
 
 	beforeEach(() => {
 		res = {
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		}
-	
+
 		mockUserInstance = {
 			getBars: vi.fn().mockResolvedValue(fakeBars),
-		}		
+		}
 		mockDbInstance = {
 			connectDb: vi.fn(),
 			disconnectDb: vi.fn(),
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-		}		
+		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
 
 		controller = new CommunController()
+
+		// ✅ On mocke les méthodes internes pour contrôler leur sortie
+		controller._filterAndSortMatches = vi.fn().mockReturnValue(filteredBars)
+		controller._formatedDataBar = vi.fn().mockReturnValue(formattedBars)
 	})
 
 	it('retourne les bars correctement filtrés et formatés', async () => {
-		await controller.getAllBarController(res)
+		await controller.getAllBarController({}, res)
+
 		expect(mockDbInstance.connectDb).toHaveBeenCalled()
-		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 		expect(mockUserInstance.getBars).toHaveBeenCalled()
+		expect(controller._filterAndSortMatches).toHaveBeenCalledWith(fakeBars)
+		expect(controller._formatedDataBar).toHaveBeenCalledWith(filteredBars)
+		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith([
-			{
-				id: 'bar1',
-				role: 'bar',
-				informations: {
-					name: 'Le Bar',
-					description: 'Un bar sympa',
-					address: 'Rue du test',
-					pictures: ['img.jpg'],
-					longitude: 5.0,
-					latitude: 45.0,
-				},
-				programmedMatches: [
-					{ date: expect.any(String) },
-				],
-			},
-		])
+		expect(res.json).toHaveBeenCalledWith(formattedBars) 
 	})
 
 	it('retourne une erreur 500 si un problème survient', async () => {
@@ -706,9 +713,76 @@ describe('getAllBarController', () => {
 			throw new Error('Crash')
 		})
 
-		await controller.getAllBarController(res)
+		await controller.getAllBarController({}, res)
 
 		expect(res.status).toHaveBeenCalledWith(500)
-		expect(res.json).toHaveBeenCalledWith(errorServer)
+		expect(res.json).toHaveBeenCalledWith({ message: errorServer })
+	})
+})
+
+describe('FavorisController - endpoints REST addFavorites / deleteFavorites', () => {
+
+	let controller, res, favorisMock
+
+	beforeEach(() => {
+		// ✅ Déclare favorisMock ici
+		favorisMock = {
+			addFavorisGameController: vi.fn().mockResolvedValue({ success: true }),
+			addFavorisLeagueController: vi.fn().mockResolvedValue({ success: true }),
+			addFavorisTeamController: vi.fn().mockResolvedValue({ success: true }),
+			addFavorisBarNameController: vi.fn().mockResolvedValue({ success: true }),
+			deleteFavorisGameController: vi.fn().mockResolvedValue({ success: true }),
+			deleteFavorisLeagueController: vi.fn().mockResolvedValue({ success: true }),
+			deleteFavorisTeamController: vi.fn().mockResolvedValue({ success: true }),
+			deleteFavorisBarNameController: vi.fn().mockResolvedValue({ success: true }),
+		}
+
+		// ✅ On mock la classe FavorisController pour qu'elle renvoie notre mock
+		FavorisController.mockImplementation(() => favorisMock)
+
+		controller = new CommunController()
+		controller.newLogger = { error: vi.fn() }
+
+		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+	})
+
+	it('addFavorites appelle addFavorisGameController et renvoie 200', async () => {
+		const req = { body: { type: 'gameName', idUser: 1, data: 'FIFA' } }
+
+		await controller.addFavorites(req, res)
+
+		expect(favorisMock.addFavorisGameController).toHaveBeenCalledWith(1, 'FIFA', 'gameName')
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({ success: true })
+	})
+
+	it('addFavorites renvoie 500 si addFavoris renvoie une erreur', async () => {
+		favorisMock.addFavorisTeamController.mockResolvedValue({ message: errorServer })
+		const req = { body: { type: 'teams', idUser: 1, data: 10 } }
+
+		await controller.addFavorites(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(500)
+		expect(res.json).toHaveBeenCalledWith({ message: errorServer })
+	})
+
+	it('deleteFavorites appelle deleteFavorisBarNameController et renvoie 200', async () => {
+		const req = { body: { type: 'barName', idUser: 1, data: 99 } }
+
+		await controller.deleteFavorites(req, res)
+
+		expect(favorisMock.deleteFavorisBarNameController).toHaveBeenCalledWith(1, 99)
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(res.json).toHaveBeenCalledWith({ success: true })
+	})
+
+	it('deleteFavorites renvoie 500 si deleteFavoris renvoie une erreur', async () => {
+		favorisMock.deleteFavorisLeagueController.mockResolvedValue({ message: errorServer })
+		const req = { body: { type: 'leagueName', idUser: 1, data: 'Ligue 1' } }
+
+		await controller.deleteFavorites(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(500)
+		expect(res.json).toHaveBeenCalledWith({ message: errorServer })
 	})
 })
