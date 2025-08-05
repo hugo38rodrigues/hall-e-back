@@ -28,7 +28,7 @@ Téléchargez Hall-E et faites de chaque sortie un événement que vous n’oubl
 ---
 
 docker build \
-  --build-arg GITHUB_TOKEN=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 \
+  --build-arg GITHUB_TOKEN=<GH_TOKEN> \
   -t api-hall-e .
 
 docker run  \
