@@ -21,10 +21,11 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 23
+          node-version: '24'   # >= 24.0.2 -> bug npm corrigé @rollup/rollup-linux-x64-gnu
+          cache: 'npm'
 
       - name: Install dependencies
         run: |
