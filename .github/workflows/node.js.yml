@@ -29,6 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" > ~/.npmrc
+          rm -rf node_modules/@hugo38rodrigues package-lock.json
           npm ci
 
       - name: Run linter
