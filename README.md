@@ -43,3 +43,9 @@ kubectl create secret docker-registry regcred \
   --docker-password=TON_PASSWORD \
   --docker-email=TON_EMAIL \
   --docker-server=https://index.docker.io/v1/
+
+kubectl create secret generic secret-api \
+  --from-literal=SECRET_JWT_KEY="" \
+  --from-literal=LOCATIONIQ_API_KEY="" \
+  --from-literal=USER_EMAIL="" \
+  --from-literal=USER_PASSWORD=""
