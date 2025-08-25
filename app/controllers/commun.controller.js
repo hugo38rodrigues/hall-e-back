@@ -446,6 +446,7 @@ export class CommunController {
 			if (!isIdUser) {
 				this.newLogger.error('Id must be mongo id')
 				return res.status(401).json({ message: 'Il manque un id utilisateur ' })
+
 			}
 			const databaseInstance = databaseFactory()
 			 // on connecte avant d'appeler les instances
@@ -454,11 +455,12 @@ export class CommunController {
 			if (!userInDb){
 				return res.status(401).json({ message: 'Utilisateur un trouvable' })
 			}
+
 			const isDeleteUser = await userInstance.deleteUser(idUser, userInDb.role)
 			if (!isDeleteUser){
 				return res.status(401).json({ message: 'Impossible de supprimer le compte' })
 			}
-			
+
 
 			return res.status(200).json({ message: 'Compte supprimé' })
 		} catch (error) {
