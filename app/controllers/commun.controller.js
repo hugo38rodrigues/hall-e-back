@@ -281,7 +281,7 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const userDb = await userInstance.getUser(data.profile.email)
 
 			if (userDb !== null) {
@@ -292,7 +292,7 @@ export class CommunController {
 			await userInstance.addUser(data.profile)
 
 			this.newLogger.info(`user insert successful ${data.profile.email}`)
-			await databaseInstance.disconnectDb()
+			
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
 			this.newLogger.error(error)
@@ -306,9 +306,9 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const userDb = await userInstance.getProfileUser(email)
-			await databaseInstance.disconnectDb()
+			
 			if (userDb === null) {
 				this.newLogger.error('email is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
@@ -344,7 +344,7 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 
 			const userExist = await userInstance.getProfileUser(email)
 
@@ -352,13 +352,13 @@ export class CommunController {
 				const { codeNumber, expiresIn } = this.encrypt.generetedCode()
 				await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
 				await sendEmailResetPassword(email, codeNumber)
-				await databaseInstance.disconnectDb()
+				
 				const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
 
 				return res.header('Authorization', token).status(200).send({ id: userExist._id })
 			}
 
-			await databaseInstance.disconnectDb()
+			
 			return res.status(200)
 		} catch (error) {
 			this.newLogger.error(error)
@@ -378,7 +378,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await databaseInstance.connectDb()
+		
 
 		const user = await userInstance.getUserById(idUser)
 
@@ -395,7 +395,7 @@ export class CommunController {
 				return res.status(200).json({ id: user.id })
 			}
 		}
-		await databaseInstance.disconnectDb()
+		
 	}
 
 	resetPassword = async (req, res) => {
@@ -411,7 +411,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await databaseInstance.connectDb()
+		
 
 		const userInDb = await userInstance.getUserById(id)
 
@@ -448,7 +448,7 @@ export class CommunController {
 				return res.status(401).json({ message: 'Il manque un id utilisateur ' })
 			}
 			const databaseInstance = databaseFactory()
-			await databaseInstance.connectDb() // on connecte avant d'appeler les instances
+			 // on connecte avant d'appeler les instances
 			const userInstance = await databaseInstance.usersInstances()
 			const userInDb = await userInstance.getUserById(idUser)
 			if (!userInDb){
@@ -458,7 +458,7 @@ export class CommunController {
 			if (!isDeleteUser){
 				return res.status(401).json({ message: 'Impossible de supprimer le compte' })
 			}
-			await databaseInstance.disconnectDb()
+			
 
 			return res.status(200).json({ message: 'Compte supprimé' })
 		} catch (error) {
@@ -475,7 +475,7 @@ export class CommunController {
 			}
 
 			const databaseInstance = databaseFactory()
-			await databaseInstance.connectDb() // on connecte avant d'appeler les instances
+			 // on connecte avant d'appeler les instances
 			const userInstance = await databaseInstance.usersInstances()
 
 			let newProfile = { ...profile }
@@ -500,10 +500,9 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const matches = await userInstance.getMatches()
 
-			await databaseInstance.disconnectDb()
 			return res.status(200).send(matches)
 		} catch (error) {
 			this.newLogger.error(error)
@@ -515,9 +514,9 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const filters = await userInstance.getAllFilters()
-			await databaseInstance.disconnectDb()
+			
 			return res.status(200).json({ filters })
 		} catch (error) {
 			this.newLogger.error(error)
@@ -530,12 +529,12 @@ export class CommunController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 
-			await databaseInstance.connectDb()
+			
 			const barList = await userInstance.getBars()
 			const bars = this._filterAndSortMatches(barList)
 			const formatedDataBar = this._formatedDataBar(bars)
 
-			await databaseInstance.disconnectDb()
+			
 
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {
