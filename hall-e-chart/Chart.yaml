@@ -1,0 +1,4 @@
+apiVersion: v2
+name: hall-e
+type: application
+version: 1.0.0

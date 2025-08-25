@@ -1,0 +1,15 @@
+{{- if .Values.api_hall_e.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hall-e.fullname" . }}-api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ include "hall-e.name" . }}
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .Values.api_hall_e.env.PORT }}
+{{- end }}

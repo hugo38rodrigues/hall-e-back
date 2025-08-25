@@ -1,0 +1,25 @@
+{{- $ns := .Release.Namespace -}}
+{{- $svc := printf "%s-api" (include "hall-e.fullname" .) -}}
+
+1) Inspecter le type du Service
+   kubectl -n {{ $ns }} get svc {{ $svc }} -o jsonpath='{.spec.type}{"\n"}'
+
+2) Accès selon le type
+
+# --- ClusterIP (port-forward local) ---
+PORT=$(kubectl -n {{ $ns }} get svc {{ $svc }} -o jsonpath='{.spec.ports[0].port}')
+kubectl -n {{ $ns }} port-forward svc/{{ $svc }} 8080:$PORT
+echo "http://127.0.0.1:8080"
+
+# --- NodePort ---
+NODE_PORT=$(kubectl -n {{ $ns }} get svc {{ $svc }} -o jsonpath='{.spec.ports[0].nodePort}')
+NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+echo "http://$NODE_IP:$NODE_PORT"
+
+# --- LoadBalancer ---
+echo "Attendez que l'EXTERNAL-IP apparaisse…"
+kubectl -n {{ $ns }} get svc {{ $svc }} -w
+# Puis :
+EXT_IP=$(kubectl -n {{ $ns }} get svc {{ $svc }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+PORT=$(kubectl -n {{ $ns }} get svc {{ $svc }} -o jsonpath='{.spec.ports[0].port}')
+echo "http://$EXT_IP:$PORT"
