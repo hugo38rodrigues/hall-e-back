@@ -459,8 +459,7 @@ describe('deleteUser', () => {
 		}
 
 		mockDbInstance = {
-			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),s
-
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance)
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)

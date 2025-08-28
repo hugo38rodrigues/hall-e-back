@@ -30,8 +30,6 @@ describe('FavorisController - méthodes internes', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			,
-			dis,
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
