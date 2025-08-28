@@ -10,8 +10,6 @@ describe('matchesPlanningsController', () => {
   let barController
 	let userInstanceMock
 	let barInstanceMock
-	let connectDbMock
-	let disconnectDbMock
 
 	const req = {
 		body: {
@@ -38,13 +36,9 @@ describe('matchesPlanningsController', () => {
 			addProgrammedMatch: vi.fn().mockResolvedValue(true),
 		}
 
-		connectDbMock = vi.fn()
-		disconnectDbMock = vi.fn()
 
 		// 👇 Configure le mock de databaseFactory
 		databaseFactory.mockReturnValue({
-			connectDb: connectDbMock,
-			disconnectDb: disconnectDbMock,
 			usersInstances: vi.fn().mockResolvedValue(userInstanceMock),
 			barInstance: vi.fn().mockResolvedValue(barInstanceMock),
 		})
@@ -119,8 +113,6 @@ describe('deletedMatchProgramming', () => {
 
 	let userInstanceMock
 	let barInstanceMock
-	let connectDbMock
-	let disconnectDbMock
 
 	beforeEach(() => {
 		barController = new BarController()
@@ -133,13 +125,9 @@ describe('deletedMatchProgramming', () => {
 			deletedProgMatch: vi.fn().mockResolvedValue(true),
 		}
 
-		connectDbMock = vi.fn()
-		disconnectDbMock = vi.fn()
 
 		// 👇 Configure le mock de databaseFactory
 		databaseFactory.mockReturnValue({
-			connectDb: connectDbMock,
-			disconnectDb: disconnectDbMock,
 			usersInstances: vi.fn().mockResolvedValue(userInstanceMock),
 			barInstance: vi.fn().mockResolvedValue(barInstanceMock),
 		})

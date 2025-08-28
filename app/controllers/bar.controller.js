@@ -17,7 +17,6 @@ export class BarController {
       const userInstance = await databaseInstance.usersInstances()
       const barInstance = await databaseInstance.barInstance()
 
-      await databaseInstance.connectDb()
       const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
 
@@ -34,7 +33,7 @@ export class BarController {
 			}
 
       res.status(200).json({ message: 'Match planifié' })
-      await databaseInstance.disconnectDb()
+      
     } 
     
     catch (error) {
@@ -51,7 +50,7 @@ export class BarController {
 		const userInstance = await databaseInstance.usersInstances()
 		const barInstance = await databaseInstance.barInstance()
 
-		await databaseInstance.connectDb()
+		
 		const bar = await userInstance.getUserById(barId)
 		const match = await userInstance.getMatchById(matchId)
 
@@ -68,7 +67,7 @@ export class BarController {
     
     this.newLogger.info(isDeleted)
     res.status(200).json(matchId)
-    await databaseInstance.disconnectDb() 
+     
   }    
     catch (error) {
       this.newLogger.error(error)
@@ -80,9 +79,9 @@ export class BarController {
     const id = req.params.userId
     const databaseInstance = databaseFactory()
     const barInstance = await databaseInstance.barInstance()
-    await databaseInstance.connectDb()
+    
     const bar = await barInstance.getProgrammedMatches(id)
-    await databaseInstance.disconnectDb()
+    
     return res.status(200).json(bar.programmedMatches) 
 
   }
