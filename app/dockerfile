@@ -1,5 +1,5 @@
 # Étape 1 : Build
-FROM node:18 AS builder
+FROM node:24 AS builder
 
 # Crée un répertoire de travail
 WORKDIR /app
@@ -18,7 +18,7 @@ RUN npm install
 COPY . .
 
 # Étape 2 : Image finale (plus légère)
-FROM node:18-slim
+FROM node:24-slim
 
 WORKDIR /app
 

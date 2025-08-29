@@ -11,7 +11,7 @@ import {
 	IS_CODE_NUMBER,
 	IS_DESCRIPTION,
 	IS_EMAIL,
-	IS_NUMBER,
+	IS_MONGO_ID,
 	IS_PASSWORD,
 	IS_STRING,
 } from '../utils/regex.js'
@@ -281,7 +281,7 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const userDb = await userInstance.getUser(data.profile.email)
 
 			if (userDb !== null) {
@@ -292,7 +292,7 @@ export class CommunController {
 			await userInstance.addUser(data.profile)
 
 			this.newLogger.info(`user insert successful ${data.profile.email}`)
-			await databaseInstance.disconnectDb()
+			
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
 			this.newLogger.error(error)
@@ -306,9 +306,9 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const userDb = await userInstance.getProfileUser(email)
-			await databaseInstance.disconnectDb()
+			
 			if (userDb === null) {
 				this.newLogger.error('email is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
@@ -344,7 +344,7 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 
 			const userExist = await userInstance.getProfileUser(email)
 
@@ -352,13 +352,13 @@ export class CommunController {
 				const { codeNumber, expiresIn } = this.encrypt.generetedCode()
 				await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
 				await sendEmailResetPassword(email, codeNumber)
-				await databaseInstance.disconnectDb()
+				
 				const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
 
 				return res.header('Authorization', token).status(200).send({ id: userExist._id })
 			}
 
-			await databaseInstance.disconnectDb()
+			
 			return res.status(200)
 		} catch (error) {
 			this.newLogger.error(error)
@@ -378,7 +378,7 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await databaseInstance.connectDb()
+		
 
 		const user = await userInstance.getUserById(idUser)
 
@@ -395,18 +395,13 @@ export class CommunController {
 				return res.status(200).json({ id: user.id })
 			}
 		}
-		await databaseInstance.disconnectDb()
+		
 	}
 
 	resetPassword = async (req, res) => {
-		let verifyToken
-		const { password, token, id } = req.body
+		const { newPassword, id } = req.body
 
-		const { isValidPassword, errorPasswordMessage } = this._validationPassword(password)
-
-		if (token) {
-			verifyToken = await this.encrypt.verifyToken(token)
-		}
+		const { isValidPassword, errorPasswordMessage } = this._validationPassword(newPassword)
 
 		if (!isValidPassword) {
 			this.newLogger.error(errorPasswordMessage)
@@ -416,17 +411,16 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		await databaseInstance.connectDb()
+		
 
-		const idUser = verifyToken ? verifyToken.id : id
-		const userInDb = await userInstance.getUserById(idUser)
+		const userInDb = await userInstance.getUserById(id)
 
 		if (!userInDb) {
 			this.newLogger.error('user not exist')
 			return res.status(401).json({ message: 'Utilisateur introuvable' })
 		}
 
-		const encryptNewPassword = this.encrypt.passwordEncrypt(password)
+		const encryptNewPassword = this.encrypt.passwordEncrypt(newPassword)
 		const ressource = {
 			role: userInDb.role,
 			password: encryptNewPassword,
@@ -441,25 +435,34 @@ export class CommunController {
 
 	deleteUser = async (req, res) => {
 		try {
-			if (!req.body) {
-				this.newLogger.error('Missing body params')
-				return res.status(401).json({ message: 'Missing body params' })
+			if (!req.params) {
+				this.newLogger.error('Missing params')
+				return res.status(401).json({ message: 'Il manque un parametre dans votre requete' })
 			}
+			const { idUser } = req.params
 
-			const isRole = IS_STRING.test(req.body.role)
-			const isIdUser = IS_NUMBER.test(req.body.id)
-
-			if (!isRole) {
-				this.newLogger.error('Role must be string')
-				return res.status(401).json({ message: 'Role must be string' })
-			}
+			const isIdUser = IS_MONGO_ID.test(idUser)
 
 			if (!isIdUser) {
-				this.newLogger.error('Id must be integer')
-				return res.status(401).json({ message: 'Id must be integer' })
+				this.newLogger.error('Id must be mongo id')
+				return res.status(401).json({ message: 'Il manque un id utilisateur ' })
+
+			}
+			const databaseInstance = databaseFactory()
+			 // on connecte avant d'appeler les instances
+			const userInstance = await databaseInstance.usersInstances()
+			const userInDb = await userInstance.getUserById(idUser)
+			if (!userInDb){
+				return res.status(401).json({ message: 'Utilisateur un trouvable' })
 			}
 
-			return res.status(200).json({ message: 'delete user' })
+			const isDeleteUser = await userInstance.deleteUser(idUser, userInDb.role)
+			if (!isDeleteUser){
+				return res.status(401).json({ message: 'Impossible de supprimer le compte' })
+			}
+
+
+			return res.status(200).json({ message: 'Compte supprimé' })
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: errorServer })
@@ -474,7 +477,7 @@ export class CommunController {
 			}
 
 			const databaseInstance = databaseFactory()
-			await databaseInstance.connectDb() // on connecte avant d'appeler les instances
+			 // on connecte avant d'appeler les instances
 			const userInstance = await databaseInstance.usersInstances()
 
 			let newProfile = { ...profile }
@@ -499,10 +502,9 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const matches = await userInstance.getMatches()
 
-			await databaseInstance.disconnectDb()
 			return res.status(200).send(matches)
 		} catch (error) {
 			this.newLogger.error(error)
@@ -514,9 +516,9 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			await databaseInstance.connectDb()
+			
 			const filters = await userInstance.getAllFilters()
-			await databaseInstance.disconnectDb()
+			
 			return res.status(200).json({ filters })
 		} catch (error) {
 			this.newLogger.error(error)
@@ -529,12 +531,12 @@ export class CommunController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 
-			await databaseInstance.connectDb()
+			
 			const barList = await userInstance.getBars()
 			const bars = this._filterAndSortMatches(barList)
 			const formatedDataBar = this._formatedDataBar(bars)
 
-			await databaseInstance.disconnectDb()
+			
 
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {

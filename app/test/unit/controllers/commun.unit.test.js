@@ -49,8 +49,6 @@ describe('connexion', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -61,8 +59,6 @@ describe('connexion', () => {
 
 		await controller.connexion(req, res)
 
-		expect(mockDbInstance.connectDb).toHaveBeenCalled()
-		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: "L'email ou le mot de passe sont invalide" })
 	})
@@ -145,8 +141,6 @@ describe('createAccount', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -187,7 +181,6 @@ describe('createAccount', () => {
 		await controller.createAccount(req, res)
 
 		expect(mockUserInstance.addUser).toHaveBeenCalledWith({ email: 'user@example.com' })
-		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 		expect(res.status).toHaveBeenCalledWith(201)
 		expect(res.json).toHaveBeenCalledWith({ message: 'Inscription réussis' })
 	})
@@ -239,8 +232,6 @@ describe('forgotPassword', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -324,8 +315,6 @@ describe('verifyCode', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -409,8 +398,6 @@ describe('resetPassword', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -458,50 +445,74 @@ describe('resetPassword', () => {
 })
 
 describe('deleteUser', () => {
-	let controller, req, res
+	let controller, req, res, mockUserInstance, mockDbInstance
 
 	beforeEach(() => {
 		controller = new CommunController()
 
+		req = { params: {} } // ✅ Important !
 		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+
+		mockUserInstance = {
+			getUserById: vi.fn(),
+			deleteUser: vi.fn(),
+		}
+
+		mockDbInstance = {
+			usersInstances: vi.fn().mockResolvedValue(mockUserInstance)
+		}
+
+		databaseFactory.mockReturnValue(mockDbInstance)
 	})
 
-	it('returns 401 if body is missing', async () => {
-		req = {}
-		await controller.deleteUser(req, res)
-
-		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: 'Missing body params' })
-	})
-
-	it('returns 401 if role is invalid', async () => {
-		req = { body: { role: 123, id: 1 } }
-
-
-		await controller.deleteUser(req, res)
-
-		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: 'Role must be string' })
-	})
-
-	it('returns 401 if id is invalid', async () => {
-		req = { body: { role: 'client', id: 'abc' } }
+	it('returns 401 if params are missing', async () => {
+		req.params = undefined // ✅ simulate missing params
 
 		await controller.deleteUser(req, res)
 
 		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: 'Id must be integer' })
+		expect(res.json).toHaveBeenCalledWith({
+			message: 'Il manque un parametre dans votre requete',
+		})
+	})
+
+	it('returns 401 if idUser is invalid', async () => {
+		req.params = { idUser: '1232' } // not a valid MongoID
+
+		await controller.deleteUser(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({
+			message: 'Il manque un id utilisateur ',
+		})
+	})
+
+	it('returns 401 if user is not found', async () => {
+		req.params = { idUser: '689498a956abdf2b7a7d24f0' } // valid MongoID
+
+		mockUserInstance.getUserById.mockResolvedValue(null) // simulate user not found
+
+		await controller.deleteUser(req, res)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({
+			message: 'Utilisateur un trouvable',
+		})
 	})
 
 	it('returns 200 on success', async () => {
-		req = { body: { role: 'client', id: 1 } }
+		req.params = { idUser: '689498a956abdf2b7a7d24f0' }
+
+		mockUserInstance.getUserById.mockResolvedValue({ id: 'userId', role: 'user' })
+		mockUserInstance.deleteUser.mockResolvedValue(true) // ✅ must return a promise
 
 		await controller.deleteUser(req, res)
 
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({ message: 'delete user' })
+		expect(res.json).toHaveBeenCalledWith({ message: 'Compte supprimé' })
 	})
 })
+
 
 describe('updateProfile', () => {
 	let controller, req, res, mockDbInstance, mockUserInstance
@@ -535,8 +546,6 @@ describe('updateProfile', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -604,8 +613,6 @@ describe('getMatchesController', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -634,8 +641,6 @@ describe('getFiltersController', () => {
 
 		mockDbInstance = {
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 		}
 
 		databaseFactory.mockReturnValue(mockDbInstance)
@@ -681,8 +686,6 @@ describe('getAllBarController', () => {
 			getBars: vi.fn().mockResolvedValue(fakeBars),
 		}
 		mockDbInstance = {
-			connectDb: vi.fn(),
-			disconnectDb: vi.fn(),
 			usersInstances: vi.fn().mockResolvedValue(mockUserInstance),
 		}
 
@@ -698,11 +701,9 @@ describe('getAllBarController', () => {
 	it('retourne les bars correctement filtrés et formatés', async () => {
 		await controller.getAllBarController({}, res)
 
-		expect(mockDbInstance.connectDb).toHaveBeenCalled()
 		expect(mockUserInstance.getBars).toHaveBeenCalled()
 		expect(controller._filterAndSortMatches).toHaveBeenCalledWith(fakeBars)
 		expect(controller._formatedDataBar).toHaveBeenCalledWith(filteredBars)
-		expect(mockDbInstance.disconnectDb).toHaveBeenCalled()
 
 		expect(res.status).toHaveBeenCalledWith(200)
 		expect(res.json).toHaveBeenCalledWith(formattedBars) 

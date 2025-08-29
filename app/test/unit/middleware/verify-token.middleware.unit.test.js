@@ -1,21 +1,111 @@
-import request from 'supertest'
-import { describe, expect, test } from 'vitest'
-import app from '../../../index.js'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { Auth } from '../../../midleware/auth.js' 
 
-describe('Middleware tests', () => {
-  const url = '/api/v1/'
-  const oldToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+// Helpers simples pour req / res / next
+const makeReq = (authorization) => ({
+	headers: authorization ? { authorization } : {},
+})
 
-  test('should be error with a missing token and 400 status', async () => {
-    const res = await request(app)
-      .put(url)
-    expect(res.statusCode).toEqual(401)
-    expect(res.body.message).toEqual('Token manquant ou invalide')
-  })
+const makeRes = () => {
+	const res = {}
+	res.status = vi.fn().mockImplementation(function (code) {
+		res.statusCode = code
+		return res
+	})
+	res.json = vi.fn().mockImplementation(function (payload) {
+		res.body = payload
+		return res
+	})
+	return res
+}
 
-  test('should be error with a bad token and 401 status', async () => {
-    const res = await request(app).put(url).set('Authorization', oldToken)
-    expect(res.statusCode).toEqual(401)
-    expect(res.body.message).toEqual('Ce token est trop ancien')
-  })
+const makeNext = () => vi.fn()
+
+describe('Auth.verifyAccount', () => {
+	let auth
+
+	let encryptMock
+
+	beforeEach(() => {
+		vi.restoreAllMocks()
+
+		auth = new Auth()
+
+		// On remplace les dépendances par des mocks directement sur l’instance
+		encryptMock = { verifyToken: vi.fn() }
+
+		auth.encrypt = encryptMock
+	})
+
+	it("retourne 401 si l'en-tête Authorization est manquant", async () => {
+		const req = makeReq(undefined)
+		const res = makeRes()
+		const next = makeNext()
+
+		await auth.verifyAccount(req, res, next)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Token manquant ou invalide' })
+		expect(next).not.toHaveBeenCalled()
+		expect(encryptMock.verifyToken).not.toHaveBeenCalled()
+	})
+
+	it("retourne 401 si l'en-tête ne commence pas par 'Bearer '", async () => {
+		const req = makeReq('Token abc.def.ghi')
+		const res = makeRes()
+		const next = makeNext()
+
+		await auth.verifyAccount(req, res, next)
+
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Token manquant ou invalide' })
+		expect(next).not.toHaveBeenCalled()
+		expect(encryptMock.verifyToken).not.toHaveBeenCalled()
+	})
+
+	it('appelle next() si le token est valide', async () => {
+		encryptMock.verifyToken.mockResolvedValue(true)
+
+		const req = makeReq('Bearer valid.jwt.token')
+		const res = makeRes()
+		const next = makeNext()
+
+		await auth.verifyAccount(req, res, next)
+
+		expect(encryptMock.verifyToken).toHaveBeenCalledWith('valid.jwt.token')
+		expect(next).toHaveBeenCalledTimes(1)
+		expect(res.status).not.toHaveBeenCalled()
+		expect(res.json).not.toHaveBeenCalled()
+	})
+
+	it('retourne 401 si verifyToken renvoie false (token trop ancien)', async () => {
+		encryptMock.verifyToken.mockResolvedValue(false)
+
+		const req = makeReq('Bearer old.jwt.token')
+		const res = makeRes()
+		const next = makeNext()
+
+		await auth.verifyAccount(req, res, next)
+
+		expect(encryptMock.verifyToken).toHaveBeenCalledWith('old.jwt.token')
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Ce token est trop ancien' })
+		expect(next).not.toHaveBeenCalled()
+	})
+
+	it('retourne 401 si verifyToken lève une erreur', async () => {
+		const boom = new Error('boom')
+		encryptMock.verifyToken.mockRejectedValue(boom)
+
+		const req = makeReq('Bearer bad.jwt.token')
+		const res = makeRes()
+		const next = makeNext()
+
+		await auth.verifyAccount(req, res, next)
+
+		expect(encryptMock.verifyToken).toHaveBeenCalledWith('bad.jwt.token')
+		expect(res.status).toHaveBeenCalledWith(401)
+		expect(res.json).toHaveBeenCalledWith({ message: 'Ce token est trop ancien' })
+		expect(next).not.toHaveBeenCalled()
+	})
 })

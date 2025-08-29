@@ -1,4 +1,4 @@
-*.drawio
+*.drawio.*
 *.plantuml
 .idea
 .vscode
