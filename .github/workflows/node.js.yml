@@ -2,28 +2,30 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: ["main", "features/**", "bugFix/**"]
+    branches: ["main", "feature/**", "bugFix/**"]
   pull_request:
-    branches: ["features/**", "bugFix/**"]
+    branches: ["feature/**", "bugFix/**"]
 
 jobs:
   lint-and-test:
     name: "🔍 Lint & Test"
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}  # secret dispo via env
     defaults:
       run:
         working-directory: ./app
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # IMPORTANT : éliminer tout .npmrc du repo / runner qui pourrait casser la config
+      # Nettoyage de .npmrc éventuels (évite les conflits)
       - name: Sanitize npm config
         run: |
           rm -f .npmrc || true
           rm -f ~/.npmrc || true
 
-      # Configure Node + cache + mapping de scope GitHub Packages
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -34,8 +36,15 @@ jobs:
           scope: "@hugo38rodrigues"
           always-auth: true
 
-      # Installe dev+prod pour lint/tests (token fourni via env)
+      # On n’essaie d’installer que si les secrets sont dispos (pas PR fork)
+      - name: Verify GitHub Packages token
+        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        run: npm whoami --registry=https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GH_TOKEN }}
+
       - name: Install dependencies
+        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: |
           if [ -f package-lock.json ]; then
             npm ci
@@ -43,22 +52,32 @@ jobs:
             npm install
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ env.GH_TOKEN }}
 
       - name: Run linter
+        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: npm run lint
 
       - name: Run tests
+        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: npm run test
+
+      # PR depuis fork : secrets indisponibles → on skip proprement
+      - name: Skip install on forked PR (no secrets)
+        if: ${{ env.GH_TOKEN == '' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
+        run: echo "::notice::Skipping npm install/tests (no secrets on forked PRs)."
 
   build-and-push:
     name: "🐳 Build & Push Docker Image"
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     defaults:
       run:
         working-directory: ./app
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,11 +96,10 @@ jobs:
           docker buildx create --use
           docker buildx inspect --bootstrap
 
-      # Build multi-arch. Le PAT est passé au Dockerfile via --build-arg.
       - name: Build & Push
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            --build-arg GITHUB_TOKEN=${{ secrets.GH_TOKEN }} \
+            --build-arg GITHUB_TOKEN=${GH_TOKEN} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }} \
             --push .
