@@ -13,12 +13,17 @@ jobs:
     defaults:
       run:
         working-directory: ./app
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Configure Node + cache + registry GitHub Packages pour le scope @hugo38rodrigues
+      # IMPORTANT : éliminer tout .npmrc du repo / runner qui pourrait casser la config
+      - name: Sanitize npm config
+        run: |
+          rm -f .npmrc || true
+          rm -f ~/.npmrc || true
+
+      # Configure Node + cache + mapping de scope GitHub Packages
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -27,8 +32,9 @@ jobs:
           cache-dependency-path: app/package-lock.json
           registry-url: "https://npm.pkg.github.com"
           scope: "@hugo38rodrigues"
+          always-auth: true
 
-      # Installe toutes les deps (prod + dev) pour lint & tests
+      # Installe dev+prod pour lint/tests (token fourni via env)
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
@@ -53,7 +59,6 @@ jobs:
     defaults:
       run:
         working-directory: ./app
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -72,7 +77,7 @@ jobs:
           docker buildx create --use
           docker buildx inspect --bootstrap
 
-      # Build multi-arch et push. Le PAT est passé au Dockerfile via --build-arg.
+      # Build multi-arch. Le PAT est passé au Dockerfile via --build-arg.
       - name: Build & Push
         run: |
           docker buildx build \
