@@ -1,32 +1,47 @@
-# Étape 1 : Build
-FROM node:24 AS builder
+# syntax=docker/dockerfile:1.6
 
-# Crée un répertoire de travail
+############################
+# Étape deps/build
+############################
+FROM node:24-slim AS builder
 WORKDIR /app
 
-# Copie les fichiers nécessaires
-COPY ./package*.json ./
+# Copie manifeste + lock (npm ci = reproductible)
+COPY package.json package-lock.json ./
 
-# Injecte les variables d'environnement si nécessaire (ex. via ARG)
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+# Reçoit le token GitHub Packages
+ARG GITHUB_TOKEN
 
-# Installe les dépendances, y compris le repo privé
-RUN npm install
+# .npmrc éphémère + install prod-only (évite les devDeps)
+RUN set -e; \
+  echo "@hugo38rodrigues:registry=https://npm.pkg.github.com" > /root/.npmrc; \
+  if [ -n "${GITHUB_TOKEN:-}" ]; then \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> /root/.npmrc; \
+  fi; \
+  echo "always-auth=true" >> /root/.npmrc; \
+  npm ci --omit=dev; \
+  rm -f /root/.npmrc; \
+  npm cache clean --force
 
-# Copie le reste de l'app
+# Copie le reste du code (après install pour profiter du cache)
 COPY . .
 
-# Étape 2 : Image finale (plus légère)
-FROM node:24-slim
-
+############################
+# Étape runtime légère
+############################
+FROM node:24-slim AS runner
+ENV NODE_ENV=production
 WORKDIR /app
 
-# Copie uniquement les fichiers nécessaires depuis l'étape de build
+# Copie node_modules + code
 COPY --from=builder /app ./
 
-# Expose le port (ajuste selon ton app)
+# (Optionnel) user non-root si besoin
+# USER node
+
+# Expose si ton API écoute 3000 (facultatif)
 EXPOSE 3000
 
-# Commande de démarrage
+# Démarrage (adapte selon ton app)
+# pour l'API:
 CMD ["node", "server.js"]
