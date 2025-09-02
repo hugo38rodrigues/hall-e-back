@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: ["main", "features/**", "bugFix/**"]
+    branches: ["main", "feature/**", "bugFix/**"]
   pull_request:
-    branches: ["features/**", "bugFix/**"]
+    branches: ["feature/**", "bugFix/**"]
 
 jobs:
   lint-and-test:
@@ -13,21 +13,22 @@ jobs:
     defaults:
       run:
         working-directory: ./app
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure Node + cache + registry GitHub Packages pour le scope @hugo38rodrigues
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "npm"
           cache-dependency-path: app/package-lock.json
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@hugo38rodrigues"
 
-      # Auth npm pour installer devDeps pendant les tests
-      - name: Configure npm auth (GitHub Packages)
-        run: |
-          echo "@hugo38rodrigues:registry=https://npm.pkg.github.com" >> ~/.npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
-
+      # Installe toutes les deps (prod + dev) pour lint & tests
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
@@ -35,9 +36,14 @@ jobs:
           else
             npm install
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - run: npm run lint
-      - run: npm run test
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
 
   build-and-push:
     name: "🐳 Build & Push Docker Image"
@@ -47,8 +53,10 @@ jobs:
     defaults:
       run:
         working-directory: ./app
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Get version from package.json
         id: version
@@ -59,14 +67,16 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Setup Buildx
+      - name: Setup Docker Buildx
         run: |
           docker buildx create --use
           docker buildx inspect --bootstrap
 
+      # Build multi-arch et push. Le PAT est passé au Dockerfile via --build-arg.
       - name: Build & Push
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
             --build-arg GITHUB_TOKEN=${{ secrets.GH_TOKEN }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }} \
             --push .
