@@ -60,7 +60,7 @@ describe('connexion', () => {
 		await controller.connexion(req, res)
 
 		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: "L'email ou le mot de passe sont invalide" })
+		expect(res.json).toHaveBeenCalledWith({ message: 'L\'email ou le mot de passe sont invalide' })
 	})
 
 	it('renvoie 401 si mot de passe incorrect', async () => {
@@ -71,7 +71,7 @@ describe('connexion', () => {
 
 		expect(bcryptjs.compare).toHaveBeenCalledWith('password123', 'hashedPassword')
 		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: "L'email ou le mot de passe sont invalide" })
+		expect(res.json).toHaveBeenCalledWith({ message: 'L\'email ou le mot de passe sont invalide' })
 	})
 
 	it('renvoie 200 avec le profil si tout est valide', async () => {
@@ -88,7 +88,7 @@ describe('connexion', () => {
 		expect(res.send).toHaveBeenCalledWith({ id: 1, token: 'mockedToken' })
 	})
 
-	it("renvoie 500 en cas d'erreur inattendue", async () => {
+	it('renvoie 500 en cas d\'erreur inattendue', async () => {
 		mockUserInstance.getProfileUser.mockRejectedValue(new Error('Unexpected error'))
 
 		await controller.connexion(req, res)
@@ -157,7 +157,7 @@ describe('createAccount', () => {
 	})
 
 	// ✅ Cas 2 : L'utilisateur existe déjà
-	it("renvoie 401 si l'utilisateur existe déjà", async () => {
+	it('renvoie 401 si l\'utilisateur existe déjà', async () => {
 		mockAccountVerify('_clientAccountVerify', {
 			isValid: true,
 			profile: { email: 'user@example.com' },
@@ -167,7 +167,7 @@ describe('createAccount', () => {
 		await controller.createAccount(req, res)
 
 		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: "L'utilisateur existe déjà" })
+		expect(res.json).toHaveBeenCalledWith({ message: 'L\'utilisateur existe déjà' })
 	})
 
 	// ✅ Cas 3 : Création utilisateur réussie
@@ -201,7 +201,7 @@ describe('forgotPassword', () => {
 	let mockDbInstance, mockUserInstance
 
 	beforeEach(() => {
-		req = { body: { email: 'user@example.com' } }
+		req = { body: { email: 'user@example.com' }}
 
 		res = {
 			status: vi.fn().mockReturnThis(),
@@ -326,7 +326,7 @@ describe('verifyCode', () => {
 		await controller.verifyCode(req, res)
 
 		expect(res.status).toHaveBeenCalledWith(401)
-		expect(res.json).toHaveBeenCalledWith({ message: "Ce n'est pas le bon code" })
+		expect(res.json).toHaveBeenCalledWith({ message: 'Ce n\'est pas le bon code' })
 	})
 
 	it('returns 400 if code is not found in DB', async () => {
@@ -450,7 +450,7 @@ describe('deleteUser', () => {
 	beforeEach(() => {
 		controller = new CommunController()
 
-		req = { params: {} } // ✅ Important !
+		req = { params: {}} // ✅ Important !
 		res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
 
 		mockUserInstance = {
@@ -552,7 +552,7 @@ describe('updateProfile', () => {
 	})
 
 	it('renvoie 200 avec profil mis à jour sans le mot de passe', async () => {
-		const updatedUser = { username: 'updatedUser', other: 'otherField', password: 'encryptedPassword'}
+		const updatedUser = { username: 'updatedUser', other: 'otherField', password: 'encryptedPassword' }
 
 		mockUserInstance.updateUser.mockResolvedValue(updatedUser)
 
@@ -565,7 +565,7 @@ describe('updateProfile', () => {
 			password: 'encryptedPassword',
 		})
 		expect(res.status).toHaveBeenCalledWith(200)
-		expect(res.json).toHaveBeenCalledWith({	username: 'updatedUser',other: 'otherField',
+		expect(res.json).toHaveBeenCalledWith({	username: 'updatedUser', other: 'otherField',
 
 		})
 	})
@@ -573,7 +573,7 @@ describe('updateProfile', () => {
 	it('renvoie 200 même si aucun mot de passe n’est fourni', async () => {
 		req.body.profile = { username: 'newName' }
 
-		mockUserInstance.updateUser.mockResolvedValue({username: 'newName'})
+		mockUserInstance.updateUser.mockResolvedValue({ username: 'newName' })
 
 		await controller.updateProfile(req, res)
 
@@ -748,7 +748,7 @@ describe('FavorisController - endpoints REST addFavorites / deleteFavorites', ()
 	})
 
 	it('addFavorites appelle addFavorisGameController et renvoie 200', async () => {
-		const req = { body: { type: 'gameName', idUser: 1, data: 'FIFA' } }
+		const req = { body: { type: 'gameName', idUser: 1, data: 'FIFA' }}
 
 		await controller.addFavorites(req, res)
 
@@ -759,7 +759,7 @@ describe('FavorisController - endpoints REST addFavorites / deleteFavorites', ()
 
 	it('addFavorites renvoie 500 si addFavoris renvoie une erreur', async () => {
 		favorisMock.addFavorisTeamController.mockResolvedValue({ message: errorServer })
-		const req = { body: { type: 'teams', idUser: 1, data: 10 } }
+		const req = { body: { type: 'teams', idUser: 1, data: 10 }}
 
 		await controller.addFavorites(req, res)
 
@@ -768,7 +768,7 @@ describe('FavorisController - endpoints REST addFavorites / deleteFavorites', ()
 	})
 
 	it('deleteFavorites appelle deleteFavorisBarNameController et renvoie 200', async () => {
-		const req = { body: { type: 'barName', idUser: 1, data: 99 } }
+		const req = { body: { type: 'barName', idUser: 1, data: 99 }}
 
 		await controller.deleteFavorites(req, res)
 
@@ -779,7 +779,7 @@ describe('FavorisController - endpoints REST addFavorites / deleteFavorites', ()
 
 	it('deleteFavorites renvoie 500 si deleteFavoris renvoie une erreur', async () => {
 		favorisMock.deleteFavorisLeagueController.mockResolvedValue({ message: errorServer })
-		const req = { body: { type: 'leagueName', idUser: 1, data: 'Ligue 1' } }
+		const req = { body: { type: 'leagueName', idUser: 1, data: 'Ligue 1' }}
 
 		await controller.deleteFavorites(req, res)
 

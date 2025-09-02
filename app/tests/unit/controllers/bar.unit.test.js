@@ -82,7 +82,7 @@ describe('matchesPlanningsController', () => {
 		expect(res.json).toHaveBeenCalledWith({ message: 'Impossible de plannifié le match' })
 	})
 
-	it("Doit retourner 500 en cas d'erreur inconnue", async () => {
+	it('Doit retourner 500 en cas d\'erreur inconnue', async () => {
 		databaseFactory.mockImplementation(() => {
 			throw new Error('Boom')
 		})
@@ -137,34 +137,34 @@ describe('deletedMatchProgramming', () => {
 		res.json.mockClear()
 	})
 
-	it("Doit retourner 200 si le match est programmé", async () => {
+	it('Doit retourner 200 si le match est programmé', async () => {
 		await barController.deletedMatchProgramming(req, res)
 		expect(res.status).toHaveBeenCalledWith(200)
 		expect(res.json).toHaveBeenCalledWith(req.body.matchId)
 	})
 
-	it("Doit retourner 401 si le match n'existe pas", async () => {
+	it('Doit retourner 401 si le match n\'existe pas', async () => {
 		userInstanceMock.getMatchById.mockResolvedValue(null)
-		await barController.deletedMatchProgramming(req,res)
+		await barController.deletedMatchProgramming(req, res)
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: 'Utilisateur inconnu ou match inconnu' })
 	})
 
-	it("Doit retourner 401 si le bar n'existe pas", async () => {
+	it('Doit retourner 401 si le bar n\'existe pas', async () => {
 		userInstanceMock.getUserById.mockResolvedValue(null)
-		await barController.deletedMatchProgramming(req,res)
+		await barController.deletedMatchProgramming(req, res)
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: 'Utilisateur inconnu ou match inconnu' })
 	})
 	
-	it("Doit retourner 401 si c'est impossible de supprimer le match", async () => {
+	it('Doit retourner 401 si c\'est impossible de supprimer le match', async () => {
 		barInstanceMock.deletedProgMatch.mockResolvedValue(false)
-		await barController.deletedMatchProgramming(req,res)
+		await barController.deletedMatchProgramming(req, res)
 		expect(res.status).toHaveBeenCalledWith(401)
 		expect(res.json).toHaveBeenCalledWith({ message: 'Impossible de supprimé le match' })
 	})
 
-	it("Doit retourner 500 en cas d'erreur inconnue", async () => {
+	it('Doit retourner 500 en cas d\'erreur inconnue', async () => {
 		databaseFactory.mockImplementation(() => {
 			throw new Error('Boom')
 		})

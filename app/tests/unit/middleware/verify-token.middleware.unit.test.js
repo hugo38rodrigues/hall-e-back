@@ -37,7 +37,7 @@ describe('Auth.verifyAccount', () => {
 		auth.encrypt = encryptMock
 	})
 
-	it("retourne 401 si l'en-tête Authorization est manquant", async () => {
+	it('retourne 401 si l\'en-tête Authorization est manquant', async () => {
 		const req = makeReq(undefined)
 		const res = makeRes()
 		const next = makeNext()
@@ -50,7 +50,7 @@ describe('Auth.verifyAccount', () => {
 		expect(encryptMock.verifyToken).not.toHaveBeenCalled()
 	})
 
-	it("retourne 401 si l'en-tête ne commence pas par 'Bearer '", async () => {
+	it('retourne 401 si l\'en-tête ne commence pas par \'Bearer \'', async () => {
 		const req = makeReq('Token abc.def.ghi')
 		const res = makeRes()
 		const next = makeNext()

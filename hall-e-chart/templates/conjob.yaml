@@ -1,0 +1,37 @@
+{{- if .Values.cron.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "hall-e.fullname" . }}-cron
+spec:
+  schedule: {{ .Values.cron.schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.cron.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cron.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cron
+              image: {{ .Values.cron.image | quote }}
+              imagePullPolicy: IfNotPresent
+              {{- with .Values.cron.command }}command: {{ toJson . }}{{- end }}
+              {{- with .Values.cron.args }}args: {{ toJson . }}{{- end }}
+              envFrom:
+                - configMapRef:
+                    name: hall-e-configmap
+                - secretRef:
+                    name: secret-cron-job
+              env: 
+                - name: DB_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: secret-mongo
+                      key: MONGO_INITDB_ROOT_USERNAME
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: secret-mongo
+                      key: MONGO_INITDB_ROOT_PASSWORD
+{{- end }}

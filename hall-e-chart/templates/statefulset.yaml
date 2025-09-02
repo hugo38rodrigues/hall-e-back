@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.database.name }}
+  labels: {{ .Values.database.label }}
+spec:
+  serviceName: {{ .Values.database.name }}
+  replicas: 1 # Minikube: 1 instance (simple et léger).
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "mongo.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "mongo.name" . }}
+    spec:
+      securityContext:
+        fsGroup: {{ .Values.database.podSecurityContext.fsGroup }}
+        fsGroupChangePolicy: {{ .Values.database.podSecurityContext.fsGroupChangePolicy | quote }}
+      containers:
+        - name: mongo
+          image: "{{ .Values.database.image.repository }}:{{.Values.database.image.tag}}"
+          imagePullPolicy: {{ .Values.database.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.database.service.port }}
+          envFrom:
+            - secretRef: 
+                name: secret-mongo
+          env:
+            - name: MONGO_INITDB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: hall-e-configmap
+                  key: DB_NAME
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+          readinessProbe:
+            exec:
+              command: ["sh","-c","mongosh --quiet --eval \"db.adminCommand('ping').ok\" | grep -q 1"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["sh","-c","mongosh --quiet --eval \"db.adminCommand('ping').ok\" | grep -q 1"]
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+          resources:
+            {{- toYaml .Values.database.resources | nindent 12 }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+              storage: {{ .Values.database.persistence.size | quote }}
+        {{- if .Values.database.persistence.storageClass }}
+          storageClassName: {{ .Values.database.persistence.storageClass | quote }}
+        {{- end }}

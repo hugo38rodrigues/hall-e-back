@@ -1,0 +1,51 @@
+{{- if .Values.api_hall_e.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hall-e.fullname" . }}-api
+  labels: {{- include "hall-e.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hall-e.name" . }}
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "hall-e.name" . }}
+        app.kubernetes.io/component: api
+    spec:
+      containers:
+        - name: api-hall-e
+          image: "{{- if .Values.api_hall_e.image.registry }}{{ .Values.api_hall_e.image.registry }}/{{ end }}{{ .Values.api_hall_e.image.repository }}:{{ .Values.api_hall_e.image.tag }}"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: hall-e-configmap
+            - secretRef:
+                name: secret-api
+          env:
+            - name: JWT_EXPIRATION
+              value: {{ .Values.api_hall_e.env.JWT_EXPIRATION | quote }}
+            - name: PORT
+              value: {{ .Values.api_hall_e.env.PORT | quote }}
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mongo
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mongo
+                  key: MONGO_INITDB_ROOT_PASSWORD
+            
+          # readinessProbe:
+          #   httpGet: { path: /health, port: {{ .Values.api_hall_e.env.PORT }} }
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 10
+          # livenessProbe:
+          #   httpGet: { path: /health, port: {{ .Values.api_hall_e.env.PORT}} }
+          #   initialDelaySeconds: 20
+          #   periodSeconds: 20
+{{- end }}

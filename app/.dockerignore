@@ -1,0 +1,9 @@
+node_modules
+.npmrc
+.env*
+.git
+.gitignore
+coverage
+tests
+*.md
+Dockerfile
