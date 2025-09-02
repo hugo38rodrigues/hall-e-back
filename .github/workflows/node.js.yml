@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: ["main", "feature/**", "bugFix/**"]
+    branches: ["main", "features/**", "bugFix/**"]
   pull_request:
-    branches: ["feature/**", "bugFix/**"]
+    branches: ["features/**", "bugFix/**"]
 
 jobs:
   lint-and-test:
