@@ -12,13 +12,10 @@ COPY package.json package-lock.json ./
 # Reçoit le token GitHub Packages
 ARG GITHUB_TOKEN
 
-# .npmrc éphémère + install prod-only (évite les devDeps)
 RUN set -e; \
-  echo "@hugo38rodrigues:registry=https://npm.pkg.github.com" > /root/.npmrc; \
-  if [ -n "${GITHUB_TOKEN:-}" ]; then \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> /root/.npmrc; \
-  fi; \
-  echo "always-auth=true" >> /root/.npmrc; \
+  { echo "registry=https://registry.npmjs.org/"; \
+    echo "@hugo38rodrigues:registry=https://npm.pkg.github.com/"; \
+    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}"; } > /root/.npmrc; \
   npm ci --omit=dev; \
   rm -f /root/.npmrc; \
   npm cache clean --force
