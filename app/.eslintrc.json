@@ -1,0 +1,54 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
+  "extends": [
+    "airbnb-base"
+  ],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".mjs",
+          ".json"
+        ]
+      }
+    }
+  },
+  "rules": {
+    "semi": [
+      "error",
+      "never"
+    ],
+    "no-useless-escape": "off",
+    "import/prefer-default-export": "off",
+    "no-tabs": "off", // autorise les tabulations
+    "indent": [
+      "error",
+      "tab"
+    ],
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_id"
+        ]
+      }
+    ], // valable que si la BDD est mongo
+    "class-methods-use-this": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "always",
+        "mjs": "always"
+      }
+    ]
+  }
+}

@@ -1,5 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Auth } from '../../../midleware/auth.js' 
+import {
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest'
+import { Auth } from '../../../middleware/auth.js'
 
 // Helpers simples pour req / res / next
 const makeReq = (authorization) => ({
@@ -8,11 +14,11 @@ const makeReq = (authorization) => ({
 
 const makeRes = () => {
 	const res = {}
-	res.status = vi.fn().mockImplementation(function (code) {
+	res.status = vi.fn().mockImplementation((code) => {
 		res.statusCode = code
 		return res
 	})
-	res.json = vi.fn().mockImplementation(function (payload) {
+	res.json = vi.fn().mockImplementation((payload) => {
 		res.body = payload
 		return res
 	})

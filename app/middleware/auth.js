@@ -1,14 +1,15 @@
 import { Crypt } from '../controllers/encryption.controller.js'
-import { Logger } from './logger.js'
+import Logger from './logger.js'
 
 export class Auth {
-	constructor () {
+	constructor() {
 		this.encrypt = new Crypt()
 		this.logger = new Logger()
 	}
 
+	// eslint-disable-next-line consistent-return
 	verifyAccount = async (req, res, next) => {
-		const authHeader = req.headers['authorization']
+		const authHeader = req.headers.authorization
 		if (!authHeader || !authHeader.startsWith('Bearer ')) {
 			this.logger.error('Token manquant ou invalide')
 			return res.status(401).json({ message: 'Token manquant ou invalide' })
