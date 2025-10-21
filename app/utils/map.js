@@ -1,6 +1,9 @@
 import axios from 'axios'
+import Logger from '../middleware/logger.js'
 
-export const getCoordinatesFromAddress = async (address)=> {
+const logger = new Logger()
+
+export const getCoordinatesFromAddress = async (address) => {
 	try {
 		const response = await axios.get('https://us1.locationiq.com/v1/search.php', {
 			params: {
@@ -18,7 +21,7 @@ export const getCoordinatesFromAddress = async (address)=> {
 
 		return null
 	} catch (error) {
-		console.error('Erreur LocationIQ :', error.message)
+		logger.error('Erreur LocationIQ :', error.message)
 		return null
 	}
 }

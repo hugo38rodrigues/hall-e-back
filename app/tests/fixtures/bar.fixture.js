@@ -72,17 +72,17 @@ export const badTypeName = {
 
 export const barWithoutFavoriteAndLike = {
 	address: '5 rue victor hugo, 25555, Limoge',
-  description: 'Le meilleur bar de limoge',
-  email: 'hugoBar@gmail.com',
-  favoriteGamesBar: [],
-  favoriteLeaguesBar: [],
-  favoriteTeamsBar: [],
-  id: 10,
-  name: 'Tonneaux de limoge',
-  photo: {
-    data: [],
-    type: 'Buffer',
-  },
-  price: null,
-  role: 'bar',
+	description: 'Le meilleur bar de limoge',
+	email: 'hugoBar@gmail.com',
+	favoriteGamesBar: [],
+	favoriteLeaguesBar: [],
+	favoriteTeamsBar: [],
+	id: 10,
+	name: 'Tonneaux de limoge',
+	photo: {
+		data: [],
+		type: 'Buffer',
+	},
+	price: null,
+	role: 'bar',
 }
