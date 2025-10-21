@@ -1,7 +1,7 @@
-
 import {
 	beforeEach,
-	describe, expect,
+	describe,
+	expect,
 	it,
 	vi,
 } from 'vitest'
@@ -18,8 +18,7 @@ const makeRes = () => {
 		res.statusCode = code
 		return res
 	})
-	res.json = vi.fn().mockImplementation((payload) => {
-
+	res.json = vi.fn().mockImplementation(function (payload) {
 		res.body = payload
 		return res
 	})

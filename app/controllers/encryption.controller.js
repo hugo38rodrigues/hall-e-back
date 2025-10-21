@@ -1,12 +1,11 @@
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { Logger } from '../midleware/logger.js'
-
+import Logger from '../middleware/logger.js'
 
 export class Crypt {
 	#jwtSecret
 
-	constructor () {
+	constructor() {
 		this.#jwtSecret = process.env.SECRET_JWT_KEY
 		this.newLogger = new Logger()
 	}
@@ -24,18 +23,16 @@ export class Crypt {
 		return encryptPassword
 	}
 
-	verifyToken = async (token)  => {
+	verifyToken = async (token) => {
 		try {
 			const decoded = jwt.verify(
 				token,
 				this.#jwtSecret,
-				{ algorithms: ['HS256'] } 
+				{ algorithms: ['HS256'] },
 			)
 			return decoded
-			
 		} catch (err) {
 			this.newLogger.error('Token validation failed:', err.message)
-			console.error('Token validation failed:', err.message)
 			return false
 		}
 	}
@@ -45,6 +42,4 @@ export class Crypt {
 		const expiresIn = Date.now() + 10 * 60 * 1000 // Expiration dans 5 minutes
 		return { codeNumber, expiresIn }
 	}
-
-	
 }
