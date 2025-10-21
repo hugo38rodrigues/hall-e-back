@@ -18,7 +18,7 @@ const makeRes = () => {
 		res.statusCode = code
 		return res
 	})
-	res.json = vi.fn().mockImplementation(function (payload) {
+	res.json = vi.fn().mockImplementation((payload) => {
 		res.body = payload
 		return res
 	})
