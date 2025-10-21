@@ -1,10 +1,9 @@
 import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import bcryptjs from 'bcryptjs'
-import { Crypt } from '../controllers/encryption.controller.js'
-import { Logger } from '../midleware/logger.js'
+import Logger from '../middleware/logger.js'
+import { ERROR_SERVER } from '../utils/constants.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
-import { errorServer } from '../utils/messages.js'
 import {
 	IS_ADDRESS,
 	IS_BAR_NAME,
@@ -15,21 +14,20 @@ import {
 	IS_PASSWORD,
 	IS_STRING,
 } from '../utils/regex.js'
-import { FavorisController } from './favoris.controller.js'
+import { Crypt } from './encryption.controller.js'
 
 export class CommunController {
-	constructor () {
+	constructor() {
 		this.encrypt = new Crypt()
 		this.newLogger = new Logger()
 	}
 
-	_filterProfile = (profile) => {
-		return Object.fromEntries(
-			Object.entries(profile).filter(([_, value]) => value !== null && value !== '')
-		)
-	}
+	#filterProfile = (profile) => Object.fromEntries(
+		// eslint-disable-next-line no-unused-vars
+		Object.entries(profile).filter(([_, value]) => value !== null && value !== ''),
+	)
 
-	_formatedDataProfile = async (body) => {
+	#formatedDataProfile = async (body) => {
 		if (body.role === 'client') {
 			return {
 				firstName: body.informations.firstName,
@@ -51,49 +49,48 @@ export class CommunController {
 				price: body.informations.price,
 				description: body.informations.description,
 				photo: body.informations.photo,
-				latitude: latitude,
-				longitude: longitude,
+				latitude,
+				longitude,
 			}
 		}
+		return null
 	}
 
-	_formatedDataBar = (data) => {
-		const newMap = data.map((item) => {
-			return {
-				id: item._id,
-				role: item.role,
-				informations: {
-					name: item.name,
-					description: item.description,
-					address: item.address,
-					pictures: item.pictures,
-				},
-				programmedMatches: item.programmedMatches,
-				userLocation: { longitude: item.longitude, latitude: item.latitude },
-			}
-		})
+	#formatedDataBar = (data) => {
+		const newMap = data.map((item) => ({
+			id: item._id,
+			role: item.role,
+			informations: {
+				name: item.name,
+				description: item.description,
+				address: item.address,
+				pictures: item.pictures,
+			},
+			programmedMatches: item.programmedMatches,
+			userLocation: { longitude: item.longitude, latitude: item.latitude },
+		}))
 		return newMap
 	}
 
-	_computeAdditionalHours = (gameName, bo) => {
+	#computeAdditionalHours = (gameName, bo) => {
 		const normalizedGame = gameName.toLowerCase()
 
 		// Stockage des durées en minutes pour simplifier
 		const gameDurations = {
 			'league of legends': {
-				'1': 33,
-				'3': 110, // 1h50 = 110 min
-				'5': 230, // 3h50 = 230 min
+				1: 33,
+				3: 110, // 1h50 = 110 min
+				5: 230, // 3h50 = 230 min
 			},
 			'cs go': {
-				'1': 50,
-				'3': 150, // 2h30 = 150 min
-				'5': 300, // 5h00 = 300 min
+				1: 50,
+				3: 150, // 2h30 = 150 min
+				5: 300, // 5h00 = 300 min
 			},
-			'valorant': {
-				'1': 45,
-				'3': 135, // 2h15 = 135 min
-				'5': 270, // 4h30 = 270 min
+			valorant: {
+				1: 45,
+				3: 135, // 2h15 = 135 min
+				5: 270, // 4h30 = 270 min
 			},
 		}
 
@@ -106,31 +103,37 @@ export class CommunController {
 		return 120
 	}
 
-
-	_filterAndSortMatches = (data) => {
+	#filterAndSortMatches = (data) => {
 		const now = new Date()
-		const today = now.toISOString().split('T')[0] // YYYY-MM-DD
-		const currentTime = now.getTime() // Timestamp actuel
+		const today = now.toISOString().slice(0, 10) // 'YYYY-MM-DD'
 
-		data.forEach((bar) => {
-			bar.programmedMatches = bar.programmedMatches.filter((match) => {
+		const updatedData = data.map((bar) => {
+			const programmedMatches = (bar.programmedMatches || []).filter((match) => {
 				const matchDate = new Date(match.date)
-				const matchDay = matchDate.toISOString().split('T')[0] // YYYY-MM-DD
+				const matchDay = matchDate.toISOString().slice(0, 10) // 'YYYY-MM-DD'
 
-				// Supprime les matchs d'avant aujourd’hui
+				// Retire les matchs d'avant aujourd'hui
 				if (matchDay < today) return false
 
-				// Si c'est aujourd’hui, on garde uniquement les matchs futurs
-				if (matchDay === today && matchDate.getHours < currentTime + this._computeAdditionalHours(match.gameName, match.numberOfGame) ) return false
+				// Si c'est aujourd'hui, ne garder que les matchs futurs (avec marge additionnelle)
+				if (matchDay === today) {
+					const extraHours = this.#computeAdditionalHours(match.gameName, match.numberOfGame) || 0
+					const cutoff = new Date(now.getTime() + extraHours * 60 * 1000) // now + extraHours
+					return matchDate >= cutoff
+				}
 
+				// Jours futurs : on garde
 				return true
 			})
+
+			// retourne un NOUVEL objet (pas de mutation du paramètre)
+			return { ...bar, programmedMatches }
 		})
 
-		return data
+		return updatedData
 	}
 
-	_clientAccountVerify = async (body) => {
+	#clientAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isFirstName = IS_STRING.test(body.informations.firstName)
@@ -147,7 +150,7 @@ export class CommunController {
 		if (!isValidLastName || !isValidFirstName) {
 			return { isValid: false, message: 'Missing first name or last name' }
 		}
-		const profile = await this._formatedDataProfile(body)
+		const profile = await this.#formatedDataProfile(body)
 
 		return {
 			profile,
@@ -155,7 +158,7 @@ export class CommunController {
 		}
 	}
 
-	_barAccountVerify = async (body) => {
+	#barAccountVerify = async (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isAddress = IS_ADDRESS.test(body.informations.address)
@@ -183,7 +186,7 @@ export class CommunController {
 		if (!isName) {
 			return { isValid: false, message: 'Is invalid name' }
 		}
-		const profile = await this._formatedDataProfile(body)
+		const profile = await this.#formatedDataProfile(body)
 
 		return {
 			profile,
@@ -191,22 +194,14 @@ export class CommunController {
 		}
 	}
 
-	_validationEmail = (email) => {
-		const isEmail = IS_EMAIL.test(email)
+	#validationEmail = (email) => (IS_EMAIL.test(email)
+		? { isEmail: true }
+		: {
+			isEmail: false,
+			errorEmailMessage: 'L\'email n\'est pas au bon format',
+		})
 
-		if (!isEmail) {
-			return {
-				isEmail: false,
-				errorEmailMessage: 'L\'email n\'est pas au bon format',
-			}
-		}
-
-		return {
-			isEmail: true,
-		}
-	}
-
-	_validationPassword = (password) => {
+	#validationPassword = (password) => {
 		const isPassword = IS_PASSWORD.test(password)
 
 		if (!isPassword) {
@@ -221,7 +216,7 @@ export class CommunController {
 		}
 	}
 
-	_getConnexionProfile = (data) => {
+	#getConnexionProfile = (data) => {
 		let informationsData
 		if (data.role === 'bar') {
 			informationsData = {
@@ -245,33 +240,27 @@ export class CommunController {
 			role: data.role,
 			favorites: data.favorites
 				? {
-						gameName: data.favorites.gameName,
-						leagueName: data.favorites.leagueName,
-						teams: data.favorites.teams,
-						barName: data.role === 'client' ? data.favorites.barName : [],
-				  }
+					gameName: data.favorites.gameName,
+					leagueName: data.favorites.leagueName,
+					teams: data.favorites.teams,
+					barName: data.role === 'client' ? data.favorites.barName : [],
+				}
 				: {},
 			informations: informationsData,
-			userLocation:
-				data.role === 'bar'
-					? {
-							longitude: data.longitude,
-							latitude: data.latitude,
-					  }
-					: null,
+			userLocation: data.role === 'bar' ? { longitude: data.longitude, latitude: data.latitude } : null,
 		}
 	}
 
 	createAccount = async (req, res) => {
-		const role = req.body.role
+		const { role } = req.body
 		let data
 		try {
 			if (role === 'client') {
-				data = await this._clientAccountVerify(req.body, res)
+				data = await this.#clientAccountVerify(req.body, res)
 			}
 
 			if (role === 'bar') {
-				data = await this._barAccountVerify(req.body, res)
+				data = await this.#barAccountVerify(req.body, res)
 			}
 
 			if (!data.isValid) {
@@ -281,7 +270,7 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			
+
 			const userDb = await userInstance.getUser(data.profile.email)
 
 			if (userDb !== null) {
@@ -292,11 +281,11 @@ export class CommunController {
 			await userInstance.addUser(data.profile)
 
 			this.newLogger.info(`user insert successful ${data.profile.email}`)
-			
+
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
@@ -306,9 +295,9 @@ export class CommunController {
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			
+
 			const userDb = await userInstance.getProfileUser(email)
-			
+
 			if (userDb === null) {
 				this.newLogger.error('email is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
@@ -323,28 +312,27 @@ export class CommunController {
 
 			const token = await this.encrypt.tokenCreation(userDb.id, userDb.password)
 
-			const profile = this._getConnexionProfile(userDb)
+			const profile = this.#getConnexionProfile(userDb)
 
 			return res.header('Authorization', token).status(200).send(profile)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
 	forgotPassword = async (req, res) => {
 		try {
-			const email = req.body.email
-			const { isValidCredentiel, message } = this._validationEmail(email)
+			const { email } = req.body
+			const { isEmail, errorEmailMessage } = this.#validationEmail(email)
 
-			if (isValidCredentiel) {
-				this.newLogger.error(message)
-				return res.status(401).json({ message })
+			if (!isEmail) {
+				this.newLogger.error(errorEmailMessage)
+				return res.status(401).json({ errorEmailMessage })
 			}
 
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			
 
 			const userExist = await userInstance.getProfileUser(email)
 
@@ -352,23 +340,22 @@ export class CommunController {
 				const { codeNumber, expiresIn } = this.encrypt.generetedCode()
 				await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
 				await sendEmailResetPassword(email, codeNumber)
-				
+
 				const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
 
 				return res.header('Authorization', token).status(200).send({ id: userExist._id })
 			}
 
-			
 			return res.status(200)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
 	verifyCode = async (req, res) => {
 		const { idUser, code } = req.body
-		const isCode = IS_CODE_NUMBER.test(parseInt(code))
+		const isCode = IS_CODE_NUMBER.test(parseInt(code, 10))
 
 		if (!isCode) {
 			this.newLogger.error('Is not a good code')
@@ -378,8 +365,6 @@ export class CommunController {
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
 
-		
-
 		const user = await userInstance.getUserById(idUser)
 
 		if (user) {
@@ -388,20 +373,19 @@ export class CommunController {
 			if (!storeCodeNumberInData) {
 				this.newLogger.error('invalid code')
 				return res.status(400).json({ message: 'Code invalide' })
-			} else if (Date.now() > storeCodeNumberInData.expiresIn) {
+			} if (Date.now() > storeCodeNumberInData.expiresIn) {
 				this.newLogger.error('request expired')
 				return res.status(400).json({ message: 'Demande expiré' })
-			} else {
-				return res.status(200).json({ id: user.id })
 			}
+			return res.status(200).json({ id: user.id })
 		}
-		
+		return null
 	}
 
 	resetPassword = async (req, res) => {
 		const { newPassword, id } = req.body
 
-		const { isValidPassword, errorPasswordMessage } = this._validationPassword(newPassword)
+		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(newPassword)
 
 		if (!isValidPassword) {
 			this.newLogger.error(errorPasswordMessage)
@@ -410,8 +394,6 @@ export class CommunController {
 
 		const databaseInstance = databaseFactory()
 		const userInstance = await databaseInstance.usersInstances()
-
-		
 
 		const userInDb = await userInstance.getUserById(id)
 
@@ -425,7 +407,7 @@ export class CommunController {
 			role: userInDb.role,
 			password: encryptNewPassword,
 		}
-		const { isError, errorMessage } = userInstance.updateUser(userInDb.id, ressource)
+		const { isError, errorMessage } = await userInstance.updateUser(userInDb.id, ressource)
 		if (isError) {
 			this.newLogger.error(errorMessage)
 			return res.status(401).json({ message: errorMessage })
@@ -446,26 +428,24 @@ export class CommunController {
 			if (!isIdUser) {
 				this.newLogger.error('Id must be mongo id')
 				return res.status(401).json({ message: 'Il manque un id utilisateur ' })
-
 			}
 			const databaseInstance = databaseFactory()
-			 // on connecte avant d'appeler les instances
+			// on connecte avant d'appeler les instances
 			const userInstance = await databaseInstance.usersInstances()
 			const userInDb = await userInstance.getUserById(idUser)
-			if (!userInDb){
+			if (!userInDb) {
 				return res.status(401).json({ message: 'Utilisateur un trouvable' })
 			}
 
 			const isDeleteUser = await userInstance.deleteUser(idUser, userInDb.role)
-			if (!isDeleteUser){
+			if (!isDeleteUser) {
 				return res.status(401).json({ message: 'Impossible de supprimer le compte' })
 			}
-
 
 			return res.status(200).json({ message: 'Compte supprimé' })
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
@@ -477,24 +457,24 @@ export class CommunController {
 			}
 
 			const databaseInstance = databaseFactory()
-			 // on connecte avant d'appeler les instances
+			// on connecte avant d'appeler les instances
 			const userInstance = await databaseInstance.usersInstances()
 
-			let newProfile = { ...profile }
+			const newProfile = { ...profile }
 
 			if (profile.password) {
 				const encryptPassword = await this.encrypt.passwordEncrypt(profile.password)
 				newProfile.password = encryptPassword
 			}
 
-			const objectProfile = await userInstance.updateUser(userId, this._filterProfile(newProfile))
+			const objectProfile = await userInstance.updateUser(userId, this.#filterProfile(newProfile))
 
 			const { password: _password, favorites: _favorites, ...sanitizedProfile } = objectProfile
 
 			return res.status(200).json(sanitizedProfile)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
@@ -502,13 +482,13 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			
+
 			const matches = await userInstance.getMatches()
 
 			return res.status(200).send(matches)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
@@ -516,13 +496,13 @@ export class CommunController {
 		try {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
-			
+
 			const filters = await userInstance.getAllFilters()
-			
+
 			return res.status(200).json({ filters })
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
@@ -531,79 +511,14 @@ export class CommunController {
 			const databaseInstance = databaseFactory()
 			const userInstance = await databaseInstance.usersInstances()
 
-			
 			const barList = await userInstance.getBars()
-			const bars = this._filterAndSortMatches(barList)
-			const formatedDataBar = this._formatedDataBar(bars)
-
-			
+			const bars = this.#filterAndSortMatches(barList)
+			const formatedDataBar = this.#formatedDataBar(bars)
 
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {
 			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
-		}
-	}
-
-	addFavorites = async (req, res) => {
-		try {
-			const { type, idUser, data } = req.body
-			const favoris = new FavorisController()
-			let addFavoris
-			switch (type) {
-				case 'gameName':
-					addFavoris = await favoris.addFavorisGameController(idUser, data, type)
-					break
-				case 'leagueName':
-					addFavoris = await favoris.addFavorisLeagueController(idUser, data, type)
-					break
-				case 'teams':
-					addFavoris = await favoris.addFavorisTeamController(idUser, data, type)
-					break
-				case 'barName':
-					addFavoris = await favoris.addFavorisBarNameController(idUser, data, type)
-					break
-				default:
-			}
-			if (addFavoris.message) {
-				res.status(500).json(addFavoris)
-			}
-			res.status(200).json(addFavoris)
-		} catch (error) {
-			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
-		}
-	}
-
-	deleteFavorites = async (req, res) => {
-		try {
-			const { type, idUser, data } = req.body
-			const favoris = new FavorisController()
-			let deleteFavoris
-			switch (type) {
-				case 'gameName':
-					deleteFavoris = await favoris.deleteFavorisGameController(idUser, data)
-					break
-				case 'leagueName':
-					deleteFavoris = await favoris.deleteFavorisLeagueController(idUser, data)
-					break
-				case 'teams':
-					deleteFavoris = await favoris.deleteFavorisTeamController(idUser, data)
-					break
-				case 'barName':
-					deleteFavoris = await favoris.deleteFavorisBarNameController(idUser, data)
-					break
-				default:
-			}
-
-			if (deleteFavoris.message){
-				res.status(500).json(deleteFavoris)
-			}
-			
-			res.status(200).json(deleteFavoris)
-		} catch (error) {
-			this.newLogger.error(error)
-			return res.status(500).json({ message: errorServer })
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 }

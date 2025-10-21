@@ -1,8 +1,7 @@
 import nodemailer from 'nodemailer'
-import { Logger } from '../midleware/logger.js'
+import Logger from '../middleware/logger.js'
 
-const emailHtml = (codeNumber) => {
-	return `<header style="font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction:column; align-items: center;">
+const emailHtml = (codeNumber) => `<header style="font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction:column; align-items: center;">
   <h1 style="color: #987464;">Bienvenue sur Hall-E !</h1>
 </header>
 <body>
@@ -17,7 +16,6 @@ const emailHtml = (codeNumber) => {
   <hr>
   <p style="font-size: 12px; color: #987464;">Cet e-mail est envoyé automatiquement, merci de ne pas y répondre.</p>
 </footer>`
-}
 
 export const sendEmailResetPassword = async (email, token) => {
 	const transporter = nodemailer.createTransport({
@@ -42,6 +40,5 @@ export const sendEmailResetPassword = async (email, token) => {
 		newLogger.info(`send Email at ${email}`)
 	} catch (error) {
 		newLogger.error(error)
-		console.error('Erreur lors de l’envoi :', error)
 	}
 }
