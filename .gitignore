@@ -3,10 +3,10 @@
 .idea
 .vscode
 *.key
+k8s
+logs
 # node files
 /app/node_modules
 .npmrc
 # env folder
 env
-k8s
-logs

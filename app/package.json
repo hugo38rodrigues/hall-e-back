@@ -13,14 +13,16 @@
         "fix-linter": "npx eslint --fix"
     },
     "dependencies": {
+        "@aws-sdk/client-secrets-manager": "^3.925.0",
         "@babel/core": "^7.25.8",
         "@babel/preset-env": "^7.25.8",
         "@hugo38rodrigues/bdd-service-hall-e": "^1.0.0",
+        "@vendia/serverless-express": "^4.12.6",
         "axios": "^1.12.0",
         "bcryptjs": "^3.0.2",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
-        "express": "^4.19.2",
+        "express": "^4.21.2",
         "globals": "^15.8.0",
         "jsonwebtoken": "^9.0.2",
         "nodemailer": "^7.0.9",
@@ -30,9 +32,14 @@
         "winston-daily-rotate-file": "^5.0.0"
     },
     "devDependencies": {
+        "@types/aws-lambda": "^8.10.157",
+        "@types/express": "^5.0.5",
         "eslint": "^8.57.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-plugin-import": "^2.32.0",
-        "supertest": "^7.1.1"
+        "serverless": "^4.23.0",
+        "serverless-esbuild": "^1.55.1",
+        "supertest": "^7.1.1",
+        "typescript": "^5.9.3"
     }
 }
