@@ -1,4 +1,4 @@
-import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
+import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import Logger from '../middleware/logger.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 
@@ -80,8 +80,7 @@ export class FavorisController {
 
 	addFavorisGameController = async (idUser, gameName, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const addGame = await userInstance.addFavoriteGame(idUser, gameName, type)
 
@@ -94,8 +93,7 @@ export class FavorisController {
 
 	deleteFavorisGameController = async (idUser, gameName, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const deletedGame = await userInstance.removeFavoriteGame(idUser, gameName, type)
 
@@ -108,8 +106,7 @@ export class FavorisController {
 
 	addFavorisLeagueController = async (idUser, leagueName, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const addLeague = await userInstance.addFavoriteLeague(idUser, leagueName, type)
 
@@ -122,8 +119,7 @@ export class FavorisController {
 
 	deleteFavorisLeagueController = async (idUser, leagueName, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const deleteLeague = await userInstance.removeFavoriteLeague(idUser, leagueName, type)
 
@@ -136,8 +132,7 @@ export class FavorisController {
 
 	addFavorisTeamController = async (idUser, idTeam, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			return await userInstance.addFavoriteTeam(idUser, idTeam, type)
 		} catch (error) {
@@ -148,8 +143,7 @@ export class FavorisController {
 
 	deleteFavorisTeamController = async (idUser, idTeam, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const deleteTeam = await userInstance.removeFavoriteTeam(idUser, idTeam, type)
 
@@ -162,8 +156,7 @@ export class FavorisController {
 
 	addFavorisBarNameController = async (idUser, idBar, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const userInDb = await userInstance.getUserById(idUser)
 
@@ -182,8 +175,7 @@ export class FavorisController {
 
 	deleteFavorisBarNameController = async (idUser, idBar, type) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const userInDb = await userInstance.getUserById(idUser)
 

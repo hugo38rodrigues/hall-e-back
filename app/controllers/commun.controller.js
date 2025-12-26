@@ -1,4 +1,4 @@
-import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
+import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import bcryptjs from 'bcryptjs'
 import Logger from '../middleware/logger.js'
 import { ERROR_SERVER } from '../utils/constants.js'
@@ -268,8 +268,7 @@ export class CommunController {
 				return res.status(401).json({ message: data.message })
 			}
 
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const userDb = await userInstance.getUser(data.profile.email)
 
@@ -293,8 +292,7 @@ export class CommunController {
 		try {
 			const { email, password } = req.body
 
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const userDb = await userInstance.getProfileUser(email)
 
@@ -331,15 +329,14 @@ export class CommunController {
 				return res.status(401).json({ errorEmailMessage })
 			}
 
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const userExist = await userInstance.getProfileUser(email)
 
 			if (userExist) {
 				const { codeNumber, expiresIn } = this.encrypt.generetedCode()
-				await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
-				await sendEmailResetPassword(email, codeNumber)
+				const code = await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
+				await sendEmailResetPassword(email, code)
 
 				const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
 
@@ -362,8 +359,7 @@ export class CommunController {
 			return res.status(401).json({ message: 'Ce n\'est pas le bon code' })
 		}
 
-		const databaseInstance = databaseFactory()
-		const userInstance = await databaseInstance.usersInstances()
+		const userInstance = await db.usersInstances()
 
 		const user = await userInstance.getUserById(idUser)
 
@@ -392,8 +388,7 @@ export class CommunController {
 			return res.status(401).json({ message: errorPasswordMessage })
 		}
 
-		const databaseInstance = databaseFactory()
-		const userInstance = await databaseInstance.usersInstances()
+		const userInstance = await db.usersInstances()
 
 		const userInDb = await userInstance.getUserById(id)
 
@@ -429,9 +424,9 @@ export class CommunController {
 				this.newLogger.error('Id must be mongo id')
 				return res.status(401).json({ message: 'Il manque un id utilisateur ' })
 			}
-			const databaseInstance = databaseFactory()
+
 			// on connecte avant d'appeler les instances
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 			const userInDb = await userInstance.getUserById(idUser)
 			if (!userInDb) {
 				return res.status(401).json({ message: 'Utilisateur un trouvable' })
@@ -452,13 +447,12 @@ export class CommunController {
 	updateProfile = async (req, res) => {
 		try {
 			const { userId, profile } = req.body
+
 			if (!userId || !profile) {
 				return res.status(400).json({ message: 'userId et profile sont requis.' })
 			}
 
-			const databaseInstance = databaseFactory()
-			// on connecte avant d'appeler les instances
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const newProfile = { ...profile }
 
@@ -480,8 +474,7 @@ export class CommunController {
 
 	getMatchesController = async (req, res) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const matches = await userInstance.getMatches()
 
@@ -494,8 +487,7 @@ export class CommunController {
 
 	getFiltersController = async (req, res) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const filters = await userInstance.getAllFilters()
 
@@ -508,8 +500,7 @@ export class CommunController {
 
 	getAllBarController = async (req, res) => {
 		try {
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
+			const userInstance = await db.usersInstances()
 
 			const barList = await userInstance.getBars()
 			const bars = this.#filterAndSortMatches(barList)

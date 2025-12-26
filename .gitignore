@@ -3,6 +3,10 @@
 .idea
 .vscode
 *.key
+.DS_store
+*.pem
+*.png
+
 # node files
 /app/node_modules
 .npmrc

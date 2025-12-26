@@ -44,8 +44,6 @@ export default class Logger {
 			),
 			transports: [
 				new winston.transports.Console(),
-				// Optionnel : décommente pour forcer une trace dans un fichier
-				new winston.transports.File({ filename: 'logs/app.log' }),
 			],
 			exitOnError: false,
 		})

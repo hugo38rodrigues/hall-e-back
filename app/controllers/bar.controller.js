@@ -1,4 +1,4 @@
-import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
+import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import Logger from '../middleware/logger.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 
@@ -11,9 +11,8 @@ export class BarController {
 		try {
 			const { matchId, barId } = req.body
 
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
-			const barInstance = await databaseInstance.barInstance()
+			const userInstance = await db.users()
+			const barInstance = await db.bar()
 
 			const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
@@ -40,10 +39,9 @@ export class BarController {
 	deletedSchedulingMatchesController = async (req, res) => {
 		try {
 			const { matchId, barId } = req.body
-			const databaseInstance = databaseFactory()
 
-			const userInstance = await databaseInstance.usersInstances()
-			const barInstance = await databaseInstance.barInstance()
+			const userInstance = await db.users()
+			const barInstance = await db.bar()
 
 			const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
@@ -68,12 +66,11 @@ export class BarController {
 	}
 
 	getSchedulingMatchesController = async (req, res) => {
-		const { userId } = req.params
-		const databaseInstance = databaseFactory()
-		const barInstance = await databaseInstance.barInstance()
+		const { barId } = req.params
+		const barInstance = await db.bar()
 
-		const bar = await barInstance.getProgrammedMatches(userId)
+		const matchScheduling = await barInstance.getProgrammedMatches({ barId })
 
-		return res.status(200).json(bar.programmedMatches)
+		return res.status(200).json(matchScheduling)
 	}
 }
