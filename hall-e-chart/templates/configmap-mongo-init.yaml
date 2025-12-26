@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-init-script
+  labels:
+    {{- toYaml .Values.database.labels | nindent 4 }}
+data:
+  create-app-user.js: |
+    print("🔹 Initializing Mongo app user...");
+
+    // On récupère les infos
+    const appUser = process.env.MONGO_APP_USERNAME;
+    const appPwd = process.env.MONGO_APP_USER_PASSWORD;
+
+    // Important : on récupère la DB appli depuis MONGO_INITDB_DATABASE,
+    // car tu la fournis via hall-e-configmap.DB_NAME
+    const appDbName = process.env.MONGO_INITDB_DATABASE;
+
+    if (!appDbName) {
+      print("❌ MONGO_INITDB_DATABASE is not set. Cannot create application user.");
+    } else if (!appPwd) {
+      print("❌ MONGO_APP_USER_PASSWORD is not set. Cannot create application user.");
+    } else {
+      const dbApp = db.getSiblingDB(appDbName);
+
+      const existing = dbApp.getUser(appUser);
+      if (existing) {
+        print(`ℹ️ User ${appUser} already exists in ${appDbName}, skipping creation.`);
+      } else {
+        dbApp.createUser({
+          user: appUser,
+          pwd: appPwd,
+          roles: [
+            { role: "readWrite", db: appDbName }
+          ]
+        });
+        print(`✅ User ${appUser} created with readWrite on ${appDbName}.`);
+      }
+    }

@@ -24,21 +24,13 @@ spec:
                 name: hall-e-configmap
             - secretRef:
                 name: secret-api
+            - secretRef:
+                name: secret-mongo-prod  
           env:
             - name: JWT_EXPIRATION
               value: {{ .Values.api_hall_e.env.JWT_EXPIRATION | quote }}
             - name: PORT
               value: {{ .Values.api_hall_e.env.PORT | quote }}
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: secret-mongo
-                  key: MONGO_INITDB_ROOT_USERNAME
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: secret-mongo
-                  key: MONGO_INITDB_ROOT_PASSWORD
             
           # readinessProbe:
           #   httpGet: { path: /health, port: {{ .Values.api_hall_e.env.PORT }} }

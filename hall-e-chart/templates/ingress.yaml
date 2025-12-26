@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - hall-e.fr
+      secretName: tls-secret
+  rules:
+    - host: hall-e.fr
+      http:
+        paths:
+          - path: /api/v1/
+            pathType: Prefix
+            backend:
+              service:
+                name: hall-e-api
+                port:
+                  number: 80
