@@ -51,7 +51,7 @@ export class CommunController {
 			pictures: bar.pictures,
 		},
 		// eslint-disable-next-line max-len
-		programations: bar.programmedMatches.length > 0 ? bar.programmedMatches.map((programmedMatch)=> this.#formatedProgrammedMatch(programmedMatch)) : null,
+		programations: bar.programmedMatches.length > 0 ? bar.programmedMatches.map((programmedMatch) => this.#formatedProgrammedMatch(programmedMatch)) : null,
 		userLocation: { longitude: bar.longitude, latitude: bar.latitude },
 
 	})
