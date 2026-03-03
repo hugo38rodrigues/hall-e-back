@@ -16,7 +16,7 @@
         "@babel/core": "^7.25.8",
         "@babel/preset-env": "^7.25.8",
         "@hugo38rodrigues/bdd-service-hall-e": "^1.0.0",
-        "axios": "^1.12.0",
+        "axios": "^1.13.5",
         "bcryptjs": "^3.0.2",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
