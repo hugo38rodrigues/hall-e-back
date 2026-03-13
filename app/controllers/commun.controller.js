@@ -1,8 +1,10 @@
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
-import bcryptjs from 'bcryptjs'
 import Logger from '../middleware/logger.js'
+import { generetedCode } from '../utils/code-generation.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 import { sendEmailResetPassword } from '../utils/email.js'
+import { passwordEncrypt, verifyPassword } from '../utils/encryption.js'
+import { getIdInToken, tokenCreation } from '../utils/jwt.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import {
 	IS_ADDRESS,
@@ -10,15 +12,14 @@ import {
 	IS_CODE_NUMBER,
 	IS_DESCRIPTION,
 	IS_EMAIL,
-	IS_MONGO_ID,
+	IS_ID,
 	IS_PASSWORD,
 	IS_STRING,
 } from '../utils/regex.js'
-import { Crypt } from './encryption.controller.js'
+import { computeAdditionalHours } from '../utils/match-tools.js'
 
 export class CommunController {
 	constructor() {
-		this.encrypt = new Crypt()
 		this.newLogger = new Logger()
 	}
 
@@ -27,88 +28,43 @@ export class CommunController {
 		Object.entries(profile).filter(([_, value]) => value !== null && value !== ''),
 	)
 
-	#formatedDataProfile = async (body) => {
-		if (body.role === 'client') {
-			return {
-				firstName: body.informations.firstName,
-				lastName: body.informations.lastName,
-				email: body.email,
-				password: this.encrypt.passwordEncrypt(body.password),
-				role: body.role,
-			}
-		}
+	#formatedProgrammedMatch = (match) => ({
 
-		if (body.role === 'bar') {
-			const { latitude, longitude } = await getCoordinatesFromAddress(body.informations.address)
-			return {
-				name: body.informations.name,
-				address: body.informations.address,
-				email: body.email,
-				password: this.encrypt.passwordEncrypt(body.password),
-				role: body.role,
-				price: body.informations.price,
-				description: body.informations.description,
-				photo: body.informations.photo,
-				latitude,
-				longitude,
-			}
-		}
-		return null
-	}
+		id: match.id,
+		hypeScore: match.hype_score,
+		streamPlatform: match.stream_platform,
+		team1: match.team1,
+		team2: match.team2,
+		game: match.game,
+		league: match.league,
+		date: match.date,
 
-	#formatedDataBar = (data) => {
-		const newMap = data.map((item) => ({
-			id: item._id,
-			role: item.role,
-			informations: {
-				name: item.name,
-				description: item.description,
-				address: item.address,
-				pictures: item.pictures,
-			},
-			programmedMatches: item.programmedMatches,
-			userLocation: { longitude: item.longitude, latitude: item.latitude },
-		}))
-		return newMap
-	}
+	})
 
-	#computeAdditionalHours = (gameName, bo) => {
-		const normalizedGame = gameName.toLowerCase()
+	#formatedDataBar = (bar) => ({
+		id: bar.id,
+		role: bar.role,
+		informations: {
+			name: bar.name,
+			description: bar.description,
+			address: bar.address,
+			pictures: bar.pictures,
+		},
+		// eslint-disable-next-line max-len
+		programations: bar.programmedMatches.length > 0 ? this.#formatedProgrammedMatch(bar.programmedMatches) : null,
+		userLocation: { longitude: bar.longitude, latitude: bar.latitude },
 
-		// Stockage des durées en minutes pour simplifier
-		const gameDurations = {
-			'league of legends': {
-				1: 33,
-				3: 110, // 1h50 = 110 min
-				5: 230, // 3h50 = 230 min
-			},
-			'cs go': {
-				1: 50,
-				3: 150, // 2h30 = 150 min
-				5: 300, // 5h00 = 300 min
-			},
-			valorant: {
-				1: 45,
-				3: 135, // 2h15 = 135 min
-				5: 270, // 4h30 = 270 min
-			},
-		}
-
-		const durations = gameDurations[normalizedGame]
-		if (durations && bo in durations) {
-			return durations[bo] // Retourne la durée en minutes
-		}
-
-		// Durée par défaut si jeu ou BO non reconnu (2h = 120 minutes)
-		return 120
-	}
+	})
 
 	#filterAndSortMatches = (data) => {
 		const now = new Date()
 		const today = now.toISOString().slice(0, 10) // 'YYYY-MM-DD'
 
 		const updatedData = data.map((bar) => {
-			const programmedMatches = (bar.programmedMatches || []).filter((match) => {
+			const programmedMatches = bar.programmedMatches.filter((match) => {
+				if (match.id === null) {
+					return false
+				}
 				const matchDate = new Date(match.date)
 				const matchDay = matchDate.toISOString().slice(0, 10) // 'YYYY-MM-DD'
 
@@ -117,7 +73,7 @@ export class CommunController {
 
 				// Si c'est aujourd'hui, ne garder que les matchs futurs (avec marge additionnelle)
 				if (matchDay === today) {
-					const extraHours = this.#computeAdditionalHours(match.gameName, match.numberOfGame) || 0
+					const extraHours = computeAdditionalHours(match.game.name, match.numberOfGame) || 0
 					const cutoff = new Date(now.getTime() + extraHours * 60 * 1000) // now + extraHours
 					return matchDate >= cutoff
 				}
@@ -133,7 +89,7 @@ export class CommunController {
 		return updatedData
 	}
 
-	#clientAccountVerify = async (body) => {
+	#verifyDataClient = (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isFirstName = IS_STRING.test(body.informations.firstName)
@@ -144,21 +100,37 @@ export class CommunController {
 		const isValidFirstName = body.informations.firstName && isFirstName
 
 		if (!isValidEmail || !isValidPassword) {
-			return { isValid: false, message: 'Missing email or password' }
+			return 1
 		}
 
 		if (!isValidLastName || !isValidFirstName) {
-			return { isValid: false, message: 'Missing first name or last name' }
+			return 2
 		}
-		const profile = await this.#formatedDataProfile(body)
-
-		return {
-			profile,
-			isValid: true,
-		}
+		return undefined
 	}
 
-	#barAccountVerify = async (body) => {
+	#formatedTeam = (team) => ({
+		id: team.id,
+		name: team.name,
+		acronym: team.acronym,
+		logoUrl: team.logo_url,
+	})
+
+	#formatedMatch = (match) => ({
+		id: match.id,
+		idMatch: match.id_match,
+		date: match.date,
+		numberOfGame: match.number_of_game,
+		hypeScore: match.hype_score,
+		streamPlatform: match.stream_platform,
+		programmed: match.programmedBars.length === 0 ? null : match.programmedBars,
+		team1: this.#formatedTeam(match.team1),
+		team2: this.#formatedTeam(match.team2),
+		league: match.league,
+		game: match.game,
+	})
+
+	#verifyDataBar = (body) => {
 		const isEmail = IS_EMAIL.test(body.email)
 		const isPassword = IS_PASSWORD.test(body.password)
 		const isAddress = IS_ADDRESS.test(body.informations.address)
@@ -166,40 +138,24 @@ export class CommunController {
 		const isDescription = IS_DESCRIPTION.test(body.informations.description)
 
 		if (!isEmail || !isPassword) {
-			return { isValid: false, message: 'password or email invalid' }
+			return 1
 		}
 
 		if (!isAddress) {
-			return {
-				isValid: false,
-				message: 'Address is invalid',
-			}
+			return 2
 		}
 
 		if (!isDescription) {
-			return {
-				isValid: false,
-				message: 'Is invalid description',
-			}
+			return 3
 		}
 
 		if (!isName) {
-			return { isValid: false, message: 'Is invalid name' }
+			return 4
 		}
-		const profile = await this.#formatedDataProfile(body)
-
-		return {
-			profile,
-			isValid: true,
-		}
+		return undefined
 	}
 
-	#validationEmail = (email) => (IS_EMAIL.test(email)
-		? { isEmail: true }
-		: {
-			isEmail: false,
-			errorEmailMessage: 'L\'email n\'est pas au bon format',
-		})
+	#validationEmail = (email) => (!((email === '' || !IS_EMAIL.test(email))))
 
 	#validationPassword = (password) => {
 		const isPassword = IS_PASSWORD.test(password)
@@ -216,10 +172,35 @@ export class CommunController {
 		}
 	}
 
-	#getConnexionProfile = (data) => {
-		let informationsData
+	#createdNewProfil = async (data) => {
 		if (data.role === 'bar') {
-			informationsData = {
+			const { latitude, longitude } = await getCoordinatesFromAddress(data.informations.address)
+			return {
+				role: data.role,
+				email: data.email,
+				name: data.informations.name,
+				password: passwordEncrypt(data.password),
+				address: data.informations.address,
+				price: data.informations.price,
+				description: data.informations.description,
+				pictures: data.informations.pictures,
+				latitude,
+				longitude,
+			}
+		}
+		return {
+			email: data.email,
+			password: passwordEncrypt(data.password),
+			role: data.role,
+			firstName: data.informations.firstName,
+			lastName: data.informations.lastName,
+		}
+	}
+
+	#generatedProfil = (data) => {
+		let informations
+		if (data.role === 'bar') {
+			informations = {
 				name: data.name,
 				address: data.address,
 				price: data.price,
@@ -227,15 +208,15 @@ export class CommunController {
 				pictures: data.pictures,
 			}
 		} else {
-			informationsData = {
-				firstName: data.firstName,
-				lastName: data.lastName,
+			informations = {
+				firstName: data.first_name,
+				lastName: data.last_name,
 				likeBar: data.likeBar,
 			}
 		}
 
 		return {
-			id: data._id,
+			id: data.id,
 			email: data.email,
 			role: data.role,
 			favorites: data.favorites
@@ -245,41 +226,71 @@ export class CommunController {
 					teams: data.favorites.teams,
 					barName: data.role === 'client' ? data.favorites.barName : [],
 				}
-				: {},
-			informations: informationsData,
-			userLocation: data.role === 'bar' ? { longitude: data.longitude, latitude: data.latitude } : null,
+				: null,
+			informations,
+			programmedMatches: data.role === 'bar' ? data.programmedMatches.map((match) => this.#formatedProgrammedMatch(match.dataValues)) : null,
+			userLocation: data.role === 'bar' ? { longitude: parseFloat(data.longitude), latitude: parseFloat(data.latitude) } : null,
 		}
 	}
 
 	createAccount = async (req, res) => {
-		const { role } = req.body
-		let data
+		const data = req.body
+		let profil
 		try {
-			if (role === 'client') {
-				data = await this.#clientAccountVerify(req.body, res)
+			if (data.role === 'client') {
+				const isValidData = this.#verifyDataClient(data)
+				if (isValidData === 1) {
+					return res.status(401).json({ message: 'Votre mot de passe ou votre mail est invalide' })
+				}
+				if (isValidData === 2) {
+					return res.status(401).json({ message: 'Votre prénom ou nom est invalide' })
+				}
+				profil = await this.#createdNewProfil(data)
 			}
 
-			if (role === 'bar') {
-				data = await this.#barAccountVerify(req.body, res)
+			if (data.role === 'bar') {
+				const isValidData = this.#verifyDataBar(data)
+				if (isValidData === 1) {
+					return res.status(401).json({
+						message: 'Votre mot de passe ou votre mail est invalide',
+					})
+				}
+				if (isValidData === 2) {
+					return res.status(401).json({
+						message: 'Votre Addresse est invalide',
+					})
+				}
+				if (isValidData === 3) {
+					return res.status(401).json({
+						message: 'Votre description doit est invalide',
+					})
+				}
+				if (isValidData === 4) {
+					return res.status(401).json({
+						message: 'Votre nom est invalide',
+					})
+				}
+				profil = await this.#createdNewProfil(data)
 			}
 
-			if (!data.isValid) {
-				this.newLogger.error(data.message)
-				return res.status(401).json({ message: data.message })
-			}
+			const userInstance = await db.user()
 
-			const userInstance = await db.usersInstances()
+			const userDb = await userInstance.getUserByEmail(profil.email)
 
-			const userDb = await userInstance.getUser(data.profile.email)
-
-			if (userDb !== null) {
-				this.newLogger.error(`user exist: ${data.profile.email}`)
+			if (userDb !== undefined) {
+				this.newLogger.error(`user exist: ${profil.email}`)
 				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
 
-			await userInstance.addUser(data.profile)
+			if (profil.role === 'client') {
+				await userInstance.addClient(profil)
+			} else if (profil.role === 'bar') {
+				await userInstance.addBar(profil)
+			} else {
+				return res.status(404).json({ message: 'Le role est inconnu' })
+			}
 
-			this.newLogger.info(`user insert successful ${data.profile.email}`)
+			this.newLogger.info(`user insert successful ${profil.email}`)
 
 			return res.status(201).json({ message: 'Inscription réussis' })
 		} catch (error) {
@@ -292,27 +303,47 @@ export class CommunController {
 		try {
 			const { email, password } = req.body
 
-			const userInstance = await db.usersInstances()
+			const userInstance = await db.user()
 
-			const userDb = await userInstance.getProfileUser(email)
+			const userDb = await userInstance.getUserByEmail(email)
 
 			if (userDb === null) {
 				this.newLogger.error('email is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const passwordMatch = await bcryptjs.compare(password, userDb.password)
+			const passwordMatch = await verifyPassword(password, userDb.dataValues.password)
 
 			if (!passwordMatch) {
 				this.newLogger.error('password is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
 
-			const token = await this.encrypt.tokenCreation(userDb.id, userDb.password)
+			const token = await tokenCreation(userDb.id, userDb.password)
 
-			const profile = this.#getConnexionProfile(userDb)
+			return res.header('Authorization', token).status(200).send({ message: 'Connexion réussie' })
+		} catch (error) {
+			this.newLogger.error(error)
+			return res.status(500).json({ message: ERROR_SERVER })
+		}
+	}
 
-			return res.header('Authorization', token).status(200).send(profile)
+	getProfil = async (req, res) => {
+		try {
+			const token = req.headers.authorization
+			const id = getIdInToken(token)
+			const userInstance = await db.user()
+
+			const userDb = await userInstance.getUserById(id)
+
+			if (userDb === undefined) {
+				return res.status(404).json({ message: 'Erreur lors de la récupération du profile' })
+			}
+
+			const profile = await userInstance.getProfileUser(userDb.dataValues.email)
+			const formatedProfil = this.#generatedProfil(profile.dataValues)
+
+			return res.status(200).json(formatedProfil)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
@@ -322,25 +353,25 @@ export class CommunController {
 	forgotPassword = async (req, res) => {
 		try {
 			const { email } = req.body
-			const { isEmail, errorEmailMessage } = this.#validationEmail(email)
+			const isValidEmail = this.#validationEmail(email)
 
-			if (!isEmail) {
-				this.newLogger.error(errorEmailMessage)
-				return res.status(401).json({ errorEmailMessage })
+			if (!isValidEmail) {
+				this.newLogger.error('Error email')
+				return res.status(401).json({ errorEmailMessage: 'Email pas au bon format' })
 			}
 
-			const userInstance = await db.usersInstances()
+			const userInstance = await db.user()
 
-			const userExist = await userInstance.getProfileUser(email)
+			const userDb = await userInstance.getProfileUser(email)
 
-			if (userExist) {
-				const { codeNumber, expiresIn } = this.encrypt.generetedCode()
-				const code = await userInstance.addCodeNumber(codeNumber, expiresIn, userExist._id)
+			if (userDb) {
+				const { codeNumber, expiresIn } = generetedCode()
+				const code = await userInstance.addCodeNumber(codeNumber, expiresIn, userDb.dataValues.id)
 				await sendEmailResetPassword(email, code)
 
-				const token = await this.encrypt.tokenCreation(userExist._id, userExist.password)
+				const token = await tokenCreation(userDb._id, userDb.password)
 
-				return res.header('Authorization', token).status(200).send({ id: userExist._id })
+				return res.header('Authorization', token).status(200).send({ id: userDb.id })
 			}
 
 			return res.status(200)
@@ -359,7 +390,7 @@ export class CommunController {
 			return res.status(401).json({ message: 'Ce n\'est pas le bon code' })
 		}
 
-		const userInstance = await db.usersInstances()
+		const userInstance = await db.user()
 
 		const user = await userInstance.getUserById(idUser)
 
@@ -388,7 +419,7 @@ export class CommunController {
 			return res.status(401).json({ message: errorPasswordMessage })
 		}
 
-		const userInstance = await db.usersInstances()
+		const userInstance = await db.user()
 
 		const userInDb = await userInstance.getUserById(id)
 
@@ -397,7 +428,7 @@ export class CommunController {
 			return res.status(401).json({ message: 'Utilisateur introuvable' })
 		}
 
-		const encryptNewPassword = this.encrypt.passwordEncrypt(newPassword)
+		const encryptNewPassword = passwordEncrypt(newPassword)
 		const ressource = {
 			role: userInDb.role,
 			password: encryptNewPassword,
@@ -414,25 +445,34 @@ export class CommunController {
 		try {
 			if (!req.params) {
 				this.newLogger.error('Missing params')
-				return res.status(401).json({ message: 'Il manque un parametre dans votre requete' })
+				return res.status(401).json({ message: 'Erreur lors de la requete' })
 			}
 			const { idUser } = req.params
 
-			const isIdUser = IS_MONGO_ID.test(idUser)
+			const isIdUser = IS_ID.test(idUser)
 
 			if (!isIdUser) {
 				this.newLogger.error('Id must be mongo id')
-				return res.status(401).json({ message: 'Il manque un id utilisateur ' })
+				return res.status(401).json({ message: 'Il manque un id utilisateur' })
 			}
 
-			// on connecte avant d'appeler les instances
-			const userInstance = await db.usersInstances()
+			const barInstance = await db.bar()
+			const clientInstance = await db.client()
+			const userInstance = await db.user()
 			const userInDb = await userInstance.getUserById(idUser)
+
 			if (!userInDb) {
 				return res.status(401).json({ message: 'Utilisateur un trouvable' })
 			}
 
-			const isDeleteUser = await userInstance.deleteUser(idUser, userInDb.role)
+			let isDeleteUser
+
+			if (userInDb.dataValues.role === 'client') {
+				isDeleteUser = await clientInstance.deleteClient(idUser)
+			} else if (userInDb.dataValues.role === 'bar') {
+				isDeleteUser = await barInstance.deleteBar(idUser)
+			}
+
 			if (!isDeleteUser) {
 				return res.status(401).json({ message: 'Impossible de supprimer le compte' })
 			}
@@ -449,21 +489,22 @@ export class CommunController {
 			const { userId, profile } = req.body
 
 			if (!userId || !profile) {
-				return res.status(400).json({ message: 'userId et profile sont requis.' })
+				return res.status(400).json({ message: 'Il manque un id ou vos informations.' })
 			}
 
-			const userInstance = await db.usersInstances()
+			const userInstance = await db.user()
 
 			const newProfile = { ...profile }
 
 			if (profile.password) {
-				const encryptPassword = await this.encrypt.passwordEncrypt(profile.password)
-				newProfile.password = encryptPassword
+				const encryptNewPassword = await passwordEncrypt(profile.password)
+				newProfile.password = encryptNewPassword
 			}
 
 			const objectProfile = await userInstance.updateUser(userId, this.#filterProfile(newProfile))
 
-			const { password: _password, favorites: _favorites, ...sanitizedProfile } = objectProfile
+			// eslint-disable-next-line max-len
+			const { password: _password, favorites: _favorites, ...sanitizedProfile } = objectProfile.dataValues
 
 			return res.status(200).json(sanitizedProfile)
 		} catch (error) {
@@ -474,11 +515,11 @@ export class CommunController {
 
 	getMatchesController = async (req, res) => {
 		try {
-			const userInstance = await db.usersInstances()
+			const userInstance = await db.user()
 
 			const matches = await userInstance.getMatches()
-
-			return res.status(200).send(matches)
+			const formatedMatche = matches.map((match) => this.#formatedMatch(match))
+			return res.status(200).send(formatedMatche)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
@@ -487,11 +528,11 @@ export class CommunController {
 
 	getFiltersController = async (req, res) => {
 		try {
-			const userInstance = await db.usersInstances()
+			const userInstance = await db.user()
 
 			const filters = await userInstance.getAllFilters()
 
-			return res.status(200).json({ filters })
+			return res.status(200).json(filters)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
@@ -500,11 +541,16 @@ export class CommunController {
 
 	getAllBarController = async (req, res) => {
 		try {
-			const userInstance = await db.usersInstances()
+			const userInstance = await db.user()
 
 			const barList = await userInstance.getBars()
+
+			if (!barList) {
+				this.newLogger.log("don't have a bar")
+				return res.status(200).json({ message: "Aucun bar inscrit dans l'application" })
+			}
 			const bars = this.#filterAndSortMatches(barList)
-			const formatedDataBar = this.#formatedDataBar(bars)
+			const formatedDataBar = bars.map((bar) => this.#formatedDataBar(bar))
 
 			return res.status(200).json(formatedDataBar)
 		} catch (error) {

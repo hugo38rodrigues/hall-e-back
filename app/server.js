@@ -7,7 +7,6 @@ import communRoutes from './routes/commun.route.js'
 
 const logger = new Logger('Server')
 const app = express()
-
 const { PORT } = process.env
 
 app.use(cors())

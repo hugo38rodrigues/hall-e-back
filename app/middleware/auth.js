@@ -1,9 +1,8 @@
-import { Crypt } from '../controllers/encryption.controller.js'
+import { verifyToken } from '../utils/jwt.js'
 import Logger from './logger.js'
 
 export class Auth {
 	constructor() {
-		this.encrypt = new Crypt()
 		this.logger = new Logger()
 	}
 
@@ -18,9 +17,9 @@ export class Auth {
 		const token = authHeader.split(' ')[1]
 
 		try {
-			const verifyToken = await this.encrypt.verifyToken(token)
+			const isValidToken = await verifyToken(token)
 
-			if (!verifyToken) {
+			if (!isValidToken) {
 				this.logger.error('Ce token est trop ancien')
 				return res.status(401).json({ message: 'Ce token est trop ancien' })
 			}
