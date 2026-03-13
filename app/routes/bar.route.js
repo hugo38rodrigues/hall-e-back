@@ -1,12 +1,10 @@
 import { Router } from 'express'
 import { BarController } from '../controllers/bar.controller.js'
-import { FavorisController } from '../controllers/favoris.controller.js'
-// import { Auth } from '../middleware/auth.js'
+import { Auth } from '../middleware/auth.js'
 
 const router = Router()
 const bar = new BarController()
-const favoris = new FavorisController()
-// const auth = new Auth()
+const auth = new Auth()
 
 router.post('/', auth.verifyAccount, bar.addSchedulingMatchesController)
 router.delete('/', auth.verifyAccount, bar.deletedSchedulingMatchesController)
