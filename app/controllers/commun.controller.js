@@ -51,7 +51,7 @@ export class CommunController {
 			pictures: bar.pictures,
 		},
 		// eslint-disable-next-line max-len
-		programations: bar.programmedMatches.length > 0 ? this.#formatedProgrammedMatch(bar.programmedMatches) : null,
+		programations: bar.programmedMatches.length > 0 ? bar.programmedMatches.map((programmedMatch)=> this.#formatedProgrammedMatch(programmedMatch)) : null,
 		userLocation: { longitude: bar.longitude, latitude: bar.latitude },
 
 	})
@@ -546,8 +546,8 @@ export class CommunController {
 			const barList = await userInstance.getBars()
 
 			if (!barList) {
-				this.newLogger.log("don't have a bar")
-				return res.status(200).json({ message: "Aucun bar inscrit dans l'application" })
+				this.newLogger.log("Don't have a bar register")
+				return res.status(200).json(null)
 			}
 			const bars = this.#filterAndSortMatches(barList)
 			const formatedDataBar = bars.map((bar) => this.#formatedDataBar(bar))
