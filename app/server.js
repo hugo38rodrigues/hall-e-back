@@ -16,6 +16,7 @@ app.use(express.urlencoded({ extended: true }))
 
 try {
 	const isValidHealth = await db.health()
+
 	if (isValidHealth) {
 		logger.info('DB connected')
 	}
