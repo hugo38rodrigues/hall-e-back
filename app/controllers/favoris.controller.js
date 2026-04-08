@@ -16,22 +16,22 @@ export class FavorisController {
 	addFavorites = async (req, res) => {
 		try {
 			const {
-				idUser, favorisType, idBarName, idGame, idLeague, idTeam,
+				userId, type, barNameId, gameId, leagueId, teamId,
 			} = req.body
 			let addFavoris
 
-			switch (favorisType) {
-			case 'gameName':
-				addFavoris = await this.addFavorisGameController(idUser, idGame)
+			switch (type) {
+			case 'game':
+				addFavoris = await this.addFavorisGameController(userId, gameId)
 				break
-			case 'leagueName':
-				addFavoris = await this.addFavorisLeagueController(idUser, idLeague)
+			case 'league':
+				addFavoris = await this.addFavorisLeagueController(userId, leagueId)
 				break
 			case 'teams':
-				addFavoris = await this.addFavorisTeamController(idUser, idTeam)
+				addFavoris = await this.addFavorisTeamController(userId, teamId)
 				break
 			case 'barName':
-				addFavoris = await this.addFavorisBarNameController(idUser, idBarName)
+				addFavoris = await this.addFavorisBarNameController(userId, barNameId)
 				break
 			default:
 				return res.status(401).json({ message: 'Erreur dans la requete' })
@@ -91,7 +91,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisGameController = async (idUser, gameId) => {
+	addFavorisGameController = async (idUser, id) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -100,9 +100,9 @@ export class FavorisController {
 			let addGame
 
 			if (userDb.dataValues.role === 'client') {
-				addGame = await clientInstance.addFavoriteGame({ clientId: idUser, gameId })
+				addGame = await clientInstance.addFavoriteGame({ clientId: idUser, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				addGame = await barInstance.addFavoriteGame({ barId: idUser, gameId })
+				addGame = await barInstance.addFavoriteGame({ barId: idUser, id })
 			} else {
 				return undefined
 			}
@@ -114,7 +114,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisGameController = async (idUser, gameId) => {
+	deleteFavorisGameController = async (idUser, id) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -123,9 +123,9 @@ export class FavorisController {
 			let removeGame
 
 			if (userDb.dataValues.role === 'client') {
-				removeGame = await clientInstance.removeFavoriteGame({ clientId: idUser, gameId })
+				removeGame = await clientInstance.removeFavoriteGame({ clientId: idUser, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				removeGame = await barInstance.removeFavoriteGame({ barId: idUser, gameId })
+				removeGame = await barInstance.removeFavoriteGame({ barId: idUser, id })
 			} else {
 				return undefined
 			}
@@ -137,7 +137,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisLeagueController = async (idUser, leagueId) => {
+	addFavorisLeagueController = async (idUser, id) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -146,9 +146,9 @@ export class FavorisController {
 			let addLeague
 
 			if (userDb.dataValues.role === 'client') {
-				addLeague = await clientInstance.addFavoriteLeague({ clientId: idUser, leagueId })
+				addLeague = await clientInstance.addFavoriteLeague({ clientId: idUser, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				addLeague = await barInstance.addFavoriteLeague({ barId: idUser, leagueId })
+				addLeague = await barInstance.addFavoriteLeague({ barId: idUser, id })
 			} else {
 				return undefined
 			}
@@ -160,7 +160,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisLeagueController = async (idUser, leagueId) => {
+	deleteFavorisLeagueController = async (idUser, id) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -169,9 +169,9 @@ export class FavorisController {
 			let removeLeague
 
 			if (userDb.dataValues.role === 'client') {
-				removeLeague = await clientInstance.removeFavoriteLeague({ clientId: idUser, leagueId })
+				removeLeague = await clientInstance.removeFavoriteLeague({ clientId: idUser, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				removeLeague = await barInstance.removeFavoriteLeague({ barId: idUser, leagueId })
+				removeLeague = await barInstance.removeFavoriteLeague({ barId: idUser, id })
 			} else {
 				return undefined
 			}
@@ -183,7 +183,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisTeamController = async (idUser, teamId) => {
+	addFavorisTeamController = async (idUser, id) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -192,9 +192,9 @@ export class FavorisController {
 			let addTeam
 
 			if (userDb.dataValues.role === 'client') {
-				addTeam = await clientInstance.addFavoriteTeam({ clientId: idUser, teamId })
+				addTeam = await clientInstance.addFavoriteTeam({ clientId: idUser, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				addTeam = await barInstance.addFavoriteTeam({ barId: idUser, teamId })
+				addTeam = await barInstance.addFavoriteTeam({ barId: idUser, id })
 			} else {
 				return undefined
 			}
@@ -206,7 +206,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisTeamController = async (idUser, teamId) => {
+	deleteFavorisTeamController = async (idUser, id) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -215,9 +215,9 @@ export class FavorisController {
 			let removeTeam
 
 			if (userDb.dataValues.role === 'client') {
-				removeTeam = await clientInstance.removeFavoriteTeam({ clientId: idUser, teamId })
+				removeTeam = await clientInstance.removeFavoriteTeam({ clientId: idUser, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				removeTeam = await barInstance.removeFavoriteTeam({ barId: idUser, teamId })
+				removeTeam = await barInstance.removeFavoriteTeam({ barId: idUser, id })
 			} else {
 				return undefined
 			}
