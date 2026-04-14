@@ -144,8 +144,7 @@ export class CommunController {
 		if (!isAddress) {
 			return 2
 		}
-
-		if (!isDescription) {
+		if (body.informations.description && !isDescription) {
 			return 3
 		}
 
@@ -262,7 +261,7 @@ export class CommunController {
 				}
 				if (isValidData === 3) {
 					return res.status(401).json({
-						message: 'Votre description doit est invalide',
+						message: 'Votre description est invalide',
 					})
 				}
 				if (isValidData === 4) {
