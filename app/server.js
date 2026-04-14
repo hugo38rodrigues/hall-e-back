@@ -40,5 +40,3 @@ app.get('/api/v1/test', (req, res) => res.send('Hello World!'))
 app.listen(PORT, () => {
 	logger.info(`Server is running on port ${PORT}`)
 })
-
-export default app
