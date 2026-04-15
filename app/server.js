@@ -35,7 +35,7 @@ app.get('/dbcheck', async (_req, res) => {
 app.use('/api/v1', communRoutes)
 app.use('/api/v1/bar', barRoutes)
 
-app.get('/api/v1/test', (req, res) => res.send('Hello World!'))
+app.get('/api/v1/test', (_req, res) => res.send('Hello World!'))
 
 app.listen(PORT, () => {
 	logger.info(`Server is running on port ${PORT}`)
