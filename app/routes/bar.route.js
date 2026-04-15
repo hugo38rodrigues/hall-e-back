@@ -7,6 +7,6 @@ const bar = new BarController()
 const auth = new Auth()
 
 router.post('/', auth.verifyAccount, bar.addSchedulingMatchesController)
-router.delete('/', auth.verifyAccount, bar.deletedSchedulingMatchesController)
+router.delete('/:matchId/:barId', auth.verifyAccount, bar.deletedSchedulingMatchesController)
 router.get('/:barId', auth.verifyAccount, bar.getSchedulingMatchesController)
 export default router
