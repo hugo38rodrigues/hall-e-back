@@ -6,6 +6,7 @@ import { sendEmailResetPassword } from '../utils/email.js'
 import { passwordEncrypt, verifyPassword } from '../utils/encryption.js'
 import { getIdInToken, tokenCreation } from '../utils/jwt.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
+import { computeAdditionalHours } from '../utils/match-tools.js'
 import {
 	IS_ADDRESS,
 	IS_BAR_NAME,
@@ -16,7 +17,6 @@ import {
 	IS_PASSWORD,
 	IS_STRING,
 } from '../utils/regex.js'
-import { computeAdditionalHours } from '../utils/match-tools.js'
 
 export class CommunController {
 	constructor() {
@@ -55,38 +55,22 @@ export class CommunController {
 		userLocation: { longitude: bar.longitude, latitude: bar.latitude },
 
 	})
-
 	#filterAndSortMatches = (data) => {
-		const now = new Date()
-		const today = now.toISOString().slice(0, 10) // 'YYYY-MM-DD'
+		const now = new Date();
 
-		const updatedData = data.map((bar) => {
+		return data.map((bar) => {
 			const programmedMatches = bar.programmedMatches.filter((match) => {
-				if (match.id === null) {
-					return false
-				}
-				const matchDate = new Date(match.date)
-				const matchDay = matchDate.toISOString().slice(0, 10) // 'YYYY-MM-DD'
+				if (!match.id) return false;
 
-				// Retire les matchs d'avant aujourd'hui
-				if (matchDay < today) return false
+				const matchDate = new Date(match.date);
+				const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame);
+				const matchEndTime = new Date(matchDate.getTime() + durationInMinutes * 60 * 1000);
 
-				// Si c'est aujourd'hui, ne garder que les matchs futurs (avec marge additionnelle)
-				if (matchDay === today) {
-					const extraHours = computeAdditionalHours(match.game.name, match.numberOfGame) || 0
-					const cutoff = new Date(now.getTime() + extraHours * 60 * 1000) // now + extraHours
-					return matchDate >= cutoff
-				}
+				return matchEndTime >= now;
+			});
 
-				// Jours futurs : on garde
-				return true
-			})
-
-			// retourne un NOUVEL objet (pas de mutation du paramètre)
-			return { ...bar, programmedMatches }
-		})
-
-		return updatedData
+			return { ...bar, programmedMatches };
+		});
 	}
 
 	#verifyDataClient = (body) => {
@@ -451,7 +435,7 @@ export class CommunController {
 			const isIdUser = IS_ID.test(idUser)
 
 			if (!isIdUser) {
-				this.newLogger.error('Id must be mongo id')
+				this.newLogger.error('This params is not a id for DB')
 				return res.status(401).json({ message: 'Il manque un id utilisateur' })
 			}
 

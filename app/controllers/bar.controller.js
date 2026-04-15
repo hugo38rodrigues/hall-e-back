@@ -4,16 +4,16 @@ import { computeAdditionalHours } from '../utils/match-tools.js'
 import { CommunController } from './commun.controller.js'
 
 export class BarController extends CommunController {
+
 	#filterAndSortMatches = (matches) => {
-		const today = new Date()
-		const computeAdditionDurationsMatch = matches.map((match) => match).filter((match) => {
-			const extraHours = computeAdditionalHours(match.game.name, match.numberoFGame)
-			const cutoff = new Date(match.date.getTime() + extraHours * 60 * 1000)
-			const test = cutoff >= today
-			return test
-		})
-		return computeAdditionDurationsMatch
-	}
+		const today = new Date();
+		
+		return matches.filter((match) => {
+			const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame);
+			const matchEndTime = new Date(match.date.getTime() + durationInMinutes * 60 * 1000);  
+			return matchEndTime >= today;
+		});
+}
 
 	#formatedSchedulingMatches = (schedulingMatches) => ({
 		id: schedulingMatches.id,
@@ -66,7 +66,7 @@ export class BarController extends CommunController {
 
 	deletedSchedulingMatchesController = async (req, res) => {
 		try {
-			const { matchId, barId } = req.body
+			const { matchId, barId } = req.params
 
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
