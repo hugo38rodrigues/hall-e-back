@@ -55,22 +55,23 @@ export class CommunController {
 		userLocation: { longitude: bar.longitude, latitude: bar.latitude },
 
 	})
+
 	#filterAndSortMatches = (data) => {
-		const now = new Date();
+		const now = new Date()
 
 		return data.map((bar) => {
 			const programmedMatches = bar.programmedMatches.filter((match) => {
-				if (!match.id) return false;
+				if (!match.id) return false
 
-				const matchDate = new Date(match.date);
-				const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame);
-				const matchEndTime = new Date(matchDate.getTime() + durationInMinutes * 60 * 1000);
+				const matchDate = new Date(match.date)
+				const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame)
+				const matchEndTime = new Date(matchDate.getTime() + durationInMinutes * 60 * 1000)
 
-				return matchEndTime >= now;
-			});
+				return matchEndTime >= now
+			})
 
-			return { ...bar, programmedMatches };
-		});
+			return { ...bar, programmedMatches }
+		})
 	}
 
 	#verifyDataClient = (body) => {
@@ -181,35 +182,42 @@ export class CommunController {
 	}
 
 	#generatedProfil = (data) => {
-  const informations = data.role === 'bar'
-    ? { name: data.name, address: data.address, price: data.price, description: data.description, pictures: data.pictures }
-    : { firstName: data.first_name, lastName: data.last_name, likeBar: data.likeBar }
+		const informations = data.role === 'bar'
+			? {
+				name: data.name,
+				address: data.address,
+				price: data.price,
+				description: data.description,
+				pictures: data.pictures,
+			}
+			: { firstName: data.first_name, lastName: data.last_name, likeBar: data.likeBar }
 
-  // Aplatit toutes les relations N-N de tous les favoris en une seule liste
-  const favoris = data.favoris ?? []
-  const favorites = favoris.length === 0 ? null : {
-    games:    favoris.flatMap(f => f.games    ?? []).map(g => ({ id: g.id, name: g.name })),
-    leagues:  favoris.flatMap(f => f.leagues  ?? []).map(l => ({ id: l.id, name: l.name })),
-    teams:    favoris.flatMap(f => f.teams    ?? []).map(t => ({ id: t.id, name: t.name, acronym: t.acronym })),
-    barName:  data.role === 'client'
-      ? favoris.flatMap(f => f.barNames ?? []).map(b => ({ id: b.id, name: b.name }))
-      : [],
-  }
+		// Aplatit toutes les relations N-N de tous les favoris en une seule liste
+		const favoris = data.favoris ?? []
+		const favorites = favoris.length === 0 ? null : {
+			games: favoris.flatMap((f) => f.games ?? []).map((g) => ({ id: g.id, name: g.name })),
+			leagues: favoris.flatMap((f) => f.leagues ?? []).map((l) => ({ id: l.id, name: l.name })),
+			teams: favoris.flatMap((f) => f.teams ?? [])
+				.map((t) => ({ id: t.id, name: t.name, acronym: t.acronym })),
+			barName: data.role === 'client'
+				? favoris.flatMap((f) => f.barNames ?? []).map((b) => ({ id: b.id, name: b.name }))
+				: [],
+		}
 
-  return {
-    id: data.id,
-    email: data.email,
-    role: data.role,
-    favorites,
-    informations,
-    programmedMatches: data.role === 'bar'
-      ? data.programmedMatches.map(m => this.#formatedProgrammedMatch(m.dataValues))
-      : null,
-    userLocation: data.role === 'bar'
-      ? { longitude: parseFloat(data.longitude), latitude: parseFloat(data.latitude) }
-      : null,
-  }
-}
+		return {
+			id: data.id,
+			email: data.email,
+			role: data.role,
+			favorites,
+			informations,
+			programmedMatches: data.role === 'bar'
+				? data.programmedMatches.map((m) => this.#formatedProgrammedMatch(m.dataValues))
+				: null,
+			userLocation: data.role === 'bar'
+				? { longitude: parseFloat(data.longitude), latitude: parseFloat(data.latitude) }
+				: null,
+		}
+	}
 
 	createAccount = async (req, res) => {
 		const data = req.body

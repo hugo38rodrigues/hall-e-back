@@ -14,7 +14,6 @@ export class FavorisController {
 		}
 	)
 
-
 	addFavorites = async (req, res) => {
 		try {
 			const {
@@ -24,16 +23,16 @@ export class FavorisController {
 
 			switch (type) {
 			case 'game':
-				addFavoris = await this.addFavorisGameController({userId, id})
+				addFavoris = await this.addFavorisGameController({ userId, id })
 				break
 			case 'league':
-				addFavoris = await this.addFavorisLeagueController({userId, id})
+				addFavoris = await this.addFavorisLeagueController({ userId, id })
 				break
 			case 'teams':
-				addFavoris = await this.addFavorisTeamController({userId, id})
+				addFavoris = await this.addFavorisTeamController({ userId, id })
 				break
 			case 'barName':
-				addFavoris = await this.addFavorisBarNameController({userId, id})
+				addFavoris = await this.addFavorisBarNameController({ userId, id })
 				break
 			default:
 				return res.status(401).json({ message: 'Erreur dans la requete' })
@@ -64,16 +63,16 @@ export class FavorisController {
 			let deleteFavoris
 			switch (type) {
 			case 'game':
-				deleteFavoris = await this.deleteFavorisGameController({userId, id})
+				deleteFavoris = await this.deleteFavorisGameController({ userId, id })
 				break
 			case 'league':
-				deleteFavoris = await this.deleteFavorisLeagueController({userId, id})
+				deleteFavoris = await this.deleteFavorisLeagueController({ userId, id })
 				break
 			case 'teams':
-				deleteFavoris = await this.deleteFavorisTeamController({userId, id})
+				deleteFavoris = await this.deleteFavorisTeamController({ userId, id })
 				break
 			case 'barName':
-				deleteFavoris = await this.deleteFavorisBarNameController({userId, id})
+				deleteFavoris = await this.deleteFavorisBarNameController({ userId, id })
 				break
 			default:
 				return res.status(401).json({ message: 'Erreur dans la requete' })
@@ -93,7 +92,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisGameController = async ({userId, id}) => {
+	addFavorisGameController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -116,7 +115,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisGameController = async ({userId, id}) => {
+	deleteFavorisGameController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -139,7 +138,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisLeagueController = async ({userId, id}) => {
+	addFavorisLeagueController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -162,7 +161,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisLeagueController = async ({userId, id}) => {
+	deleteFavorisLeagueController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -185,7 +184,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisTeamController = async ({userId, id}) => {
+	addFavorisTeamController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -208,7 +207,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisTeamController = async ({userId, id}) => {
+	deleteFavorisTeamController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
@@ -231,7 +230,7 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisBarNameController = async ({userId, id}) => {
+	addFavorisBarNameController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const clientInstance = await db.client()
@@ -251,7 +250,7 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisBarNameController = async ({userId, id}) => {
+	deleteFavorisBarNameController = async ({ userId, id }) => {
 		try {
 			const userInstance = await db.user()
 			const clientInstance = await db.client()

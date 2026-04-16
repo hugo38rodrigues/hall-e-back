@@ -4,16 +4,15 @@ import { computeAdditionalHours } from '../utils/match-tools.js'
 import { CommunController } from './commun.controller.js'
 
 export class BarController extends CommunController {
-
 	#filterAndSortMatches = (matches) => {
-		const today = new Date();
-		
+		const today = new Date()
+
 		return matches.filter((match) => {
-			const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame);
-			const matchEndTime = new Date(match.date.getTime() + durationInMinutes * 60 * 1000);  
-			return matchEndTime >= today;
-		});
-}
+			const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame)
+			const matchEndTime = new Date(match.date.getTime() + durationInMinutes * 60 * 1000)
+			return matchEndTime >= today
+		})
+	}
 
 	#formatedSchedulingMatches = (schedulingMatches) => ({
 		id: schedulingMatches.id,
