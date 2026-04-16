@@ -10,96 +10,66 @@ jobs:
   lint-and-test:
     name: "🔍 Lint & Test"
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}  # secret dispo via env
     defaults:
       run:
         working-directory: ./app
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Nettoyage de .npmrc éventuels (évite les conflits)
-      - name: Sanitize npm config
-        run: |
-          rm -f .npmrc || true
-          rm -f ~/.npmrc || true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "24"
           cache: "npm"
           cache-dependency-path: app/package-lock.json
           registry-url: "https://npm.pkg.github.com"
           scope: "@hugo38rodrigues"
-          always-auth: true
 
-      # On n’essaie d’installer que si les secrets sont dispos (pas PR fork)
-      - name: Verify GitHub Packages token
-        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        run: npm whoami --registry=https://npm.pkg.github.com
+      - name: Install
+        run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ env.GH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Install dependencies
-        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ env.GH_TOKEN }}
-
-      - name: Run linter
-        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+      - name: Lint
         run: npm run lint
 
-      - name: Run tests
-        if: ${{ env.GH_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+      - name: Test
         run: npm run test
 
-      # PR depuis fork : secrets indisponibles → on skip proprement
-      - name: Skip install on forked PR (no secrets)
-        if: ${{ env.GH_TOKEN == '' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
-        run: echo "::notice::Skipping npm install/tests (no secrets on forked PRs)."
-
   build-and-push:
-    name: "🐳 Build & Push Docker Image"
+    name: "🐳 Build & Push Docker"
     needs: lint-and-test
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-    defaults:
-      run:
-        working-directory: ./app
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Get version from package.json
-        id: version
+      - name: Get version
+        run: echo "VERSION=$(node -p "require('./app/package.json').version")" >> $GITHUB_ENV
+
+      - name: Create Git tag
         run: |
-          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-          echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+          git tag v${{ env.VERSION }} || echo "::warning::Tag v${{ env.VERSION }} existe déjà, skipping."
+          git push origin v${{ env.VERSION }} || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Setup Docker Buildx
-        run: |
-          docker buildx create --use
-          docker buildx inspect --bootstrap
+      - uses: docker/setup-buildx-action@v3
 
-      - name: Build & Push
-        run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            --build-arg GITHUB_TOKEN=${GH_TOKEN} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }} \
-            --push .
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:${{ env.VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/api-hall-e:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: github_token=${{ secrets.GH_TOKEN }}
