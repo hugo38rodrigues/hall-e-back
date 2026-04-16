@@ -11,27 +11,29 @@ export class FavorisController {
 		{
 			id: bar.id,
 			name: bar.name,
-		})
+		}
+	)
+
 
 	addFavorites = async (req, res) => {
 		try {
 			const {
-				userId, type, barNameId, gameId, leagueId, teamId,
+				userId, type, id,
 			} = req.body
 			let addFavoris
 
 			switch (type) {
 			case 'game':
-				addFavoris = await this.addFavorisGameController(userId, gameId)
+				addFavoris = await this.addFavorisGameController({userId, id})
 				break
 			case 'league':
-				addFavoris = await this.addFavorisLeagueController(userId, leagueId)
+				addFavoris = await this.addFavorisLeagueController({userId, id})
 				break
 			case 'teams':
-				addFavoris = await this.addFavorisTeamController(userId, teamId)
+				addFavoris = await this.addFavorisTeamController({userId, id})
 				break
 			case 'barName':
-				addFavoris = await this.addFavorisBarNameController(userId, barNameId)
+				addFavoris = await this.addFavorisBarNameController({userId, id})
 				break
 			default:
 				return res.status(401).json({ message: 'Erreur dans la requete' })
@@ -58,20 +60,20 @@ export class FavorisController {
 
 	deleteFavorites = async (req, res) => {
 		try {
-			const { favorisType, idUser, data } = req.body
+			const { type, userId, id } = req.body
 			let deleteFavoris
-			switch (favorisType) {
+			switch (type) {
 			case 'game':
-				deleteFavoris = await this.deleteFavorisGameController(idUser, data)
+				deleteFavoris = await this.deleteFavorisGameController({userId, id})
 				break
 			case 'league':
-				deleteFavoris = await this.deleteFavorisLeagueController(idUser, data)
+				deleteFavoris = await this.deleteFavorisLeagueController({userId, id})
 				break
 			case 'teams':
-				deleteFavoris = await this.deleteFavorisTeamController(idUser, data)
+				deleteFavoris = await this.deleteFavorisTeamController({userId, id})
 				break
-			case 'bar':
-				deleteFavoris = await this.deleteFavorisBarNameController(idUser, data)
+			case 'barName':
+				deleteFavoris = await this.deleteFavorisBarNameController({userId, id})
 				break
 			default:
 				return res.status(401).json({ message: 'Erreur dans la requete' })
@@ -91,18 +93,18 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisGameController = async (idUser, id) => {
+	addFavorisGameController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
 			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(idUser)
+			const userDb = await userInstance.getUserById(userId)
 			let addGame
 
 			if (userDb.dataValues.role === 'client') {
-				addGame = await clientInstance.addFavoriteGame({ clientId: idUser, id })
+				addGame = await clientInstance.addFavoriteGame({ clientId: userId, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				addGame = await barInstance.addFavoriteGame({ barId: idUser, id })
+				addGame = await barInstance.addFavoriteGame({ barId: userId, id })
 			} else {
 				return undefined
 			}
@@ -114,18 +116,18 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisGameController = async (idUser, id) => {
+	deleteFavorisGameController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
 			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(idUser)
+			const userDb = await userInstance.getUserById(userId)
 			let removeGame
 
 			if (userDb.dataValues.role === 'client') {
-				removeGame = await clientInstance.removeFavoriteGame({ clientId: idUser, id })
+				removeGame = await clientInstance.removeFavoriteGame({ clientId: userId, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				removeGame = await barInstance.removeFavoriteGame({ barId: idUser, id })
+				removeGame = await barInstance.removeFavoriteGame({ barId: userId, id })
 			} else {
 				return undefined
 			}
@@ -137,18 +139,18 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisLeagueController = async (idUser, id) => {
+	addFavorisLeagueController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
 			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(idUser)
+			const userDb = await userInstance.getUserById(userId)
 			let addLeague
 
 			if (userDb.dataValues.role === 'client') {
-				addLeague = await clientInstance.addFavoriteLeague({ clientId: idUser, id })
+				addLeague = await clientInstance.addFavoriteLeague({ clientId: userId, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				addLeague = await barInstance.addFavoriteLeague({ barId: idUser, id })
+				addLeague = await barInstance.addFavoriteLeague({ barId: userId, id })
 			} else {
 				return undefined
 			}
@@ -160,18 +162,18 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisLeagueController = async (idUser, id) => {
+	deleteFavorisLeagueController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
 			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(idUser)
+			const userDb = await userInstance.getUserById(userId)
 			let removeLeague
 
 			if (userDb.dataValues.role === 'client') {
-				removeLeague = await clientInstance.removeFavoriteLeague({ clientId: idUser, id })
+				removeLeague = await clientInstance.removeFavoriteLeague({ clientId: userId, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				removeLeague = await barInstance.removeFavoriteLeague({ barId: idUser, id })
+				removeLeague = await barInstance.removeFavoriteLeague({ barId: userId, id })
 			} else {
 				return undefined
 			}
@@ -183,18 +185,18 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisTeamController = async (idUser, id) => {
+	addFavorisTeamController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
 			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(idUser)
+			const userDb = await userInstance.getUserById(userId)
 			let addTeam
 
 			if (userDb.dataValues.role === 'client') {
-				addTeam = await clientInstance.addFavoriteTeam({ clientId: idUser, id })
+				addTeam = await clientInstance.addFavoriteTeam({ clientId: userId, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				addTeam = await barInstance.addFavoriteTeam({ barId: idUser, id })
+				addTeam = await barInstance.addFavoriteTeam({ barId: userId, id })
 			} else {
 				return undefined
 			}
@@ -206,18 +208,18 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisTeamController = async (idUser, id) => {
+	deleteFavorisTeamController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const barInstance = await db.bar()
 			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(idUser)
+			const userDb = await userInstance.getUserById(userId)
 			let removeTeam
 
 			if (userDb.dataValues.role === 'client') {
-				removeTeam = await clientInstance.removeFavoriteTeam({ clientId: idUser, id })
+				removeTeam = await clientInstance.removeFavoriteTeam({ clientId: userId, id })
 			} else if (userDb.dataValues.role === 'bar') {
-				removeTeam = await barInstance.removeFavoriteTeam({ barId: idUser, id })
+				removeTeam = await barInstance.removeFavoriteTeam({ barId: userId, id })
 			} else {
 				return undefined
 			}
@@ -229,18 +231,18 @@ export class FavorisController {
 		}
 	}
 
-	addFavorisBarNameController = async (idUser, idBar) => {
+	addFavorisBarNameController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
 			const clientInstance = await db.client()
 
-			const userInDb = await userInstance.getUserById(idUser)
+			const userInDb = await userInstance.getUserById(userId)
 
 			if (userInDb.dataValues.role !== 'client') {
 				this.newLogger.error('Has the wrong role')
 				return 1
 			}
-			const addBarName = await clientInstance.addFavoriteBar({ clientId: idUser, barId: idBar })
+			const addBarName = await clientInstance.addFavoriteBar({ clientId: userId, barId: id })
 			const formatedBarName = addBarName.map((bars) => this.#formatedFavoriteBarName(bars))
 			return { barName: formatedBarName }
 		} catch (error) {
@@ -249,17 +251,18 @@ export class FavorisController {
 		}
 	}
 
-	deleteFavorisBarNameController = async (idUser, idBar) => {
+	deleteFavorisBarNameController = async ({userId, id}) => {
 		try {
 			const userInstance = await db.user()
+			const clientInstance = await db.client()
 
-			const userInDb = await userInstance.getUserById(idUser)
+			const userInDb = await userInstance.getUserById(userId)
 
 			if (userInDb.role !== 'client') {
 				this.newLogger.error('Has the wrong role')
 				return 1
 			}
-			const deleteBarName = await userInstance.removeFavoriteBar({ clientId: idUser, barId: idBar })
+			const deleteBarName = await clientInstance.removeFavoriteBar({ clientId: userId, barId: id })
 
 			return deleteBarName
 		} catch (error) {
