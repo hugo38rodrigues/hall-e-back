@@ -181,40 +181,35 @@ export class CommunController {
 	}
 
 	#generatedProfil = (data) => {
-		let informations
-		if (data.role === 'bar') {
-			informations = {
-				name: data.name,
-				address: data.address,
-				price: data.price,
-				description: data.description,
-				pictures: data.pictures,
-			}
-		} else {
-			informations = {
-				firstName: data.first_name,
-				lastName: data.last_name,
-				likeBar: data.likeBar,
-			}
-		}
+  const informations = data.role === 'bar'
+    ? { name: data.name, address: data.address, price: data.price, description: data.description, pictures: data.pictures }
+    : { firstName: data.first_name, lastName: data.last_name, likeBar: data.likeBar }
 
-		return {
-			id: data.id,
-			email: data.email,
-			role: data.role,
-			favorites: data.favorites
-				? {
-					gameName: data.favorites.gameName,
-					leagueName: data.favorites.leagueName,
-					teams: data.favorites.teams,
-					barName: data.role === 'client' ? data.favorites.barName : [],
-				}
-				: null,
-			informations,
-			programmedMatches: data.role === 'bar' ? data.programmedMatches.map((match) => this.#formatedProgrammedMatch(match.dataValues)) : null,
-			userLocation: data.role === 'bar' ? { longitude: parseFloat(data.longitude), latitude: parseFloat(data.latitude) } : null,
-		}
-	}
+  // Aplatit toutes les relations N-N de tous les favoris en une seule liste
+  const favoris = data.favoris ?? []
+  const favorites = favoris.length === 0 ? null : {
+    games:    favoris.flatMap(f => f.games    ?? []).map(g => ({ id: g.id, name: g.name })),
+    leagues:  favoris.flatMap(f => f.leagues  ?? []).map(l => ({ id: l.id, name: l.name })),
+    teams:    favoris.flatMap(f => f.teams    ?? []).map(t => ({ id: t.id, name: t.name, acronym: t.acronym })),
+    barName:  data.role === 'client'
+      ? favoris.flatMap(f => f.barNames ?? []).map(b => ({ id: b.id, name: b.name }))
+      : [],
+  }
+
+  return {
+    id: data.id,
+    email: data.email,
+    role: data.role,
+    favorites,
+    informations,
+    programmedMatches: data.role === 'bar'
+      ? data.programmedMatches.map(m => this.#formatedProgrammedMatch(m.dataValues))
+      : null,
+    userLocation: data.role === 'bar'
+      ? { longitude: parseFloat(data.longitude), latitude: parseFloat(data.latitude) }
+      : null,
+  }
+}
 
 	createAccount = async (req, res) => {
 		const data = req.body
@@ -290,7 +285,7 @@ export class CommunController {
 
 			const userDb = await userInstance.getUserByEmail(email)
 
-			if (userDb === null) {
+			if (userDb === undefined) {
 				this.newLogger.error('email is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
@@ -435,7 +430,7 @@ export class CommunController {
 			const isIdUser = IS_ID.test(idUser)
 
 			if (!isIdUser) {
-				this.newLogger.error('This params is not a id for DB')
+				this.newLogger.error('Id user is know')
 				return res.status(401).json({ message: 'Il manque un id utilisateur' })
 			}
 
