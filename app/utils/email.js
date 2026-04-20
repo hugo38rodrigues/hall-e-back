@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import Logger from '../middleware/logger.js'
+import Logger from './logger.js'
 
 const emailHtml = (codeNumber) => `<header style="font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction:column; align-items: center;">
   <h1 style="color: #987464;">Bienvenue sur Hall-E !</h1>

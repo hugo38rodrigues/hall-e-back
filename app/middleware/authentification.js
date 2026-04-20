@@ -1,6 +1,6 @@
 import { db } from '@hugo38rodrigues/bdd-service-hall-e-test'
 import jwt from 'jsonwebtoken'
-import Logger from './logger.js'
+import Logger from '../utils/logger.js'
 
 export class Authentification {
 	constructor() {

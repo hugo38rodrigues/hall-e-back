@@ -1,5 +1,5 @@
 import axios from 'axios'
-import Logger from '../middleware/logger.js'
+import Logger from './logger.js'
 
 const logger = new Logger()
 
