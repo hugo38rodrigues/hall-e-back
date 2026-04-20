@@ -1,10 +1,10 @@
 import { db } from '@hugo38rodrigues/bdd-service-hall-e'
 import cors from 'cors'
 import express from 'express'
-import Logger from './middleware/logger.js'
 import barRoutes from './routes/bar.route.js'
 import communRoutes from './routes/commun.route.js'
 
+import Logger from './utils/logger.js'
 const logger = new Logger('Server')
 const app = express()
 const { PORT } = process.env
