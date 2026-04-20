@@ -33,7 +33,6 @@ export class Authentification {
 
 	/**
 	 * Vérifie et décode un token. Retourne le payload ou null.
-	 * Ne touche pas à la réponse HTTP : c'est au middleware de décider.
 	 */
 	verifyToken = (token) => {
 		try {
