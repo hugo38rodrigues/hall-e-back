@@ -1,4 +1,4 @@
-import Logger from '../middleware/logger.js'
+import Logger from '../utils/logger.js'
 
 export class ClientController {
 	constructor() {

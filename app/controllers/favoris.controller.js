@@ -1,6 +1,6 @@
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
-import Logger from '../middleware/logger.js'
 import { ERROR_SERVER } from '../utils/constants.js'
+import Logger from '../utils/logger.js'
 
 export class FavorisController {
 	constructor() {

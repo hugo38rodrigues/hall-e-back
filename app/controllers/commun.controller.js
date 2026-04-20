@@ -1,10 +1,11 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
-import Logger from '../middleware/logger.js'
+import { Authentification } from '../middleware/authentification.js'
+import Logger from '../utils/logger.js'
 import { generetedCode } from '../utils/code-generation.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { passwordEncrypt, verifyPassword } from '../utils/encryption.js'
-import { getIdInToken, tokenCreation } from '../utils/jwt.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import { computeAdditionalHours } from '../utils/match-tools.js'
 import {
@@ -263,7 +264,7 @@ export class CommunController {
 
 			const userDb = await userInstance.getUserByEmail(profil.email)
 
-			if (userDb !== undefined) {
+			if (userDb !== null) {
 				this.newLogger.error(`user exist: ${profil.email}`)
 				return res.status(401).json({ message: 'L\'utilisateur existe déjà' })
 			}
@@ -288,7 +289,6 @@ export class CommunController {
 	connexion = async (req, res) => {
 		try {
 			const { email, password } = req.body
-
 			const userInstance = await db.user()
 
 			const userDb = await userInstance.getUserByEmail(email)
@@ -304,8 +304,9 @@ export class CommunController {
 				this.newLogger.error('password is not valid')
 				return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
 			}
+			const auth = new Authentification()
 
-			const token = await tokenCreation(userDb.id, userDb.password)
+			const token = await auth.tokenCreation(userDb.id, userDb.password)
 
 			return res.header('Authorization', token).status(200).send({ message: 'Connexion réussie' })
 		} catch (error) {
@@ -317,7 +318,7 @@ export class CommunController {
 	getProfil = async (req, res) => {
 		try {
 			const token = req.headers.authorization
-			const id = getIdInToken(token)
+			const id = Authentification.getIdInToken(token)
 			const userInstance = await db.user()
 
 			const userDb = await userInstance.getUserById(id)
@@ -355,7 +356,7 @@ export class CommunController {
 				const code = await userInstance.addCodeNumber(codeNumber, expiresIn, userDb.dataValues.id)
 				await sendEmailResetPassword(email, code)
 
-				const token = await tokenCreation(userDb._id, userDb.password)
+				const token = await Authentification.tokenCreation(userDb._id, userDb.password)
 
 				return res.header('Authorization', token).status(200).send({ id: userDb.id })
 			}

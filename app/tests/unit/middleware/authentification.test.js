@@ -19,7 +19,7 @@ vi.mock('jsonwebtoken', () => ({
 }))
 
 const mockGetUserById = vi.fn()
-vi.mock('@hugo38rodrigues/bdd-service-hall-e-test', () => ({
+vi.mock('@hugo38rodrigues/bdd-service-hall-e', () => ({
 	db: {
 		user: () => ({ getUserById: mockGetUserById }),
 	},

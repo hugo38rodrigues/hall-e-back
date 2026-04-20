@@ -49,15 +49,7 @@
         "js": "always",
         "mjs": "always"
       }
-    ],
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": [
-        "**/*.test.js",
-        "**/*.spec.js",
-        "**/tests/**",
-        "**/__tests__/**"
-      ]
-    }]
+    ]
 
   }
 }

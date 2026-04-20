@@ -1,4 +1,4 @@
-import { db } from '@hugo38rodrigues/bdd-service-hall-e-test'
+import { db } from '@hugo38rodrigues/bdd-service-hall-e'
 import jwt from 'jsonwebtoken'
 import Logger from '../utils/logger.js'
 
