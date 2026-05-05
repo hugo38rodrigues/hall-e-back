@@ -1,11 +1,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import { Authentification } from '../middleware/authentification.js'
-import Logger from '../utils/logger.js'
 import { generetedCode } from '../utils/code-generation.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 import { sendEmailResetPassword } from '../utils/email.js'
 import { passwordEncrypt, verifyPassword } from '../utils/encryption.js'
+import Logger from '../utils/logger.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import { computeAdditionalHours } from '../utils/match-tools.js'
 import {
@@ -361,7 +361,7 @@ export class CommunController {
 				return res.header('Authorization', token).status(200).send({ id: userDb.id })
 			}
 
-			return res.status(200)
+			return res.sendStatus(204)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
@@ -369,63 +369,76 @@ export class CommunController {
 	}
 
 	verifyCode = async (req, res) => {
-		const { idUser, code } = req.body
-		const isCode = IS_CODE_NUMBER.test(parseInt(code, 10))
+		try {
+			const { idUser, code } = req.body
+			const isCode = IS_CODE_NUMBER.test(parseInt(code, 10))
 
-		if (!isCode) {
-			this.newLogger.error('Is not a good code')
-			return res.status(401).json({ message: 'Ce n\'est pas le bon code' })
-		}
+			if (!isCode) {
+				this.newLogger.error('Is not a good code')
+				return res.status(401).json({ message: 'Ce n\'est pas le bon code' })
+			}
 
-		const userInstance = await db.user()
+			const userInstance = await db.user()
 
-		const user = await userInstance.getUserById(idUser)
+			const user = await userInstance.getUserById(idUser)
 
-		if (user) {
+			if (!user) {
+				this.newLogger.error('Unknwo user id')
+				return res.status(404).json({ message: 'Un problème est survenue' })
+			}
+
 			const storeCodeNumberInData = await userInstance.getCodeByNumber(code)
 
 			if (!storeCodeNumberInData) {
 				this.newLogger.error('invalid code')
 				return res.status(400).json({ message: 'Code invalide' })
-			} if (Date.now() > storeCodeNumberInData.expiresIn) {
+			}
+			if (Date.now() > storeCodeNumberInData.expiresIn) {
 				this.newLogger.error('request expired')
 				return res.status(400).json({ message: 'Demande expiré' })
 			}
 			return res.status(200).json({ id: user.id })
+		} catch (error) {
+			this.newLogger.error(`Error in verifyCode: ${error}`)
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
-		return null
 	}
 
 	resetPassword = async (req, res) => {
-		const { newPassword, id } = req.body
+		try {
+			const { newPassword, id } = req.body
 
-		const { isValidPassword, errorPasswordMessage } = this.#validationPassword(newPassword)
+			const { isValidPassword, errorPasswordMessage } = this.#validationPassword(newPassword)
 
-		if (!isValidPassword) {
-			this.newLogger.error(errorPasswordMessage)
-			return res.status(401).json({ message: errorPasswordMessage })
+			if (!isValidPassword) {
+				this.newLogger.error(errorPasswordMessage)
+				return res.status(401).json({ message: errorPasswordMessage })
+			}
+
+			const userInstance = await db.user()
+
+			const userInDb = await userInstance.getUserById(id)
+
+			if (!userInDb) {
+				this.newLogger.error('user not exist')
+				return res.status(401).json({ message: 'Utilisateur introuvable' })
+			}
+
+			const encryptNewPassword = passwordEncrypt(newPassword)
+			const ressource = {
+				role: userInDb.role,
+				password: encryptNewPassword,
+			}
+			const { isError, errorMessage } = await userInstance.updateUser(userInDb.id, ressource)
+			if (isError) {
+				this.newLogger.error(errorMessage)
+				return res.status(401).json({ message: errorMessage })
+			}
+			return res.status(200).json({ message: 'Mot de passe changé avec succès' })
+		} catch (error) {
+			this.newLogger.error(`Error in resetPassword: ${error}`)
+			return res.status(500).json({ message: ERROR_SERVER })
 		}
-
-		const userInstance = await db.user()
-
-		const userInDb = await userInstance.getUserById(id)
-
-		if (!userInDb) {
-			this.newLogger.error('user not exist')
-			return res.status(401).json({ message: 'Utilisateur introuvable' })
-		}
-
-		const encryptNewPassword = passwordEncrypt(newPassword)
-		const ressource = {
-			role: userInDb.role,
-			password: encryptNewPassword,
-		}
-		const { isError, errorMessage } = await userInstance.updateUser(userInDb.id, ressource)
-		if (isError) {
-			this.newLogger.error(errorMessage)
-			return res.status(401).json({ message: errorMessage })
-		}
-		return res.status(200).json({ message: 'Mot de passe changé avec succès' })
 	}
 
 	deleteUser = async (req, res) => {
@@ -449,7 +462,7 @@ export class CommunController {
 			const userInDb = await userInstance.getUserById(idUser)
 
 			if (!userInDb) {
-				return res.status(401).json({ message: 'Utilisateur un trouvable' })
+				return res.status(401).json({ message: 'Utilisateur introuvable' })
 			}
 
 			let isDeleteUser

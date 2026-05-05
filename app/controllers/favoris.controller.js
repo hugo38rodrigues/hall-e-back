@@ -2,55 +2,72 @@ import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 import Logger from '../utils/logger.js'
 
+const SENTINELS = {
+	USER_NOT_FOUND: Symbol('USER_NOT_FOUND'),
+	WRONG_ROLE: Symbol('WRONG_ROLE'),
+	SERVER_ERROR: Symbol('SERVER_ERROR'),
+}
+
+const VALID_TYPES = ['game', 'league', 'teams', 'barName']
+
 export class FavorisController {
 	constructor() {
 		this.newLogger = new Logger()
 	}
 
-	#formatedFavoriteBarName = (bar) => (
-		{
-			id: bar.id,
-			name: bar.name,
+	#formatedFavoriteBarName = (bar) => ({
+		id: bar.id,
+		name: bar.name,
+	})
+
+	/**
+	 * Convertit un sentinel (ou une valeur de succès) en réponse HTTP.
+	 */
+	#sendResult = (res, result) => {
+		if (result === SENTINELS.USER_NOT_FOUND) {
+			return res.status(404).json({ message: 'Utilisateur introuvable' })
 		}
-	)
+		if (result === SENTINELS.WRONG_ROLE) {
+			return res.status(403).json({ message: 'Vous n\'avez pas le bon rôle' })
+		}
+		if (result === SENTINELS.SERVER_ERROR) {
+			return res.status(500).json({ message: ERROR_SERVER })
+		}
+		return res.status(200).json(result)
+	}
 
 	addFavorites = async (req, res) => {
 		try {
-			const {
-				userId, type, id,
-			} = req.body
-			let addFavoris
+			const { userId, type, id } = req.body ?? {}
 
+			if (!VALID_TYPES.includes(type)) {
+				return res.status(400).json({ message: 'Type de favori invalide' })
+			}
+			if (userId === undefined || id === undefined) {
+				return res.status(400).json({ message: 'userId et id sont requis' })
+			}
+
+			let result
 			switch (type) {
 			case 'game':
-				addFavoris = await this.addFavorisGameController({ userId, id })
+				result = await this.addFavorisGameController({ userId, id })
 				break
 			case 'league':
-				addFavoris = await this.addFavorisLeagueController({ userId, id })
+				result = await this.addFavorisLeagueController({ userId, id })
 				break
 			case 'teams':
-				addFavoris = await this.addFavorisTeamController({ userId, id })
+				result = await this.addFavorisTeamController({ userId, id })
 				break
 			case 'barName':
-				addFavoris = await this.addFavorisBarNameController({ userId, id })
+				result = await this.addFavorisBarNameController({ userId, id })
 				break
 			default:
-				return res.status(401).json({ message: 'Erreur dans la requete' })
+				// Inatteignable grâce à la garde VALID_TYPES, mais on garde
+				// le cas pour blinder en cas de modif future de la liste.
+				return res.status(400).json({ message: 'Type de favori invalide' })
 			}
 
-			if (addFavoris === 1) {
-				return res.status(500).json({ message: 'Vous n\'avez pas le bon rôle' })
-			}
-
-			if (addFavoris === ERROR_SERVER) {
-				return res.status(500).json({ message: ERROR_SERVER })
-			}
-
-			if (addFavoris === undefined) {
-				return res.status(401).json({ message: 'Utilisateur introuvable' })
-			}
-
-			return res.status(200).json(addFavoris)
+			return this.#sendResult(res, result)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
@@ -59,214 +76,131 @@ export class FavorisController {
 
 	deleteFavorites = async (req, res) => {
 		try {
-			const { type, userId, id } = req.body
-			let deleteFavoris
+			const { userId, type, id } = req.body ?? {}
+
+			if (!VALID_TYPES.includes(type)) {
+				return res.status(400).json({ message: 'Type de favori invalide' })
+			}
+			if (userId === undefined || id === undefined) {
+				return res.status(400).json({ message: 'userId et id sont requis' })
+			}
+
+			let result
 			switch (type) {
 			case 'game':
-				deleteFavoris = await this.deleteFavorisGameController({ userId, id })
+				result = await this.deleteFavorisGameController({ userId, id })
 				break
 			case 'league':
-				deleteFavoris = await this.deleteFavorisLeagueController({ userId, id })
+				result = await this.deleteFavorisLeagueController({ userId, id })
 				break
 			case 'teams':
-				deleteFavoris = await this.deleteFavorisTeamController({ userId, id })
+				result = await this.deleteFavorisTeamController({ userId, id })
 				break
 			case 'barName':
-				deleteFavoris = await this.deleteFavorisBarNameController({ userId, id })
+				result = await this.deleteFavorisBarNameController({ userId, id })
 				break
 			default:
-				return res.status(401).json({ message: 'Erreur dans la requete' })
+				return res.status(400).json({ message: 'Type de favori invalide' })
 			}
 
-			if (deleteFavoris === ERROR_SERVER) {
-				return res.status(500).json({ message: ERROR_SERVER })
-			}
-			if (deleteFavoris === 1) {
-				return res.status(500).json({ message: 'Vous n\'avez pas le bon rôle' })
-			}
-
-			return res.status(200).json(deleteFavoris)
+			return this.#sendResult(res, result)
 		} catch (error) {
 			this.newLogger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
-	addFavorisGameController = async ({ userId, id }) => {
+	#getUserRole = async (userId) => {
+		const userInstance = await db.user()
+		const userDb = await userInstance.getUserById(userId)
+		if (!userDb) return { user: null, role: null }
+		const role = userDb.dataValues?.role ?? userDb.role ?? null
+		return { user: userDb, role }
+	}
+
+	#buildTriRoleController = ({ clientMethod, barMethod }) => async ({ userId, id }) => {
 		try {
-			const userInstance = await db.user()
-			const barInstance = await db.bar()
-			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(userId)
-			let addGame
+			const { user, role } = await this.#getUserRole(userId)
+			if (!user) return SENTINELS.USER_NOT_FOUND
 
-			if (userDb.dataValues.role === 'client') {
-				addGame = await clientInstance.addFavoriteGame({ clientId: userId, id })
-			} else if (userDb.dataValues.role === 'bar') {
-				addGame = await barInstance.addFavoriteGame({ barId: userId, id })
-			} else {
-				return undefined
+			if (role === 'client') {
+				const clientInstance = await db.client()
+				return await clientInstance[clientMethod]({ clientId: userId, id })
 			}
-
-			return addGame
+			if (role === 'bar') {
+				const barInstance = await db.bar()
+				return await barInstance[barMethod]({ barId: userId, id })
+			}
+			return SENTINELS.WRONG_ROLE
 		} catch (error) {
 			this.newLogger.error(error)
-			return ERROR_SERVER
+			return SENTINELS.SERVER_ERROR
 		}
 	}
 
-	deleteFavorisGameController = async ({ userId, id }) => {
-		try {
-			const userInstance = await db.user()
-			const barInstance = await db.bar()
-			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(userId)
-			let removeGame
+	addFavorisGameController = this.#buildTriRoleController({
+		clientMethod: 'addFavoriteGame',
+		barMethod: 'addFavoriteGame',
+	})
 
-			if (userDb.dataValues.role === 'client') {
-				removeGame = await clientInstance.removeFavoriteGame({ clientId: userId, id })
-			} else if (userDb.dataValues.role === 'bar') {
-				removeGame = await barInstance.removeFavoriteGame({ barId: userId, id })
-			} else {
-				return undefined
-			}
+	deleteFavorisGameController = this.#buildTriRoleController({
+		clientMethod: 'removeFavoriteGame',
+		barMethod: 'removeFavoriteGame',
+	})
 
-			return removeGame
-		} catch (error) {
-			this.newLogger.error(error)
-			return ERROR_SERVER
-		}
-	}
+	addFavorisLeagueController = this.#buildTriRoleController({
+		clientMethod: 'addFavoriteLeague',
+		barMethod: 'addFavoriteLeague',
+	})
 
-	addFavorisLeagueController = async ({ userId, id }) => {
-		try {
-			const userInstance = await db.user()
-			const barInstance = await db.bar()
-			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(userId)
-			let addLeague
+	deleteFavorisLeagueController = this.#buildTriRoleController({
+		clientMethod: 'removeFavoriteLeague',
+		barMethod: 'removeFavoriteLeague',
+	})
 
-			if (userDb.dataValues.role === 'client') {
-				addLeague = await clientInstance.addFavoriteLeague({ clientId: userId, id })
-			} else if (userDb.dataValues.role === 'bar') {
-				addLeague = await barInstance.addFavoriteLeague({ barId: userId, id })
-			} else {
-				return undefined
-			}
+	addFavorisTeamController = this.#buildTriRoleController({
+		clientMethod: 'addFavoriteTeam',
+		barMethod: 'addFavoriteTeam',
+	})
 
-			return addLeague
-		} catch (error) {
-			this.newLogger.error(error)
-			return ERROR_SERVER
-		}
-	}
-
-	deleteFavorisLeagueController = async ({ userId, id }) => {
-		try {
-			const userInstance = await db.user()
-			const barInstance = await db.bar()
-			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(userId)
-			let removeLeague
-
-			if (userDb.dataValues.role === 'client') {
-				removeLeague = await clientInstance.removeFavoriteLeague({ clientId: userId, id })
-			} else if (userDb.dataValues.role === 'bar') {
-				removeLeague = await barInstance.removeFavoriteLeague({ barId: userId, id })
-			} else {
-				return undefined
-			}
-
-			return removeLeague
-		} catch (error) {
-			this.newLogger.error(error)
-			return ERROR_SERVER
-		}
-	}
-
-	addFavorisTeamController = async ({ userId, id }) => {
-		try {
-			const userInstance = await db.user()
-			const barInstance = await db.bar()
-			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(userId)
-			let addTeam
-
-			if (userDb.dataValues.role === 'client') {
-				addTeam = await clientInstance.addFavoriteTeam({ clientId: userId, id })
-			} else if (userDb.dataValues.role === 'bar') {
-				addTeam = await barInstance.addFavoriteTeam({ barId: userId, id })
-			} else {
-				return undefined
-			}
-
-			return addTeam
-		} catch (error) {
-			this.newLogger.error(error)
-			return ERROR_SERVER
-		}
-	}
-
-	deleteFavorisTeamController = async ({ userId, id }) => {
-		try {
-			const userInstance = await db.user()
-			const barInstance = await db.bar()
-			const clientInstance = await db.client()
-			const userDb = await userInstance.getUserById(userId)
-			let removeTeam
-
-			if (userDb.dataValues.role === 'client') {
-				removeTeam = await clientInstance.removeFavoriteTeam({ clientId: userId, id })
-			} else if (userDb.dataValues.role === 'bar') {
-				removeTeam = await barInstance.removeFavoriteTeam({ barId: userId, id })
-			} else {
-				return undefined
-			}
-
-			return removeTeam
-		} catch (error) {
-			this.newLogger.error(error)
-			return ERROR_SERVER
-		}
-	}
+	deleteFavorisTeamController = this.#buildTriRoleController({
+		clientMethod: 'removeFavoriteTeam',
+		barMethod: 'removeFavoriteTeam',
+	})
 
 	addFavorisBarNameController = async ({ userId, id }) => {
 		try {
-			const userInstance = await db.user()
-			const clientInstance = await db.client()
-
-			const userInDb = await userInstance.getUserById(userId)
-
-			if (userInDb.dataValues.role !== 'client') {
+			const { user, role } = await this.#getUserRole(userId)
+			if (!user) return SENTINELS.USER_NOT_FOUND
+			if (role !== 'client') {
 				this.newLogger.error('Has the wrong role')
-				return 1
+				return SENTINELS.WRONG_ROLE
 			}
-			const addBarName = await clientInstance.addFavoriteBar({ clientId: userId, barId: id })
-			const formatedBarName = addBarName.map((bars) => this.#formatedFavoriteBarName(bars))
-			return { barName: formatedBarName }
+
+			const clientInstance = await db.client()
+			const bars = await clientInstance.addFavoriteBar({ clientId: userId, barId: id })
+			return bars.map((bar) => this.#formatedFavoriteBarName(bar))
 		} catch (error) {
 			this.newLogger.error(error)
-			return ERROR_SERVER
+			return SENTINELS.SERVER_ERROR
 		}
 	}
 
 	deleteFavorisBarNameController = async ({ userId, id }) => {
 		try {
-			const userInstance = await db.user()
-			const clientInstance = await db.client()
-
-			const userInDb = await userInstance.getUserById(userId)
-
-			if (userInDb.role !== 'client') {
+			const { user, role } = await this.#getUserRole(userId)
+			if (!user) return SENTINELS.USER_NOT_FOUND
+			if (role !== 'client') {
 				this.newLogger.error('Has the wrong role')
-				return 1
+				return SENTINELS.WRONG_ROLE
 			}
-			const deleteBarName = await clientInstance.removeFavoriteBar({ clientId: userId, barId: id })
 
-			return deleteBarName
+			const clientInstance = await db.client()
+			const bars = await clientInstance.removeFavoriteBar({ clientId: userId, barId: id })
+			return bars.map((bar) => this.#formatedFavoriteBarName(bar))
 		} catch (error) {
 			this.newLogger.error(error)
-			return ERROR_SERVER
+			return SENTINELS.SERVER_ERROR
 		}
 	}
 }

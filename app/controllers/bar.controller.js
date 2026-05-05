@@ -4,7 +4,7 @@ import { computeAdditionalHours } from '../utils/match-tools.js'
 import { CommunController } from './commun.controller.js'
 
 export class BarController extends CommunController {
-	#filterAndSortMatches = (matches) => {
+	#filterMatches = (matches) => {
 		const today = new Date()
 
 		return matches.filter((match) => {
@@ -18,7 +18,7 @@ export class BarController extends CommunController {
 		id: schedulingMatches.id,
 		hypeScore: schedulingMatches.hype_score,
 		streamPlatform: schedulingMatches.stream_platform,
-		numberoFGame: schedulingMatches.number_of_game,
+		numberOfGame: schedulingMatches.number_of_game,
 		team1: {
 			id: schedulingMatches.team1.id,
 			name: schedulingMatches.team1.name,
@@ -30,7 +30,7 @@ export class BarController extends CommunController {
 			logoUrl: schedulingMatches.team2.logo_url,
 		},
 		game: schedulingMatches.game,
-		league: schedulingMatches.game,
+		league: schedulingMatches.league,
 		date: schedulingMatches.date,
 	})
 
@@ -93,13 +93,18 @@ export class BarController extends CommunController {
 	}
 
 	getSchedulingMatchesController = async (req, res) => {
-		const { barId } = req.params
-		const barInstance = await db.bar()
+		try {
+			const { barId } = req.params
+			const barInstance = await db.bar()
 
-		const matchScheduling = await barInstance.getProgrammedMatches({ barId })
-		// eslint-disable-next-line max-len
-		const formatedSchedulingMatches = matchScheduling.map((match) => this.#formatedSchedulingMatches(match))
-		const filterSchedulingMatches = this.#filterAndSortMatches(formatedSchedulingMatches)
-		return res.status(200).json(filterSchedulingMatches)
+			const matchScheduling = await barInstance.getProgrammedMatches({ barId })
+			// eslint-disable-next-line max-len
+			const formatedSchedulingMatches = matchScheduling.map((match) => this.#formatedSchedulingMatches(match))
+			const filterSchedulingMatches = this.#filterMatches(formatedSchedulingMatches)
+			return res.status(200).json(filterSchedulingMatches)
+		} catch (error) {
+			this.newLogger.error(error)
+			return res.status(500).json({ message: ERROR_SERVER })
+		}
 	}
 }

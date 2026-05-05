@@ -12,6 +12,7 @@
   ],
   "settings": {
     "import/resolver": {
+      "typescript": {},
       "node": {
         "extensions": [
           ".js",
@@ -22,6 +23,16 @@
     }
   },
   "rules": {
+    "import/no-extraneous-dependencies": ["error", {
+        "devDependencies": [
+            "**/*.test.js",
+            "**/*.spec.js",
+            "tests/**/*.js",
+            "vitest.config.js",
+            "vitest.config.{js,ts,mjs}"
+        ]
+      }
+    ],
     "semi": [
       "error",
       "never"
