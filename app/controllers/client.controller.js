@@ -1,9 +1,4 @@
-import Logger from '../utils/logger.js'
-
 export class ClientController {
-	constructor() {
-		this.newLogger = new Logger()
-	}
 
 	// Code a ajouter pour la v2
 	// addLikeBarController = async (req, res) => {

@@ -15,52 +15,19 @@ import {
 	vi,
 } from 'vitest'
 
-vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => {
-	const mockGetProgrammedMatches = vi.fn()
-	return {
-		db: {
-			user: vi.fn(async () => ({})),
-			bar: vi.fn(async () => ({
-				getProgrammedMatches: mockGetProgrammedMatches,
-			})),
-		},
-		__mocks: { mockGetProgrammedMatches },
-	}
-})
-
-vi.mock('../../../../utils/constants.js', () => ({
-	ERROR_SERVER: 'Erreur serveur',
-}))
-
-vi.mock('../../../../utils/match-tools.js', () => {
-	const mockComputeAdditionalHours = vi.fn(() => 24 * 60)
-	return {
-		computeAdditionalHours: mockComputeAdditionalHours,
-		__mocks: { mockComputeAdditionalHours },
-	}
-})
-
-vi.mock('../../../../controllers/commun.controller.js', () => ({
-	CommunController: class {
-		constructor() {
-			this.newLogger = { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
-		}
-	},
-}))
+import { dbMocks, resetAllMocks, utilsMocks } from '../../../utils/setup.js'
 
 const { BarController } = await import('../../../../controllers/bar.controller.js')
-const matchTools = await import('../../../../utils/match-tools.js')
-const dbModule = await import('@hugo38rodrigues/bdd-service-hall-e/main.js')
-const { mockGetProgrammedMatches } = dbModule.__mocks
-const { mockComputeAdditionalHours } = matchTools.__mocks
 
 describe('BarController - #formatedSchedulingMatches (testé via getSchedulingMatchesController)', () => {
 	let controller
 	let res
 
 	beforeEach(() => {
-		vi.clearAllMocks()
-		mockComputeAdditionalHours.mockReturnValue(24 * 60)
+		resetAllMocks()
+		// Override par défaut : durée largement suffisante pour que les matchs
+		// avec date future ne soient pas filtrés
+		utilsMocks.computeAdditionalHours.mockReturnValue(24 * 60)
 		controller = new BarController()
 		res = {
 			status: vi.fn().mockReturnThis(),
@@ -69,7 +36,7 @@ describe('BarController - #formatedSchedulingMatches (testé via getSchedulingMa
 	})
 
 	const callWith = async (dbMatch) => {
-		mockGetProgrammedMatches.mockResolvedValue([dbMatch])
+		dbMocks.getProgrammedMatches.mockResolvedValue([dbMatch])
 		await controller.getSchedulingMatchesController(
 			{ params: { barId: 1 } },
 			res,
@@ -131,7 +98,8 @@ describe('BarController - #formatedSchedulingMatches (testé via getSchedulingMa
 
 	test('conserve la date sans la transformer', async () => {
 		const date = new Date('2027-01-15T20:00:00Z')
-		mockComputeAdditionalHours.mockReturnValue(60 * 24 * 365 * 2)
+		// Durée très large pour que le match reste éligible
+		utilsMocks.computeAdditionalHours.mockReturnValue(60 * 24 * 365 * 2)
 
 		const out = await callWith({
 			id: 1,

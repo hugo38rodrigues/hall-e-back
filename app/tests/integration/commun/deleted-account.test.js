@@ -13,7 +13,6 @@ import {
 import { dbMocks, resetAllMocks } from '../../utils/setup.js'
 
 const { CommunController } = await import('../../../controllers/commun.controller.js')
-
 const buildApp = () => {
 	const app = express()
 	app.use(express.json())

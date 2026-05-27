@@ -59,7 +59,9 @@ describe('CommunController.updateProfile', () => {
 			dataValues: {
 				id: 5,
 				email: 'a@b.c',
-				firstName: 'John',
+				first_name: 'John',
+				last_name: 'Doe',
+				role: 'client',
 				password: 'hashed',
 				favorites: { games: [] },
 			},
@@ -69,12 +71,14 @@ describe('CommunController.updateProfile', () => {
 
 		expect(res.status).toHaveBeenCalledWith(200)
 		const payload = res.json.mock.calls[0][0]
-		expect(payload).not.toHaveProperty('password')
-		expect(payload).not.toHaveProperty('favorites')
+		expect(payload.favorites).toEqual(null)
+		expect(payload.password).toEqual(undefined)
 		expect(payload).toMatchObject({
 			id: 5,
 			email: 'a@b.c',
-			firstName: 'John',
+			role: 'client',
+			favorites: null,
+			informations: { firstName: 'John', lastName: 'Doe', likeBar: null },
 		})
 	})
 

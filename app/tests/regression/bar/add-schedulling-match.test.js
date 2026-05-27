@@ -1,181 +1,140 @@
 /* eslint-disable no-underscore-dangle */
 /**
- * Tests de régression - addSchedulingMatchesController (Vitest)
+ * Tests d'intégration - addSchedulingMatchesController (Vitest)
  * --------------------------------------------------------------
- * Ces tests verrouillent des comportements précis qu'on ne souhaite
- * pas voir changer accidentellement (codes HTTP, messages d'erreur
- * exacts, ordre des appels DB, fautes d'orthographe contractuelles…).
+ * On monte un mini serveur Express, on branche le contrôleur et
+ * on tape dessus avec supertest.
+ *
+ * La couche DB reste mockée (test d'intégration "côté HTTP",
+ * pas un E2E vers Postgres).
  */
 
+import express from 'express'
+import request from 'supertest'
 import {
 	beforeEach,
 	describe,
 	expect,
 	test,
-	vi,
 } from 'vitest'
 
-vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => {
-	const mockGetUserById = vi.fn()
-	const mockGetMatchById = vi.fn()
-	const mockAddProgrammedMatch = vi.fn()
-	const mockUserFactory = vi.fn(async () => ({
-		getUserById: mockGetUserById,
-		getMatchById: mockGetMatchById,
-	}))
-	const mockBarFactory = vi.fn(async () => ({
-		addProgrammedMatch: mockAddProgrammedMatch,
-	}))
-	return {
-		db: { user: mockUserFactory, bar: mockBarFactory },
-		__mocks: {
-			mockGetUserById,
-			mockGetMatchById,
-			mockAddProgrammedMatch,
-			mockUserFactory,
-			mockBarFactory,
-		},
-	}
-})
-
-vi.mock('../../../utils/constants.js', () => ({
-	ERROR_SERVER: 'Erreur serveur',
-}))
-
-vi.mock('../../../utils/match-tools.js', () => ({
-	computeAdditionalHours: vi.fn(() => 120),
-}))
-
-vi.mock('../../../controllers/commun.controller.js', () => ({
-	CommunController: class {
-		constructor() {
-			this.newLogger = { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
-		}
-	},
-}))
+import { dbMocks, resetAllMocks } from '../../utils/setup.js'
 
 const { BarController } = await import('../../../controllers/bar.controller.js')
-const dbModule = await import('@hugo38rodrigues/bdd-service-hall-e/main.js')
-const {
-	mockGetUserById,
-	mockGetMatchById,
-	mockAddProgrammedMatch,
-	mockUserFactory,
-} = dbModule.__mocks
 
-describe('REGRESSION - addSchedulingMatchesController', () => {
-	let controller; let req; let
-		res
+const buildApp = () => {
+	const app = express()
+	app.use(express.json())
+	const controller = new BarController()
+	app.post('/bar/scheduling', controller.addSchedulingMatchesController)
+	return app
+}
+
+describe('Intégration HTTP - POST /bar/scheduling', () => {
+	let app
 
 	beforeEach(() => {
-		vi.clearAllMocks()
-		controller = new BarController()
-		req = { body: { matchId: 42, barId: 7 } }
-		res = {
-			status: vi.fn().mockReturnThis(),
-			json: vi.fn().mockReturnThis(),
-		}
+		resetAllMocks()
+		app = buildApp()
 	})
 
-	// ------------------------------------------------------------------
-	// Contrats de message exacts (front-dépendants)
-	// ------------------------------------------------------------------
-	test('message succès EXACT : "Match planifié"', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(true)
+	test('200 quand tout est valide', async () => {
+		dbMocks.getUserById.mockResolvedValue({ id: 7, role: 'bar' })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.addProgrammedMatch.mockResolvedValue(true)
 
-		await controller.addSchedulingMatchesController(req, res)
-		expect(res.json).toHaveBeenCalledWith({ message: 'Match planifié' })
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
+
+		expect(res.status).toBe(200)
+		expect(res.body).toEqual({ message: 'Match planifié' })
 	})
 
-	test('message 401 (user/match inconnu) EXACT', async () => {
-		mockGetUserById.mockResolvedValue(null)
-		mockGetMatchById.mockResolvedValue(null)
+	test('passe { barId, matchId } à addProgrammedMatch', async () => {
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.addProgrammedMatch.mockResolvedValue(true)
 
-		await controller.addSchedulingMatchesController(req, res)
-		expect(res.json).toHaveBeenCalledWith({
-			message: 'Utilisateur inconnu ou match inconnu',
+		await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
+
+		expect(dbMocks.addProgrammedMatch).toHaveBeenCalledWith({
+			barId: 7,
+			matchId: 42,
 		})
 	})
 
-	test('message 401 (échec planif) conserve la faute "plannifié"', async () => {
-		// Faute d'orthographe historique. Si on la corrige côté serveur,
-		// il faut prévenir le front (i18n, tests UI…).
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(false)
+	test('401 si l\'utilisateur n\'existe pas', async () => {
+		dbMocks.getUserById.mockResolvedValue(null)
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
 
-		await controller.addSchedulingMatchesController(req, res)
-		expect(res.json).toHaveBeenCalledWith({
-			message: 'Impossible de plannifié le match',
-		})
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
+
+		expect(res.status).toBe(401)
+		expect(res.body.message).toContain('inconnu')
+		expect(dbMocks.addProgrammedMatch).not.toHaveBeenCalled()
 	})
 
-	// ------------------------------------------------------------------
-	// Codes HTTP figés
-	// ------------------------------------------------------------------
-	test('utilise 401 (et NON 404 ou 400) pour les ressources introuvables', async () => {
-		mockGetUserById.mockResolvedValue(null)
-		mockGetMatchById.mockResolvedValue({ id: 42 })
+	test('401 si le match n\'existe pas', async () => {
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue(null)
 
-		await controller.addSchedulingMatchesController(req, res)
-		expect(res.status).toHaveBeenCalledWith(401)
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
+
+		expect(res.status).toBe(401)
+		expect(dbMocks.addProgrammedMatch).not.toHaveBeenCalled()
 	})
 
-	test('utilise 500 pour toute exception interne (jamais 200)', async () => {
-		mockGetUserById.mockRejectedValue(new Error('x'))
-		await controller.addSchedulingMatchesController(req, res)
-		expect(res.status).toHaveBeenCalledWith(500)
-		expect(res.status).not.toHaveBeenCalledWith(200)
+	test('401 si la planification échoue côté DB', async () => {
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.addProgrammedMatch.mockResolvedValue(false)
+
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
+
+		expect(res.status).toBe(401)
+		expect(res.body.message).toMatch(/plannifi/i)
 	})
 
-	// ------------------------------------------------------------------
-	// Ordre d'appel
-	// ------------------------------------------------------------------
-	test('vérifie le bar AVANT le match (ordre des appels)', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(true)
+	test('500 si la DB lève une exception', async () => {
+		dbMocks.getUserById.mockRejectedValue(new Error('boom'))
 
-		await controller.addSchedulingMatchesController(req, res)
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
 
-		const userOrder = mockGetUserById.mock.invocationCallOrder[0]
-		const matchOrder = mockGetMatchById.mock.invocationCallOrder[0]
-		const addOrder = mockAddProgrammedMatch.mock.invocationCallOrder[0]
-
-		expect(userOrder).toBeLessThan(matchOrder)
-		expect(matchOrder).toBeLessThan(addOrder)
+		expect(res.status).toBe(500)
+		expect(res.body).toEqual({ message: 'Erreur serveur' })
 	})
 
-	test('REGRESSION : getMatchById est appelée sur l\'instance USER (pas sur bar)', async () => {
-		// Comportement actuel inhabituel : `getMatchById` vit sur `db.user()`.
-		// Si on déplace cette méthode sur `db.match()` ou `db.bar()`, il faut
-		// adapter le contrôleur ET ce test.
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(true)
+	test('content-type est bien application/json', async () => {
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.addProgrammedMatch.mockResolvedValue(true)
 
-		await controller.addSchedulingMatchesController(req, res)
-		expect(mockGetMatchById).toHaveBeenCalled()
-		expect(mockUserFactory).toHaveBeenCalled()
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({ matchId: 42, barId: 7 })
+
+		expect(res.headers['content-type']).toMatch(/application\/json/)
 	})
 
-	// ------------------------------------------------------------------
-	// Lecture du body (pas params)
-	// ------------------------------------------------------------------
-	test('lit matchId et barId depuis req.body (pas req.params)', async () => {
-		req = {
-			body: { matchId: 99, barId: 100 },
-			params: { matchId: 1, barId: 2 }, // params différents → ignorés
-		}
-		mockGetUserById.mockResolvedValue({ id: 100 })
-		mockGetMatchById.mockResolvedValue({ id: 99 })
-		mockAddProgrammedMatch.mockResolvedValue(true)
+	test('req.body vide → 401 (user/match introuvables)', async () => {
+		dbMocks.getUserById.mockResolvedValue(null)
+		dbMocks.getMatchById.mockResolvedValue(null)
 
-		await controller.addSchedulingMatchesController(req, res)
+		const res = await request(app)
+			.post('/bar/scheduling')
+			.send({})
 
-		expect(mockGetUserById).toHaveBeenCalledWith(100)
-		expect(mockGetMatchById).toHaveBeenCalledWith(99)
+		expect(res.status).toBe(401)
 	})
 })

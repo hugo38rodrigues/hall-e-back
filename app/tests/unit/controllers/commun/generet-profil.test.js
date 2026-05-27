@@ -1,13 +1,7 @@
 /**
- * Tests unitaires - #generatedProfil (méthode privée)
- * ----------------------------------------------------
+ * Tests unitaires - _generateProfile (méthode protégée)
+ * ------------------------------------------------------
  * Testée indirectement via getProfil.
- *
- * Cette méthode formate le profil retourné au front, en :
- *  - distinguant client / bar
- *  - aplatissant les favoris (games/leagues/teams + barNames pour client)
- *  - formatant les programmedMatches pour les bars
- *  - parsant lat/long en float
  */
 
 import {
@@ -25,9 +19,10 @@ import {
 
 const { CommunController } = await import('../../../../controllers/commun.controller.js')
 
-describe('CommunController - #generatedProfil (via getProfil)', () => {
-	let controller; let req; let
-		res
+describe('CommunController - _generateProfile (via getProfil)', () => {
+	let controller
+	let req
+	let res
 
 	beforeEach(() => {
 		resetAllMocks()
@@ -35,7 +30,11 @@ describe('CommunController - #generatedProfil (via getProfil)', () => {
 		({ req, res } = buildReqRes({
 			headers: { authorization: 'Bearer token' },
 		}))
+
+		// Le controller utilise this.#jwt.getIdFromAuthHeader(token)
+		// → on mocke la méthode de Jwt qui le renvoie
 		utilsMocks.getIdInToken.mockReturnValue(5)
+
 		dbMocks.getUserById.mockResolvedValue({
 			id: 5,
 			dataValues: { email: 'a@b.c' },
@@ -67,21 +66,6 @@ describe('CommunController - #generatedProfil (via getProfil)', () => {
 			lastName: 'Doe',
 			likeBar: true,
 		})
-	})
-
-	test('client : programmedMatches et userLocation sont null', async () => {
-		const out = await callWith({
-			id: 5,
-			email: 'a@b.c',
-			role: 'client',
-			first_name: 'John',
-			last_name: 'Doe',
-			likeBar: false,
-			favoris: [],
-		})
-
-		expect(out.programmedMatches).toBeNull()
-		expect(out.userLocation).toBeNull()
 	})
 
 	test('client : favorites = null si liste vide', async () => {
@@ -134,6 +118,20 @@ describe('CommunController - #generatedProfil (via getProfil)', () => {
 		])
 	})
 
+	test('client : pas de programmedMatches ni userLocation dans la sortie', async () => {
+		const out = await callWith({
+			id: 5,
+			email: 'a@b.c',
+			role: 'client',
+			first_name: 'John',
+			last_name: 'Doe',
+			favoris: [],
+		})
+
+		expect(out).not.toHaveProperty('programmedMatches')
+		expect(out).not.toHaveProperty('userLocation')
+	})
+
 	// ------------------------------------------------------------------
 	// BAR
 	// ------------------------------------------------------------------
@@ -180,9 +178,10 @@ describe('CommunController - #generatedProfil (via getProfil)', () => {
 
 		expect(out.userLocation).toEqual({ longitude: 4.85, latitude: 45.75 })
 		expect(typeof out.userLocation.longitude).toBe('number')
+		expect(typeof out.userLocation.latitude).toBe('number')
 	})
 
-	test('bar : programmedMatches formatés via #formatedProgrammedMatch', async () => {
+	test('bar : programmedMatches formatés (snake_case → camelCase)', async () => {
 		const programmedMatches = [
 			{
 				dataValues: {
@@ -220,9 +219,26 @@ describe('CommunController - #generatedProfil (via getProfil)', () => {
 		})
 	})
 
-	test('bar : pour client, barNames présent même si role bar dans favoris (cas dégradé)', async () => {
-		// Le code teste `data.role === 'client'` pour `barName`.
-		// Pour un bar, barName = []
+	test('bar : programmedMatches null si aucun match', async () => {
+		const out = await callWith({
+			id: 5,
+			email: 'bar@bar.com',
+			role: 'bar',
+			name: '',
+			address: '',
+			price: '',
+			description: '',
+			pictures: [],
+			longitude: '0',
+			latitude: '0',
+			programmedMatches: null,
+			favoris: [],
+		})
+
+		expect(out.programmedMatches).toBeNull()
+	})
+
+	test('bar : barName est toujours un tableau vide (pas de barNames pour un bar)', async () => {
 		const out = await callWith({
 			id: 5,
 			email: 'bar@bar.com',

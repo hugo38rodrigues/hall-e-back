@@ -13,41 +13,11 @@ import {
 	describe,
 	expect,
 	test,
-	vi,
 } from 'vitest'
 
-vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => {
-	const mockGetProgrammedMatches = vi.fn()
-	return {
-		db: {
-			user: vi.fn(async () => ({})),
-			bar: vi.fn(async () => ({
-				getProgrammedMatches: mockGetProgrammedMatches,
-			})),
-		},
-		__mocks: { mockGetProgrammedMatches },
-	}
-})
-
-vi.mock('../../../utils/constants.js', () => ({
-	ERROR_SERVER: 'Erreur serveur',
-}))
-
-vi.mock('../../../utils/match-tools.js', () => ({
-	computeAdditionalHours: vi.fn(() => 120),
-}))
-
-vi.mock('../../controllers/commun.controller.js', () => ({
-	CommunController: class {
-		constructor() {
-			this.newLogger = { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
-		}
-	},
-}))
+import { dbMocks, resetAllMocks } from '../../utils/setup.js'
 
 const { BarController } = await import('../../../controllers/bar.controller.js')
-const dbModule = await import('@hugo38rodrigues/bdd-service-hall-e/main.js')
-const { mockGetProgrammedMatches } = dbModule.__mocks
 
 const buildApp = () => {
 	const app = express()
@@ -73,12 +43,12 @@ describe('Intégration HTTP - GET /bar/:barId/scheduling', () => {
 	let app
 
 	beforeEach(() => {
-		vi.clearAllMocks()
+		resetAllMocks()
 		app = buildApp()
 	})
 
 	test('200 + tableau JSON formaté', async () => {
-		mockGetProgrammedMatches.mockResolvedValue([
+		dbMocks.getProgrammedMatches.mockResolvedValue([
 			buildDbMatch({ id: 1 }),
 			buildDbMatch({ id: 2 }),
 		])
@@ -97,16 +67,16 @@ describe('Intégration HTTP - GET /bar/:barId/scheduling', () => {
 	})
 
 	test('le barId du params est bien remonté à la DB', async () => {
-		mockGetProgrammedMatches.mockResolvedValue([])
+		dbMocks.getProgrammedMatches.mockResolvedValue([])
 
 		await request(app).get('/bar/123/scheduling')
 
-		expect(mockGetProgrammedMatches).toHaveBeenCalledWith({ barId: '123' })
+		expect(dbMocks.getProgrammedMatches).toHaveBeenCalledWith({ barId: '123' })
 	})
 
 	test('les Date sont sérialisées en ISO string dans la réponse', async () => {
 		const date = new Date(Date.now() + 24 * 60 * 60 * 1000)
-		mockGetProgrammedMatches.mockResolvedValue([buildDbMatch({ date })])
+		dbMocks.getProgrammedMatches.mockResolvedValue([buildDbMatch({ date })])
 
 		const res = await request(app).get('/bar/7/scheduling')
 
@@ -115,7 +85,7 @@ describe('Intégration HTTP - GET /bar/:barId/scheduling', () => {
 	})
 
 	test('renvoie [] quand aucun match n\'est programmé', async () => {
-		mockGetProgrammedMatches.mockResolvedValue([])
+		dbMocks.getProgrammedMatches.mockResolvedValue([])
 
 		const res = await request(app).get('/bar/7/scheduling')
 
@@ -124,9 +94,19 @@ describe('Intégration HTTP - GET /bar/:barId/scheduling', () => {
 	})
 
 	test('content-type application/json', async () => {
-		mockGetProgrammedMatches.mockResolvedValue([])
+		dbMocks.getProgrammedMatches.mockResolvedValue([])
 
 		const res = await request(app).get('/bar/7/scheduling')
+
 		expect(res.headers['content-type']).toMatch(/application\/json/)
+	})
+
+	test('500 si la DB throw', async () => {
+		dbMocks.getProgrammedMatches.mockRejectedValue(new Error('DB down'))
+
+		const res = await request(app).get('/bar/7/scheduling')
+
+		expect(res.status).toBe(500)
+		expect(res.body).toEqual({ message: 'Erreur serveur' })
 	})
 })

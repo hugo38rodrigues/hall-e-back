@@ -1,10 +1,11 @@
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import { ERROR_SERVER } from '../utils/constants.js'
+import { logger } from '../utils/logger.js'
 import { computeAdditionalHours } from '../utils/match-tools.js'
 import { CommunController } from './commun.controller.js'
 
 export class BarController extends CommunController {
-	#filterMatches = (matches) => {
+	#filterExpiredMatches = (matches) => {
 		const today = new Date()
 
 		return matches.filter((match) => {
@@ -45,25 +46,25 @@ export class BarController extends CommunController {
 			const match = await userInstance.getMatchById(matchId)
 
 			if (!bar || !match) {
-				this.newLogger.error('User or match unknow')
+				logger.error('User or match unknow')
 				return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
 			}
 
 			const addProgrammed = await barInstance.addProgrammedMatch({ barId, matchId })
 
 			if (!addProgrammed) {
-				this.newLogger.error('Impossible planned match')
+				logger.error('Impossible planned match')
 				return res.status(401).json({ message: 'Impossible de plannifié le match' })
 			}
-
+			logger.info(`Match insert with sucess ${matchId}`)
 			return res.status(200).json({ message: 'Match planifié' })
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
-	deletedSchedulingMatchesController = async (req, res) => {
+	deleteSchedulingMatchesController = async (req, res) => {
 		try {
 			const { matchId, barId } = req.params
 
@@ -74,20 +75,20 @@ export class BarController extends CommunController {
 			const match = await userInstance.getMatchById(matchId)
 
 			if (!bar || !match) {
-				this.newLogger.error('User or match unknow')
+				logger.error('User or match unknow')
 				return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
 			}
 
-			const isDeleted = await barInstance.deletedProgMatch({ matchId, barId })
+			const isDeleted = await barInstance.deleteProgMatch({ matchId, barId })
 			if (!isDeleted) {
-				this.newLogger.error('Impossible to deleted match')
-				return res.status(401).json({ message: 'Impossible de supprimé le match' })
+				logger.error('There is no schedule')
+				return res.status(401).json({ message: 'Impossible de supprimer le match' })
 			}
 
-			this.newLogger.info(isDeleted)
+			logger.info('Match successfully deleted')
 			return res.status(200).json(matchId)
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error.message)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
@@ -100,10 +101,11 @@ export class BarController extends CommunController {
 			const matchScheduling = await barInstance.getProgrammedMatches({ barId })
 			// eslint-disable-next-line max-len
 			const formatedSchedulingMatches = matchScheduling.map((match) => this.#formatedSchedulingMatches(match))
-			const filterSchedulingMatches = this.#filterMatches(formatedSchedulingMatches)
-			return res.status(200).json(filterSchedulingMatches)
+			const filterExpiredMatches = this.#filterExpiredMatches(formatedSchedulingMatches)
+			logger.info('SucesseFully get programation matches')
+			return res.status(200).json(filterExpiredMatches)
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}

@@ -30,7 +30,7 @@ describe('Intégration HTTP - PUT /user/update-profil', () => {
 		app = buildApp()
 	})
 
-	test('200 + retire password & favorites', async () => {
+	test('Renvois un profile formater avec un code 200', async () => {
 		dbMocks.updateUser.mockResolvedValue({
 			dataValues: {
 				id: 5,
@@ -46,8 +46,8 @@ describe('Intégration HTTP - PUT /user/update-profil', () => {
 			.send({ userId: 5, profile: { firstName: 'John' } })
 
 		expect(res.status).toBe(200)
-		expect(res.body).not.toHaveProperty('password')
-		expect(res.body).not.toHaveProperty('favorites')
+		expect(res.body.favorites).toEqual(null)
+		expect(res.body.password).toEqual(undefined)
 	})
 
 	test('400 si userId manquant', async () => {

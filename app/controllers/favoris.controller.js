@@ -1,6 +1,6 @@
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import { ERROR_SERVER } from '../utils/constants.js'
-import Logger from '../utils/logger.js'
+import { logger } from '../utils/logger.js'
 
 const SENTINELS = {
 	USER_NOT_FOUND: Symbol('USER_NOT_FOUND'),
@@ -11,10 +11,6 @@ const SENTINELS = {
 const VALID_TYPES = ['game', 'league', 'teams', 'barName']
 
 export class FavorisController {
-	constructor() {
-		this.newLogger = new Logger()
-	}
-
 	#formatedFavoriteBarName = (bar) => ({
 		id: bar.id,
 		name: bar.name,
@@ -69,7 +65,7 @@ export class FavorisController {
 
 			return this.#sendResult(res, result)
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
@@ -105,7 +101,7 @@ export class FavorisController {
 
 			return this.#sendResult(res, result)
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
@@ -133,7 +129,7 @@ export class FavorisController {
 			}
 			return SENTINELS.WRONG_ROLE
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return SENTINELS.SERVER_ERROR
 		}
 	}
@@ -173,15 +169,16 @@ export class FavorisController {
 			const { user, role } = await this.#getUserRole(userId)
 			if (!user) return SENTINELS.USER_NOT_FOUND
 			if (role !== 'client') {
-				this.newLogger.error('Has the wrong role')
+				logger.error('Has the wrong role')
 				return SENTINELS.WRONG_ROLE
 			}
 
 			const clientInstance = await db.client()
 			const bars = await clientInstance.addFavoriteBar({ clientId: userId, barId: id })
+			logger.info('SuccessFully add barName favoris')
 			return bars.map((bar) => this.#formatedFavoriteBarName(bar))
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return SENTINELS.SERVER_ERROR
 		}
 	}
@@ -191,15 +188,16 @@ export class FavorisController {
 			const { user, role } = await this.#getUserRole(userId)
 			if (!user) return SENTINELS.USER_NOT_FOUND
 			if (role !== 'client') {
-				this.newLogger.error('Has the wrong role')
+				logger.error('Has the wrong role')
 				return SENTINELS.WRONG_ROLE
 			}
 
 			const clientInstance = await db.client()
 			const bars = await clientInstance.removeFavoriteBar({ clientId: userId, barId: id })
+			logger.info('SuccessFully delete barName favoris')
 			return bars.map((bar) => this.#formatedFavoriteBarName(bar))
 		} catch (error) {
-			this.newLogger.error(error)
+			logger.error(error)
 			return SENTINELS.SERVER_ERROR
 		}
 	}

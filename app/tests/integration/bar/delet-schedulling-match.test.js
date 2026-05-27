@@ -1,11 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /**
  * Tests d'intégration - deletedSchedulingMatchesController (Vitest)
- * ------------------------------------------------------------------
- * Vérifie le bon fonctionnement de la route DELETE,
- * incluant le passage des paramètres d'URL.
  */
-
 import express from 'express'
 import request from 'supertest'
 import {
@@ -13,113 +9,93 @@ import {
 	describe,
 	expect,
 	test,
-	vi,
 } from 'vitest'
-
-vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => {
-	const mockGetUserById = vi.fn()
-	const mockGetMatchById = vi.fn()
-	const mockDeletedProgMatch = vi.fn()
-	return {
-		db: {
-			user: vi.fn(async () => ({
-				getUserById: mockGetUserById,
-				getMatchById: mockGetMatchById,
-			})),
-			bar: vi.fn(async () => ({
-				deletedProgMatch: mockDeletedProgMatch,
-			})),
-		},
-		__mocks: { mockGetUserById, mockGetMatchById, mockDeletedProgMatch },
-	}
-})
-
-vi.mock('../../utils/constants.js', () => ({
-	ERROR_SERVER: 'Erreur serveur',
-}))
-
-vi.mock('../../utils/match-tools.js', () => ({
-	computeAdditionalHours: vi.fn(() => 120),
-}))
-
-vi.mock('../../controllers/commun.controller.js', () => ({
-	CommunController: class {
-		constructor() {
-			this.newLogger = { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
-		}
-	},
-}))
+import { dbMocks, resetAllMocks } from '../../utils/setup.js'
 
 const { BarController } = await import('../../../controllers/bar.controller.js')
-const dbModule = await import('@hugo38rodrigues/bdd-service-hall-e/main.js')
-const { mockGetUserById, mockGetMatchById, mockDeletedProgMatch } = dbModule.__mocks
 
 const buildApp = () => {
 	const app = express()
 	app.use(express.json())
 	const controller = new BarController()
 	app.delete(
-		'/bar/:barId/scheduling/:matchId',
-		controller.deletedSchedulingMatchesController,
+		'/bar/:barId/:matchId',
+		controller.deleteSchedulingMatchesController,
 	)
 	return app
 }
 
-describe('Intégration HTTP - DELETE /bar/:barId/scheduling/:matchId', () => {
+describe('Intégration HTTP - DELETE /bar/:barId/:matchId', () => {
 	let app
 
 	beforeEach(() => {
-		vi.clearAllMocks()
+		resetAllMocks()
 		app = buildApp()
 	})
 
 	test('200 quand la suppression réussit', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockDeletedProgMatch.mockResolvedValue(true)
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.deleteProgMatch.mockResolvedValue(true)
 
-		const res = await request(app).delete('/bar/7/scheduling/42')
-
+		const res = await request(app).delete('/bar/7/42')
 		expect(res.status).toBe(200)
-		// Le matchId vient de req.params, donc string '42'
-		expect(res.body === '42' || res.body === 42).toBe(true)
+		expect(res.body).toBe('42') // res.json(matchId) avec matchId string
 	})
 
 	test('passe bien matchId et barId issus de req.params à la DB', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockDeletedProgMatch.mockResolvedValue(true)
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.deleteProgMatch.mockResolvedValue(true)
 
-		await request(app).delete('/bar/7/scheduling/42')
+		await request(app).delete('/bar/7/42')
 
-		expect(mockDeletedProgMatch).toHaveBeenCalledWith({
+		expect(dbMocks.deleteProgMatch).toHaveBeenCalledWith({
 			matchId: '42',
 			barId: '7',
 		})
 	})
 
-	test('401 si bar inexistant', async () => {
-		mockGetUserById.mockResolvedValue(null)
-		mockGetMatchById.mockResolvedValue({ id: 42 })
+	test('401 si utilisateur (bar) inexistant', async () => {
+		dbMocks.getUserById.mockResolvedValue(null)
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
 
-		const res = await request(app).delete('/bar/7/scheduling/42')
+		const res = await request(app).delete('/bar/7/42')
+
 		expect(res.status).toBe(401)
+		expect(res.body).toEqual({
+			message: 'Utilisateur inconnu ou match inconnu',
+		})
+		expect(dbMocks.deleteProgMatch).not.toHaveBeenCalled()
+	})
+
+	test('401 si match inexistant', async () => {
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue(null)
+
+		const res = await request(app).delete('/bar/7/42')
+
+		expect(res.status).toBe(401)
+		expect(dbMocks.deleteProgMatch).not.toHaveBeenCalled()
 	})
 
 	test('401 si la suppression échoue', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockDeletedProgMatch.mockResolvedValue(false)
+		dbMocks.getUserById.mockResolvedValue({ id: 7 })
+		dbMocks.getMatchById.mockResolvedValue({ id: 42 })
+		dbMocks.deleteProgMatch.mockResolvedValue(false)
 
-		const res = await request(app).delete('/bar/7/scheduling/42')
+		const res = await request(app).delete('/bar/7/42')
+
 		expect(res.status).toBe(401)
+		expect(res.body).toEqual({ message: 'Impossible de supprimer le match' })
 	})
 
 	test('500 sur exception DB', async () => {
-		mockGetUserById.mockRejectedValue(new Error('timeout'))
+		dbMocks.getUserById.mockRejectedValue(new Error('timeout'))
 
-		const res = await request(app).delete('/bar/7/scheduling/42')
+		const res = await request(app).delete('/bar/7/42')
+
 		expect(res.status).toBe(500)
-		expect(res.body).toEqual({ message: 'Internal error' })
+		expect(res.body).toEqual({ message: 'Erreur serveur' }) // ← valeur de setup.js
 	})
 })

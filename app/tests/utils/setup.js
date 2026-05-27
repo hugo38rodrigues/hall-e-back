@@ -21,6 +21,7 @@
 
 import { vi } from 'vitest'
 
+process.env.SECRET_JWT_KEY = 'test-secret-key'
 // ============================================================
 // MOCKS - Base de données (@hugo38rodrigues/bdd-service-hall-e)
 // ============================================================
@@ -31,6 +32,7 @@ export const dbMocks = {
 	getMatches: vi.fn(),
 	getAllFilters: vi.fn(),
 	getBars: vi.fn(),
+	getProgrammedMatches: vi.fn(),
 	addClient: vi.fn(),
 	addBar: vi.fn(),
 	addCodeNumber: vi.fn(),
@@ -52,7 +54,10 @@ export const dbMocks = {
 	barAddFavoriteLeague: vi.fn(),
 	barRemoveFavoriteLeague: vi.fn(),
 	barAddFavoriteTeam: vi.fn(),
+	getMatchById: vi.fn(),
+	deleteProgMatch: vi.fn(),
 	barRemoveFavoriteTeam: vi.fn(),
+	addProgrammedMatch: vi.fn(),
 }
 
 vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => ({
@@ -69,6 +74,7 @@ vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => ({
 			addCodeNumber: dbMocks.addCodeNumber,
 			getCodeByNumber: dbMocks.getCodeByNumber,
 			updateUser: dbMocks.updateUser,
+			getMatchById: dbMocks.getMatchById,
 		})),
 		client: vi.fn(async () => ({
 			addFavoriteGame: dbMocks.addFavoriteGame,
@@ -82,13 +88,16 @@ vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => ({
 			deleteClient: dbMocks.deleteClient,
 		})),
 		bar: vi.fn(async () => ({
+			getProgrammedMatches: dbMocks.getProgrammedMatches,
 			addFavoriteGame: dbMocks.barAddFavoriteGame,
+			addProgrammedMatch: dbMocks.addProgrammedMatch,
 			removeFavoriteGame: dbMocks.barRemoveFavoriteGame,
 			addFavoriteLeague: dbMocks.barAddFavoriteLeague,
 			removeFavoriteLeague: dbMocks.barRemoveFavoriteLeague,
 			addFavoriteTeam: dbMocks.barAddFavoriteTeam,
 			removeFavoriteTeam: dbMocks.barRemoveFavoriteTeam,
 			deleteBar: dbMocks.deleteBar,
+			deleteProgMatch: dbMocks.deleteProgMatch,
 		})),
 	},
 }))
@@ -108,14 +117,27 @@ export const utilsMocks = {
 	generetedCode: vi.fn(() => ({ codeNumber: 123456, expiresIn: Date.now() + 600000 })),
 	// match-tools
 	computeAdditionalHours: vi.fn(() => 120),
-	// Authentification
+	// Jwt
 	tokenCreation: vi.fn(async () => 'fake.jwt.token'),
 	getIdInToken: vi.fn(() => 1),
+	validationTokenAccess: vi.fn(),
+	getIdFromAuthHeader: vi.fn(),
 }
 
 vi.mock('../../utils/encryption.js', () => ({
 	passwordEncrypt: (...args) => utilsMocks.passwordEncrypt(...args),
 	verifyPassword: (...args) => utilsMocks.verifyPassword(...args),
+}))
+
+vi.mock('../../middleware/jwt.js', () => ({
+	Jwt: class {
+		// Le nom DE LA MÉTHODE doit matcher ce qu'appelle le controller
+		getIdFromAuthHeader = (...args) => utilsMocks.getIdInToken(...args)
+
+		tokenCreation = (...args) => utilsMocks.tokenCreation(...args)
+
+		validationTokenAccess = (...args) => utilsMocks.validationTokenAccess(...args)
+	},
 }))
 
 vi.mock('../../utils/email.js', () => ({
@@ -151,9 +173,9 @@ vi.mock('../../utils/regex.js', () => ({
 	IS_ID: /^\d+$/,
 }))
 
-// Authentification : classe avec méthodes statiques + d'instance
-vi.mock('../../middleware/authentification.js', () => ({
-	Authentification: class {
+// Jwt : classe avec méthodes statiques + d'instance
+vi.mock('../../middleware/Jwt.js', () => ({
+	Jwt: class {
 		static getIdInToken = (...args) => utilsMocks.getIdInToken(...args)
 
 		static tokenCreation = (...args) => utilsMocks.tokenCreation(...args)
@@ -162,17 +184,13 @@ vi.mock('../../middleware/authentification.js', () => ({
 	},
 }))
 
-// Logger : on remplace par des vi.fn() silencieux
+export const loggerMock = {
+	info: vi.fn(),
+	error: vi.fn(),
+	warn: vi.fn(),
+}
 vi.mock('../../utils/logger.js', () => ({
-	default: class {
-		info = vi.fn()
-
-		error = vi.fn()
-
-		warn = vi.fn()
-
-		log = vi.fn()
-	},
+	logger: loggerMock,
 }))
 
 // ============================================================
@@ -192,6 +210,9 @@ export const resetAllMocks = () => {
 	utilsMocks.computeAdditionalHours.mockReturnValue(120)
 	utilsMocks.tokenCreation.mockResolvedValue('fake.jwt.token')
 	utilsMocks.getIdInToken.mockReturnValue(1)
+	loggerMock.info.mockReset()
+	loggerMock.error.mockReset()
+	loggerMock.warn.mockReset()
 }
 
 /**

@@ -3,9 +3,8 @@ import cors from 'cors'
 import express from 'express'
 import barRoutes from './routes/bar.route.js'
 import communRoutes from './routes/commun.route.js'
-import Logger from './utils/logger.js'
+import { logger } from './utils/logger.js'
 
-const logger = new Logger('Server')
 const app = express()
 const { PORT } = process.env
 
@@ -36,7 +35,6 @@ app.use('/api/v1', communRoutes)
 app.use('/api/v1/bar', barRoutes)
 
 app.get('/api/v1/test', (_req, res) => res.send('Hello World!'))
-
 app.listen(PORT, () => {
 	logger.info(`Server is running on port ${PORT}`)
 })

@@ -21,7 +21,6 @@ import {
 	buildReqRes,
 	dbMocks,
 	resetAllMocks,
-	utilsMocks,
 } from '../../utils/setup.js'
 
 const { CommunController } = await import('../../../controllers/commun.controller.js')
@@ -193,66 +192,5 @@ describe('REGRESSION - contrats des payloads', () => {
 
 		await controller.getAllBarController(req, res)
 		expect(res.json.mock.calls[0][0][0].programations).toBeNull()
-	})
-
-	// ------------------------------------------------------------------
-	// getProfil → #generatedProfil
-	// ------------------------------------------------------------------
-	test('REGRESSION : profil client → favorites.barName est présent même vide ([])', async () => {
-		({ req, res } = buildReqRes({ headers: { authorization: 'Bearer x' } }))
-		utilsMocks.getIdInToken.mockReturnValue(5)
-		dbMocks.getUserById.mockResolvedValue({
-			id: 5,
-			dataValues: { email: 'a@b.c' },
-		})
-		dbMocks.getProfileUser.mockResolvedValue({
-			dataValues: {
-				id: 5,
-				email: 'a@b.c',
-				role: 'client',
-				first_name: 'John',
-				last_name: 'Doe',
-				likeBar: false,
-				favoris: [{
-					games: [{ id: 1, name: 'LoL' }], leagues: [], teams: [], barNames: [],
-				}],
-			},
-		})
-
-		await controller.getProfil(req, res)
-		const out = res.json.mock.calls[0][0]
-
-		expect(out.favorites).toHaveProperty('barName')
-		expect(out.favorites.barName).toEqual([])
-	})
-
-	test('REGRESSION : profil bar → favorites.barName = [] (pas null ni undefined)', async () => {
-		({ req, res } = buildReqRes({ headers: { authorization: 'Bearer x' } }))
-		utilsMocks.getIdInToken.mockReturnValue(5)
-		dbMocks.getUserById.mockResolvedValue({
-			id: 5,
-			dataValues: { email: 'a@b.c' },
-		})
-		dbMocks.getProfileUser.mockResolvedValue({
-			dataValues: {
-				id: 5,
-				email: 'bar@bar.com',
-				role: 'bar',
-				name: '',
-				address: '',
-				price: '',
-				description: '',
-				pictures: [],
-				longitude: '0',
-				latitude: '0',
-				programmedMatches: [],
-				favoris: [{ games: [{ id: 1, name: 'LoL' }], leagues: [], teams: [] }],
-			},
-		})
-
-		await controller.getProfil(req, res)
-		const out = res.json.mock.calls[0][0]
-
-		expect(out.favorites.barName).toEqual([])
 	})
 })

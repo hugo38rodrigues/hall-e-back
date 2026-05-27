@@ -55,7 +55,6 @@ describe('CommunController.getProfil', () => {
 		})
 
 		await controller.getProfil(req, res)
-
 		expect(utilsMocks.getIdInToken).toHaveBeenCalledWith('Bearer fake.jwt.token')
 		expect(res.status).toHaveBeenCalledWith(200)
 		const payload = res.json.mock.calls[0][0]

@@ -1,16 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 /**
- * Tests d'intégration - addSchedulingMatchesController (Vitest)
+ * Tests de régression - getSchedulingMatchesController (Vitest)
  * --------------------------------------------------------------
- * On monte un mini serveur Express, on branche le contrôleur et
- * on tape dessus avec supertest.
- *
- * La couche DB reste mockée (test d'intégration "côté HTTP",
- * pas un E2E vers Postgres).
+ * Verrouille les contrats du payload de sortie (clés exactes,
+ * typos volontaires, comportement du filtre temporel...).
  */
 
-import express from 'express'
-import request from 'supertest'
 import {
 	beforeEach,
 	describe,
@@ -19,129 +14,117 @@ import {
 	vi,
 } from 'vitest'
 
-vi.mock('@hugo38rodrigues/bdd-service-hall-e/main.js', () => {
-	const mockGetUserById = vi.fn()
-	const mockGetMatchById = vi.fn()
-	const mockAddProgrammedMatch = vi.fn()
-	return {
-		db: {
-			user: vi.fn(async () => ({
-				getUserById: mockGetUserById,
-				getMatchById: mockGetMatchById,
-			})),
-			bar: vi.fn(async () => ({
-				addProgrammedMatch: mockAddProgrammedMatch,
-			})),
-		},
-		__mocks: { mockGetUserById, mockGetMatchById, mockAddProgrammedMatch },
-	}
-})
-
-vi.mock('../../utils/constants.js', () => ({
-	ERROR_SERVER: 'Erreur serveur',
-}))
-
-vi.mock('../../utils/match-tools.js', () => ({
-	computeAdditionalHours: vi.fn(() => 120),
-}))
-
-vi.mock('../../controllers/commun.controller.js', () => ({
-	CommunController: class {
-		constructor() {
-			this.newLogger = { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
-		}
-	},
-}))
+import { dbMocks, utilsMocks, resetAllMocks } from '../../utils/setup.js'
 
 const { BarController } = await import('../../../controllers/bar.controller.js')
-const dbModule = await import('@hugo38rodrigues/bdd-service-hall-e/main.js')
-const { mockGetUserById, mockGetMatchById, mockAddProgrammedMatch } = dbModule.__mocks
 
-const buildApp = () => {
-	const app = express()
-	app.use(express.json())
-	const controller = new BarController()
-	app.post('/bar/scheduling', controller.addSchedulingMatchesController)
-	return app
-}
+const buildDbMatch = (overrides = {}) => ({
+	id: 1,
+	hype_score: 80,
+	stream_platform: 'Twitch',
+	number_of_game: 3,
+	team1: { id: 10, name: 'Team A', logo_url: 'a.png' },
+	team2: { id: 20, name: 'Team B', logo_url: 'b.png' },
+	game: { id: 1, name: 'LoL' },
+	league: { id: 1, name: 'LCK' },
+	date: new Date(Date.now() + 86400000),
+	...overrides,
+})
 
-describe('Intégration HTTP - POST /bar/scheduling', () => {
-	let app
+describe('REGRESSION - getSchedulingMatchesController', () => {
+	let controller
+	let res
 
 	beforeEach(() => {
-		vi.clearAllMocks()
-		app = buildApp()
+		resetAllMocks()
+		utilsMocks.computeAdditionalHours.mockReturnValue(120)
+		controller = new BarController()
+		res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn().mockReturnThis(),
+		}
 	})
 
-	test('200 quand tout est valide', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7, role: 'bar' })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(true)
+	const run = async (matches, barId = 7) => {
+		dbMocks.getProgrammedMatches.mockResolvedValue(matches)
+		await controller.getSchedulingMatchesController(
+			{ params: { barId } },
+			res,
+		)
+		return res.json.mock.calls[0][0]
+	}
 
-		const res = await request(app)
-			.post('/bar/scheduling')
-			.send({ matchId: 42, barId: 7 })
-
-		expect(res.status).toBe(200)
-		expect(res.body).toEqual({ message: 'Match planifié' })
+	// REG-001 ----------------------------------------------------
+	test('REG-001 : exactement 9 clés sur le match formaté', async () => {
+		const out = await run([buildDbMatch()])
+		expect(Object.keys(out[0])).toHaveLength(9)
 	})
 
-	test('401 si l\'utilisateur n\'existe pas', async () => {
-		mockGetUserById.mockResolvedValue(null)
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-
-		const res = await request(app)
-			.post('/bar/scheduling')
-			.send({ matchId: 42, barId: 7 })
-
-		expect(res.status).toBe(401)
-		expect(res.body.message).toContain('inconnu')
+	// REG-002 ----------------------------------------------------
+	test('REG-002 : noms de clés exacts', async () => {
+		const out = await run([buildDbMatch()])
+		expect(Object.keys(out[0]).sort()).toEqual(
+			[
+				'date',
+				'game',
+				'hypeScore',
+				'id',
+				'league',
+				'numberOfGame',
+				'streamPlatform',
+				'team1',
+				'team2',
+			].sort(),
+		)
 	})
 
-	test('401 si la planification échoue côté DB', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(false)
-
-		const res = await request(app)
-			.post('/bar/scheduling')
-			.send({ matchId: 42, barId: 7 })
-
-		expect(res.status).toBe(401)
-		expect(res.body.message).toMatch(/plannifi/i)
+	// REG-003 ----------------------------------------------------
+	test('REG-003 : team1 et team2 ont exactement {id, name, logoUrl}', async () => {
+		const out = await run([buildDbMatch()])
+		expect(Object.keys(out[0].team1).sort()).toEqual(['id', 'logoUrl', 'name'])
+		expect(Object.keys(out[0].team2).sort()).toEqual(['id', 'logoUrl', 'name'])
 	})
 
-	test('500 si la DB lève une exception', async () => {
-		mockGetUserById.mockRejectedValue(new Error('boom'))
+	// REG-004 ----------------------------------------------------
+	test('REG-004 : un match dont la fin = "maintenant" est CONSERVÉ (>=)', async () => {
+		const startedAt = new Date(Date.now() - 60 * 60 * 1000)
+		utilsMocks.computeAdditionalHours.mockReturnValue(60)
 
-		const res = await request(app)
-			.post('/bar/scheduling')
-			.send({ matchId: 42, barId: 7 })
+		const out = await run([buildDbMatch({ date: startedAt })])
 
-		expect(res.status).toBe(500)
-		expect(res.body).toEqual({ message: 'Internal error' })
+		expect(out).toHaveLength(1)
 	})
 
-	test('content-type est bien application/json', async () => {
-		mockGetUserById.mockResolvedValue({ id: 7 })
-		mockGetMatchById.mockResolvedValue({ id: 42 })
-		mockAddProgrammedMatch.mockResolvedValue(true)
+	// REG-005 ----------------------------------------------------
+	test('REG-005 : retourne TOUJOURS 200 même pour une liste vide', async () => {
+		const out = await run([])
 
-		const res = await request(app)
-			.post('/bar/scheduling')
-			.send({ matchId: 42, barId: 7 })
-
-		expect(res.headers['content-type']).toMatch(/application\/json/)
+		expect(res.status).toHaveBeenCalledWith(200)
+		expect(out).toEqual([])
 	})
 
-	test('req.body est bien parsé même si envoyé en POST sans body explicite', async () => {
-		mockGetUserById.mockResolvedValue(null)
-		mockGetMatchById.mockResolvedValue(null)
+	// REG-006 ----------------------------------------------------
+	test('REG-006 : 500 sur exception DB, message générique', async () => {
+		dbMocks.getProgrammedMatches.mockRejectedValue(
+			new Error('Connection: postgres://user:secret@db:5432'),
+		)
 
-		const res = await request(app)
-			.post('/bar/scheduling')
-			.send({})
+		await controller.getSchedulingMatchesController(
+			{ params: { barId: 7 } },
+			res,
+		)
 
-		expect(res.status).toBe(401)
+		expect(res.status).toHaveBeenCalledWith(500)
+		const body = res.json.mock.calls[0][0]
+		expect(body).toEqual({ message: 'Erreur serveur' })
+		expect(JSON.stringify(body)).not.toContain('postgres')
+		expect(JSON.stringify(body)).not.toContain('secret')
+	})
+
+	// REG-007 ----------------------------------------------------
+	test('REG-007 : computeAdditionalHours est appelé avec (game.name, numberOfGame)', async () => {
+		await run([buildDbMatch({ game: { name: 'CS2' }, number_of_game: 5 })])
+
+		expect(utilsMocks.computeAdditionalHours).toHaveBeenCalledWith('CS2', 5)
 	})
 })
