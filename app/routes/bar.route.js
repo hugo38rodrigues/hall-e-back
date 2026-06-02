@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { BarController } from '../controllers/bar.controller.js'
-import { Jwt } from '../middleware/Jwt.js'
+import { Jwt } from '../middleware/jwt.js'
 import { RoleValidation } from '../middleware/RoleValidation.js'
 
 const router = Router()
