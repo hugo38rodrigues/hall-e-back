@@ -131,7 +131,6 @@ vi.mock('../../utils/encryption.js', () => ({
 
 vi.mock('../../middleware/jwt.js', () => ({
 	Jwt: class {
-		// Le nom DE LA MÉTHODE doit matcher ce qu'appelle le controller
 		getIdFromAuthHeader = (...args) => utilsMocks.getIdInToken(...args)
 
 		tokenCreation = (...args) => utilsMocks.tokenCreation(...args)
@@ -171,17 +170,6 @@ vi.mock('../../utils/regex.js', () => ({
 	IS_DESCRIPTION: /^.{5,}$/,
 	IS_CODE_NUMBER: /^\d{6}$/,
 	IS_ID: /^\d+$/,
-}))
-
-// Jwt : classe avec méthodes statiques + d'instance
-vi.mock('../../middleware/Jwt.js', () => ({
-	Jwt: class {
-		static getIdInToken = (...args) => utilsMocks.getIdInToken(...args)
-
-		static tokenCreation = (...args) => utilsMocks.tokenCreation(...args)
-
-		tokenCreation = (...args) => utilsMocks.tokenCreation(...args)
-	},
 }))
 
 export const loggerMock = {

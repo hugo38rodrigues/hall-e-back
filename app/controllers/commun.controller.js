@@ -412,8 +412,8 @@ export class CommunController {
 			return res.status(401).json({ message: 'Utilisateur introuvable' })
 		}
 
-		const { role } = userInDb.dataValues.role
-		let isDeleted
+		const { role } = userInDb.dataValues
+		let isDeleted = false
 
 		if (role === 'client') {
 			const clientInstance = await db.client()
