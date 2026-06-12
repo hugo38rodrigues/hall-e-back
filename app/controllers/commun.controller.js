@@ -328,7 +328,6 @@ export class CommunController {
 		const code = await userInstance.addCodeNumber(codeNumber, expiresIn, userDb.dataValues.id)
 		await sendEmailResetPassword(email, code)
 
-		// Bug corrigé : userDb._id → userDb.id
 		const token = await this.#jwt.tokenCreation(userDb.id, userDb.password)
 		return res.header('Authorization', token).status(200).send({ id: userDb.id })
 	})
