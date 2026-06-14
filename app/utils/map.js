@@ -1,7 +1,5 @@
 import axios from 'axios'
-import Logger from '../middleware/logger.js'
-
-const logger = new Logger()
+import { logger } from './logger.js'
 
 export const getCoordinatesFromAddress = async (address) => {
 	try {

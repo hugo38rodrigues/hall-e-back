@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import Logger from '../middleware/logger.js'
+import { logger } from './logger.js'
 
 const emailHtml = (codeNumber) => `<header style="font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction:column; align-items: center;">
   <h1 style="color: #987464;">Bienvenue sur Hall-E !</h1>
@@ -28,7 +28,6 @@ export const sendEmailResetPassword = async (email, token) => {
 			pass: process.env.USER_PASSWORD,
 		},
 	})
-	const newLogger = new Logger()
 
 	try {
 		await transporter.sendMail({
@@ -37,8 +36,8 @@ export const sendEmailResetPassword = async (email, token) => {
 			subject: 'Réinitialisation du mot de passe', // Sujet
 			html: emailHtml(token), // Corps de l'e-mail
 		})
-		newLogger.info(`send Email at ${email}`)
+		logger.info(`send Email at ${email}`)
 	} catch (error) {
-		newLogger.error(error)
+		logger.error(error)
 	}
 }

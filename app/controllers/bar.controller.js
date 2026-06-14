@@ -1,79 +1,112 @@
-import { databaseFactory } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
-import Logger from '../middleware/logger.js'
+import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 import { ERROR_SERVER } from '../utils/constants.js'
+import { logger } from '../utils/logger.js'
+import { computeAdditionalHours } from '../utils/match-tools.js'
+import { CommunController } from './commun.controller.js'
 
-export class BarController {
-	constructor() {
-		this.logger = new Logger()
+export class BarController extends CommunController {
+	#filterExpiredMatches = (matches) => {
+		const today = new Date()
+
+		return matches.filter((match) => {
+			const durationInMinutes = computeAdditionalHours(match.game.name, match.numberOfGame)
+			const matchEndTime = new Date(match.date.getTime() + durationInMinutes * 60 * 1000)
+			return matchEndTime >= today
+		})
 	}
+
+	#formatedSchedulingMatches = (schedulingMatches) => ({
+		id: schedulingMatches.id,
+		hypeScore: schedulingMatches.hype_score,
+		streamPlatform: schedulingMatches.stream_platform,
+		numberOfGame: schedulingMatches.number_of_game,
+		team1: {
+			id: schedulingMatches.team1.id,
+			name: schedulingMatches.team1.name,
+			logoUrl: schedulingMatches.team1.logo_url,
+		},
+		team2: {
+			id: schedulingMatches.team2.id,
+			name: schedulingMatches.team2.name,
+			logoUrl: schedulingMatches.team2.logo_url,
+		},
+		game: schedulingMatches.game,
+		league: schedulingMatches.league,
+		date: schedulingMatches.date,
+	})
 
 	addSchedulingMatchesController = async (req, res) => {
 		try {
 			const { matchId, barId } = req.body
 
-			const databaseInstance = databaseFactory()
-			const userInstance = await databaseInstance.usersInstances()
-			const barInstance = await databaseInstance.barInstance()
+			const userInstance = await db.user()
+			const barInstance = await db.bar()
 
 			const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
 
 			if (!bar || !match) {
-				this.logger.error('User or match unknow')
+				logger.error('User or match unknow')
 				return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
 			}
 
 			const addProgrammed = await barInstance.addProgrammedMatch({ barId, matchId })
 
 			if (!addProgrammed) {
-				this.logger.error('Impossible planned match')
+				logger.error('Impossible planned match')
 				return res.status(401).json({ message: 'Impossible de plannifié le match' })
 			}
-
+			logger.info(`Match insert with sucess ${matchId}`)
 			return res.status(200).json({ message: 'Match planifié' })
 		} catch (error) {
-			this.logger.error(error)
+			logger.error(error)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
-	deletedSchedulingMatchesController = async (req, res) => {
+	deleteSchedulingMatchesController = async (req, res) => {
 		try {
-			const { matchId, barId } = req.body
-			const databaseInstance = databaseFactory()
+			const { matchId, barId } = req.params
 
-			const userInstance = await databaseInstance.usersInstances()
-			const barInstance = await databaseInstance.barInstance()
+			const userInstance = await db.user()
+			const barInstance = await db.bar()
 
 			const bar = await userInstance.getUserById(barId)
 			const match = await userInstance.getMatchById(matchId)
 
 			if (!bar || !match) {
-				this.logger.error('User or match unknow')
+				logger.error('User or match unknow')
 				return res.status(401).json({ message: 'Utilisateur inconnu ou match inconnu' })
 			}
 
-			const isDeleted = await barInstance.deletedProgMatch({ matchId, barId })
+			const isDeleted = await barInstance.deleteProgMatch({ matchId, barId })
 			if (!isDeleted) {
-				this.logger.error('Impossible to deleted match')
-				return res.status(401).json({ message: 'Impossible de supprimé le match' })
+				logger.error('There is no schedule')
+				return res.status(401).json({ message: 'Impossible de supprimer le match' })
 			}
 
-			this.logger.info(isDeleted)
+			logger.info('Match successfully deleted')
 			return res.status(200).json(matchId)
 		} catch (error) {
-			this.logger.error(error)
+			logger.error(error.message)
 			return res.status(500).json({ message: ERROR_SERVER })
 		}
 	}
 
 	getSchedulingMatchesController = async (req, res) => {
-		const { userId } = req.params
-		const databaseInstance = databaseFactory()
-		const barInstance = await databaseInstance.barInstance()
+		try {
+			const { barId } = req.params
+			const barInstance = await db.bar()
 
-		const bar = await barInstance.getProgrammedMatches(userId)
-
-		return res.status(200).json(bar.programmedMatches)
+			const matchScheduling = await barInstance.getProgrammedMatches({ barId })
+			// eslint-disable-next-line max-len
+			const formatedSchedulingMatches = matchScheduling.map((match) => this.#formatedSchedulingMatches(match))
+			const filterExpiredMatches = this.#filterExpiredMatches(formatedSchedulingMatches)
+			logger.info('SucesseFully get programation matches')
+			return res.status(200).json(filterExpiredMatches)
+		} catch (error) {
+			logger.error(error)
+			return res.status(500).json({ message: ERROR_SERVER })
+		}
 	}
 }
