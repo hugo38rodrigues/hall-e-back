@@ -18,11 +18,11 @@ const buildApp = () => {
 	const app = express()
 	app.use(express.json())
 	const controller = new CommunController()
-	app.post('/connexion', controller.connexion)
+	app.post('/auth/connexion', controller.connexion)
 	return app
 }
 
-describe('Intégration HTTP - POST /api/v1/connexion', () => {
+describe('Intégration HTTP - POST /api/v1/auth/connexion', () => {
 	let app
 
 	beforeEach(() => {
@@ -39,7 +39,7 @@ describe('Intégration HTTP - POST /api/v1/connexion', () => {
 		utilsMocks.verifyPassword.mockResolvedValue(true)
 
 		const res = await request(app)
-			.post('/connexion')
+			.post('/auth/connexion')
 			.send({ email: 'a@b.c', password: 'longenough' })
 
 		expect(res.status).toBe(200)
@@ -51,7 +51,7 @@ describe('Intégration HTTP - POST /api/v1/connexion', () => {
 		dbMocks.getUserByEmail.mockResolvedValue(undefined)
 
 		const res = await request(app)
-			.post('/connexion')
+			.post('/auth/connexion')
 			.send({ email: 'unknown@x.com', password: 'longenough' })
 
 		expect(res.status).toBe(401)
@@ -65,7 +65,7 @@ describe('Intégration HTTP - POST /api/v1/connexion', () => {
 		utilsMocks.verifyPassword.mockResolvedValue(false)
 
 		const res = await request(app)
-			.post('/connexion')
+			.post('/auth/connexion')
 			.send({ email: 'a@b.c', password: 'wrong' })
 
 		expect(res.status).toBe(401)
@@ -75,7 +75,7 @@ describe('Intégration HTTP - POST /api/v1/connexion', () => {
 		dbMocks.getUserByEmail.mockRejectedValue(new Error('DB down'))
 
 		const res = await request(app)
-			.post('/connexion')
+			.post('/auth/connexion')
 			.send({ email: 'a@b.c', password: 'longenough' })
 
 		expect(res.status).toBe(500)

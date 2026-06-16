@@ -19,7 +19,7 @@ const buildApp = () => {
 	const app = express()
 	app.use(express.json())
 	const controller = new CommunController()
-	app.post('/user/register', controller.createAccount)
+	app.post('/auth/register', controller.createAccount)
 	return app
 }
 
@@ -35,7 +35,7 @@ describe('Intégration HTTP - POST /register', () => {
 		dbMocks.getUserByEmail.mockResolvedValue(null)
 		dbMocks.addClient.mockResolvedValue(true)
 
-		const res = await request(app).post('/user/register').send({
+		const res = await request(app).post('/auth/register').send({
 			role: 'client',
 			email: 'john@doe.com',
 			password: 'longenough',
@@ -50,7 +50,7 @@ describe('Intégration HTTP - POST /register', () => {
 		dbMocks.getUserByEmail.mockResolvedValue(null)
 		dbMocks.addBar.mockResolvedValue(true)
 
-		const res = await request(app).post('/user/register').send({
+		const res = await request(app).post('/auth/register').send({
 			role: 'bar',
 			email: 'bar@bar.com',
 			password: 'longenough',
@@ -69,7 +69,7 @@ describe('Intégration HTTP - POST /register', () => {
 	test('401 quand l\'utilisateur existe déjà', async () => {
 		dbMocks.getUserByEmail.mockResolvedValue({ id: 1 })
 
-		const res = await request(app).post('/user/register').send({
+		const res = await request(app).post('/auth/register').send({
 			role: 'client',
 			email: 'john@doe.com',
 			password: 'longenough',
@@ -81,7 +81,7 @@ describe('Intégration HTTP - POST /register', () => {
 	})
 
 	test('401 quand le mail est invalide', async () => {
-		const res = await request(app).post('/user/register').send({
+		const res = await request(app).post('/auth/register').send({
 			role: 'client',
 			email: 'pasunemail',
 			password: 'longenough',
@@ -94,7 +94,7 @@ describe('Intégration HTTP - POST /register', () => {
 	test('500 sur exception DB', async () => {
 		dbMocks.getUserByEmail.mockRejectedValue(new Error('boom'))
 
-		const res = await request(app).post('/user/register').send({
+		const res = await request(app).post('/auth/register').send({
 			role: 'client',
 			email: 'john@doe.com',
 			password: 'longenough',
