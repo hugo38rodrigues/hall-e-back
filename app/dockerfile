@@ -9,10 +9,10 @@ WORKDIR /app
 # Copie manifeste + lock (npm ci = reproductible)
 COPY package.json package-lock.json ./
 
-# Reçoit le token GitHub Packages
-ARG GH_TOKEN
-
-RUN set -e; \
+# Lit le token depuis le secret monté (id doit matcher le workflow: github_token)
+RUN --mount=type=secret,id=github_token \
+  set -e; \
+  GH_TOKEN="$(cat /run/secrets/github_token)"; \
   { echo "registry=https://registry.npmjs.org/"; \
     echo "@hugo38rodrigues:registry=https://npm.pkg.github.com/"; \
     echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}"; } > /root/.npmrc; \
@@ -33,12 +33,6 @@ WORKDIR /app
 # Copie node_modules + code
 COPY --from=builder /app ./
 
-# (Optionnel) user non-root si besoin
-# USER node
-
-# Expose si ton API écoute 3000 (facultatif)
 EXPOSE 3000
 
-# Démarrage (adapte selon ton app)
-# pour l'API:
 CMD ["node", "server.js"]
