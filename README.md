@@ -27,9 +27,9 @@ l'**authentification** et s'appuie sur :
 ### ✨ Ce que fait l'API
 
 - 🔐 **Authentification** — inscription, connexion, gestion des comptes.
-- 📍 **Recherche de bars** — par géolocalisation et filtres.
-- 🎮 **Diffusions** — exposition des matchs de jeux vidéo diffusés par les bars.
-- ⭐ **Favoris** — gestion des bars favoris des utilisateurs.
+- 📍 **Recherche de bars** — par géolocalisation.
+- 🎮 **Diffusions** — exposition des matchs de jeux vidéo diffusés par les bars ou sur plateforme de stream.
+- ⭐ **Favoris** — gestion des favoris compétitions, équipes, jeux, bars.
 
 ---
 
@@ -64,15 +64,6 @@ export GITHUB_TOKEN=<GH_TOKEN>
 npm install
 ```
 
-### 🔐 Configuration (.env)
-
-| Variable       | Description                                | Exemple                          |
-| -------------- | ------------------------------------------ | -------------------------------- |
-| `PORT`         | Port d'écoute                              | `3000`                           |
-| `NODE_ENV`     | Environnement d'exécution                  | `production`                     |
-| `DATABASE_URL` | Connexion à la base de données             | `postgres://user:pwd@host/halle` |
-| `JWT_SECRET`   | Secret de signature des tokens             | `<secret>`                       |
-| `CORS_ORIGIN`  | Origine autorisée pour le mobile           | `https://app.hall-e.io`          |
 
 ### ▶️ Lancement
 
@@ -134,6 +125,5 @@ npm test
 
 <div align="center">
 
-🔗 **Projets liés** — [App mobile](./README-mobile.md) · [Service de récupération](./README-recuperation.md) · [Package BDD](./README-bdd.md)
-
+🔗 **Projets liés** — [App mobile](https://github.com/hugo38rodrigues/mobile-hall-e) · [Package bdd](https://github.com/hugo38rodrigues/bdd-hall-e) · [Service récupération des matches](https://github.com/hugo38rodrigues/recoveries_matches)
 </div>
