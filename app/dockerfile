@@ -10,12 +10,12 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Reçoit le token GitHub Packages
-ARG GITHUB_TOKEN
+ARG GH_TOKEN
 
 RUN set -e; \
   { echo "registry=https://registry.npmjs.org/"; \
     echo "@hugo38rodrigues:registry=https://npm.pkg.github.com/"; \
-    echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}"; } > /root/.npmrc; \
+    echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}"; } > /root/.npmrc; \
   npm ci --omit=dev; \
   rm -f /root/.npmrc; \
   npm cache clean --force
