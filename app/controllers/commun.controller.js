@@ -2,40 +2,18 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { db } from '@hugo38rodrigues/bdd-service-hall-e/main.js'
 
-import { Jwt } from '../middleware/jwt.js'
+import { TokenService } from '../middleware/token-service.js'
 import { generetedCode } from '../utils/code-generation.js'
 import { ERROR_SERVER } from '../utils/constants.js'
 import { sendEmailResetPassword } from '../utils/email.js'
-import { passwordEncrypt, verifyPassword } from '../utils/encryption.js'
+import { PasswordHasher } from '../utils/hashing.js'
 import { logger } from '../utils/logger.js'
 import { getCoordinatesFromAddress } from '../utils/map.js'
 import { computeAdditionalHours } from '../utils/match-tools.js'
 import {
-	IS_ADDRESS,
-	IS_BAR_NAME,
 	IS_CODE_NUMBER,
-	IS_DESCRIPTION,
-	IS_EMAIL,
 	IS_ID,
-	IS_PASSWORD,
-	IS_STRING,
 } from '../utils/regex.js'
-
-// ============================================================
-// Constantes & helpers module-level (internes au fichier)
-// ============================================================
-
-const CLIENT_ERRORS = {
-	INVALID_CREDENTIALS: { code: 1, message: 'Votre mot de passe ou votre mail est invalide' },
-	INVALID_NAME: { code: 2, message: 'Votre prénom ou nom est invalide' },
-}
-
-const BAR_ERRORS = {
-	INVALID_CREDENTIALS: { code: 1, message: 'Votre mot de passe ou votre mail est invalide' },
-	INVALID_ADDRESS: { code: 2, message: 'Votre Addresse est invalide' },
-	INVALID_DESCRIPTION: { code: 3, message: 'Votre description est invalide' },
-	INVALID_NAME: { code: 4, message: 'Votre nom est invalide' },
-}
 
 const withErrorHandler = (handler) => async (req, res) => {
 	try {
@@ -45,13 +23,18 @@ const withErrorHandler = (handler) => async (req, res) => {
 		return res.status(500).json({ message: ERROR_SERVER })
 	}
 }
+const passwordHasher = new PasswordHasher()
 
 // ============================================================
 // Classe mère
 // ============================================================
 
 export class CommunController {
-	#jwt = new Jwt()
+	#jwt = new TokenService()
+
+	constructor({ validator }) {
+		this.validator = validator
+	}
 
 	// --------------------------------------------------------
 	// Helpers PROTÉGÉS (accessibles aux sous-classes via this._xxx)
@@ -172,52 +155,13 @@ export class CommunController {
 		}
 	}
 
-	_validateClientData = (body) => {
-		const isValidEmail = body.email && IS_EMAIL.test(body.email)
-		const isValidPassword = body.password && IS_PASSWORD.test(body.password)
-		if (!isValidEmail || !isValidPassword) return CLIENT_ERRORS.INVALID_CREDENTIALS
-
-		const isValidFirstName = body.informations.firstName
-			&& IS_STRING.test(body.informations.firstName)
-		const isValidLastName = body.informations.lastName
-			&& IS_STRING.test(body.informations.lastName)
-		if (!isValidFirstName || !isValidLastName) return CLIENT_ERRORS.INVALID_NAME
-
-		return null
-	}
-
-	_validateBarData = (body) => {
-		if (!IS_EMAIL.test(body.email) || !IS_PASSWORD.test(body.password)) {
-			return BAR_ERRORS.INVALID_CREDENTIALS
-		}
-		if (!IS_ADDRESS.test(body.informations.address)) {
-			return BAR_ERRORS.INVALID_ADDRESS
-		}
-		if (body.informations.description && !IS_DESCRIPTION.test(body.informations.description)) {
-			return BAR_ERRORS.INVALID_DESCRIPTION
-		}
-		if (!IS_BAR_NAME.test(body.informations.name)) {
-			return BAR_ERRORS.INVALID_NAME
-		}
-		return null
-	}
-
-	_isValidEmail = (email) => email !== '' && IS_EMAIL.test(email)
-
-	_validatePassword = (password) => {
-		if (!IS_PASSWORD.test(password)) {
-			return { isValidPassword: false, errorPasswordMessage: 'Mot de passe invalide' }
-		}
-		return { isValidPassword: true, errorPasswordMessage: '' }
-	}
-
 	_buildNewBarProfile = async (data) => {
 		const { latitude, longitude } = await getCoordinatesFromAddress(data.informations.address)
 		return {
 			role: data.role,
 			email: data.email,
 			name: data.informations.name,
-			password: passwordEncrypt(data.password),
+			password: await passwordHasher.hash(data.password),
 			address: data.informations.address,
 			price: data.informations.price,
 			description: data.informations.description,
@@ -227,9 +171,9 @@ export class CommunController {
 		}
 	}
 
-	_buildNewClientProfile = (data) => ({
+	_buildNewClientProfile = async (data) => ({
 		email: data.email,
-		password: passwordEncrypt(data.password),
+		password: await passwordHasher.hash(data.password),
 		role: data.role,
 		firstName: data.informations.firstName,
 		lastName: data.informations.lastName,
@@ -244,11 +188,11 @@ export class CommunController {
 		let profil
 
 		if (data.role === 'client') {
-			const err = this._validateClientData(data)
+			const err = this.validator.validateClient(data)
 			if (err) return res.status(401).json({ message: err.message })
 			profil = this._buildNewClientProfile(data)
 		} else if (data.role === 'bar') {
-			const err = this._validateBarData(data)
+			const err = this.validator.validateBar(data)
 			if (err) return res.status(401).json({ message: err.message })
 			profil = await this._buildNewBarProfile(data)
 		} else {
@@ -287,7 +231,7 @@ export class CommunController {
 			return res.status(401).json({ message: 'Le compte n\'existe pas' })
 		}
 
-		const passwordMatch = await verifyPassword(password, userDb.dataValues.password)
+		const passwordMatch = await passwordHasher.verifyPassword(password, userDb.dataValues.password)
 		if (!passwordMatch) {
 			logger.error('password is not valid')
 			return res.status(401).json({ message: 'L\'email ou le mot de passe sont invalide' })
@@ -314,7 +258,7 @@ export class CommunController {
 	forgotPassword = withErrorHandler(async (req, res) => {
 		const { email } = req.body
 
-		if (!this._isValidEmail(email)) {
+		if (!this.validator.isValidEmail(email)) {
 			logger.error('Error email')
 			return res.status(401).json({ errorEmailMessage: 'Email pas au bon format' })
 		}
@@ -364,7 +308,7 @@ export class CommunController {
 	resetPassword = withErrorHandler(async (req, res) => {
 		const { newPassword, id } = req.body
 
-		const { isValidPassword, errorPasswordMessage } = this._validatePassword(newPassword)
+		const { isValidPassword, errorPasswordMessage } = this.validator.isValidEmail(newPassword)
 		if (!isValidPassword) {
 			logger.error(errorPasswordMessage)
 			return res.status(401).json({ message: errorPasswordMessage })
@@ -380,7 +324,7 @@ export class CommunController {
 
 		const resource = {
 			role: userInDb.role,
-			password: passwordEncrypt(newPassword),
+			password: await passwordHasher.hash(newPassword),
 		}
 		const { isError, errorMessage } = await userInstance.updateUser(userInDb.id, resource)
 
@@ -440,7 +384,7 @@ export class CommunController {
 		const newProfile = { ...profile }
 
 		if (profile.password) {
-			newProfile.password = await passwordEncrypt(profile.password)
+			newProfile.password = await passwordHasher.hash(profile.password)
 		}
 
 		const updated = await userInstance.updateUser(userId, this._filterEmptyValues(newProfile))

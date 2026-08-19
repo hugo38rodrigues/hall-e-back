@@ -9,8 +9,24 @@
 
 # node files
 /app/node_modules
+/src/node_modules
 .npmrc
 # env folder
 env
 k8s
 logs
+
+
+.vscode/*
+!.vscode/extensions.json
+
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/*
+.env
+*.plantuml
+.npmrc

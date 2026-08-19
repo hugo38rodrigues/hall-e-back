@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { logger } from '../utils/logger.js'
 
-export class Jwt {
+export class TokenService {
 	constructor() {
 		this.jwtSecret = process.env.SECRET_JWT_KEY
 		if (!this.jwtSecret) {

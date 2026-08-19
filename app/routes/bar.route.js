@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import { BarController } from '../controllers/bar.controller.js'
-import { Jwt } from '../middleware/jwt.js'
-import { RoleValidation } from '../middleware/RoleValidation.js'
+import { RoleValidation } from '../middleware/role-validation.js'
+import { TokenService } from '../middleware/token-service.js'
 
 const router = Router()
 const bar = new BarController()
-const auth = new Jwt()
+const auth = new TokenService()
 const roleValidation = new RoleValidation()
 
 router.post('/', auth.validationTokenAccess, roleValidation.requireRole('bar'), bar.addSchedulingMatchesController)

@@ -1,8 +1,12 @@
-export PORT=3000
-export BDD_TARGET="mysql"
-export DB_PORT=3306
-export DB_USER=""
-export DB_PASSWORD=""
-export DB_NAME="hall-e"
-export DB_HOST="localhost"
-export DEV_MODE="true"
+export PORT="3000"
+export JWT_EXPIRATION=""
+export USER_EMAIL=""
+export USER_PASSWORD=""
+export LOCATIONIQ_API_KEY=""
+export SECRET_JWT_KEY=""
+export PGUSER=""
+export PGPASSWORD=""
+export PGHOST="hall-e-postgres"
+export PGPORT="5432"
+export NODE_ENV="dev"
+
