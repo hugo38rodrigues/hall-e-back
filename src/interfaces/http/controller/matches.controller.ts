@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { Match } from "../../../domain/entities/match.entities"
+import type {Request, Response} from 'express';
+import type { Match } from "../../../domain/entities/match.entities"
 
 interface GetMathcesInterface  {
 	execute() : Promise<Match[]>

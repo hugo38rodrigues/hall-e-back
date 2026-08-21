@@ -1,9 +1,8 @@
 // db/factory.ts
-import { MatchRepository } from "../../../../domain/port/match.repository"
-import { Logger } from "../../../../shared/logger"
+import type { MatchRepository } from "../../../../domain/port/match.repository"
+import type { Logger } from "../../../../shared/logger"
 import { PostgresDatabases } from "../database/postgres.database"
-import { PostgresConfig, RetryOptions } from "../database/postgres.type"
-
+import type { PostgresConfig, RetryOptions } from "../database/postgres.type"
 // import { MySqlDatabase } from './mysql/MySqlDatabase.js' // plus tard
 
 export interface DatabaseAdapter {

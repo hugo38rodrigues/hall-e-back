@@ -1,5 +1,6 @@
 // models/Bar.model.js
-import { DataTypes, Sequelize } from 'sequelize'
+import type { Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize'
 
 export function initBarModel(sequelize: Sequelize) {
 	return sequelize.define(

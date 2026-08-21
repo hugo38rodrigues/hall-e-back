@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize } from 'sequelize'
+import type { Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize'
 
 export function initFavorisModel(sequelize: Sequelize) {
 	return sequelize.define(

@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import { errorHandler } from '../interfaces/http/middleware/error-handler.js'
 import { registerRoutes } from '../interfaces/http/routes/index.js'
-import { Controllers } from './container.js'
+import type { Controllers } from './container.js'
 
 export function createApp(controllers: Controllers) {
   const app = express()
@@ -12,7 +12,7 @@ export function createApp(controllers: Controllers) {
   app.disable('x-powered-by')
   app.use(express.urlencoded({ extended: true }))
 
-  registerRoutes(app, controllers)   // ← on passe les controllers
+  registerRoutes(app, controllers)   
   app.use(errorHandler)
 
   return app

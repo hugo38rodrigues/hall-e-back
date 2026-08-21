@@ -1,5 +1,6 @@
 // models/Game.model.js
-import { DataTypes, Sequelize } from 'sequelize'
+import type { Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize'
 
 export function initGameModel(sequelize: Sequelize) {
 	return sequelize.define(

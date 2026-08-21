@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {pino, Logger as PinoLogger} from 'pino'
-import { Logger } from '../shared/logger'
+import type { Logger as PinoLogger} from 'pino';
+import {pino} from 'pino'
+import type { Logger } from '../shared/logger'
 
 export class LoggerPino implements Logger{
 	private logger: PinoLogger

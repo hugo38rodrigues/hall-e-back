@@ -1,20 +1,19 @@
-import { Sequelize } from 'sequelize'
-import {initBarModel} from './models/bar.model'
-import {initClientModel} from './models/client.model'
-import {initCodeModel} from './models/code.model'
-import {initCommentModel} from './models/comment.model'
-import {initFavorisModel} from './models/favoris.model'
-import {initGameModel} from './models/game.model'
-import {initLeagueModel} from './models/league.model'
-import {initMatchModel} from './models/match.model'
-import {initPictureModel} from './models/picture.model'
-import {initTeamModel} from './models/team.model'
-
+import type { Sequelize } from 'sequelize'
+import { initBarModel } from './models/bar.model'
+import { initClientModel } from './models/client.model'
+import { initCodeModel } from './models/code.model'
+import { initCommentModel } from './models/comment.model'
+import { initFavorisModel } from './models/favoris.model'
+import { initGameModel } from './models/game.model'
+import { initLeagueModel } from './models/league.model'
+import { initMatchModel } from './models/match.model'
+import { initPictureModel } from './models/picture.model'
+import { initTeamModel } from './models/team.model'
 
 export type Models = ReturnType<typeof buildModels>
 
 export function buildModels(sequelize: Sequelize) {
-	const models = {
+	return {
 		Bar: initBarModel(sequelize),
 		Team: initTeamModel(sequelize),
 		Match: initMatchModel(sequelize),
@@ -26,10 +25,9 @@ export function buildModels(sequelize: Sequelize) {
 		Favoris: initFavorisModel(sequelize),
 		Code: initCodeModel(sequelize),
 	}
-	return models
 }
 
-export function makeAssociations(models: any) {
+export function makeAssociations(models: Models) {
 	const { Bar, Client, Comment, Picture, Favoris, Code, Match, Team, League, Game } = models
 
 	// ─────────────────────────────────────────────────────────

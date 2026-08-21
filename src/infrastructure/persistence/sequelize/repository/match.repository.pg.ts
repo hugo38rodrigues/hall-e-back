@@ -1,6 +1,6 @@
-import { Match } from '../../../../domain/entities/match.entities'
-import { MatchRepository } from '../../../../domain/port/match.repository'
-import { Models } from '../associations'
+import type { Match } from '../../../../domain/entities/match.entities'
+import type { MatchRepository } from '../../../../domain/port/match.repository'
+import type { Models } from '../associations'
 import { toMatchEntity } from '../mappers/match.mapper'
 
 

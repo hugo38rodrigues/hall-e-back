@@ -1,4 +1,4 @@
-import { Match } from "../entities/match.entities";
+import type { Match } from "../entities/match.entities";
 
 export interface MatchRepository {
 	findAll(): Promise<Match[] | null>

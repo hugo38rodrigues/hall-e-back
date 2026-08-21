@@ -4,8 +4,8 @@ import { Sequelize } from 'sequelize'
 import { SequelizeStorage, Umzug } from 'umzug'
 import { fileURLToPath } from 'url'
 import { buildModels, makeAssociations } from '../associations'
-import { Logger } from '../../../../shared/logger'
-import { PostgresConfig, RetryOptions } from './postgres.type'
+import type { Logger } from '../../../../shared/logger'
+import type { PostgresConfig, RetryOptions } from './postgres.type'
 import { MatchRepositoryPg } from '../repository/match.repository.pg'
 
 /** Politique de retry par défaut pour l'initialisation. */
@@ -129,16 +129,16 @@ export class PostgresDatabases {
 		fn: () => Promise<T>,
 		{ maxRetries, delay, label }: RetryOptions & { label: string },
 	): Promise<T> {
-		// eslint-disable-next-line no-plusplus
+		 
 		for (let attempt = 1; attempt <= maxRetries; attempt++) {
 			try {
-				// eslint-disable-next-line no-await-in-loop
+				 
 				return await fn()
 			} catch (error) {
 				const msg = error instanceof Error ? error.message : String(error)
 				this.#log.warn(`${label} attempt ${attempt}/${maxRetries} failed: ${msg}`)
 				if (attempt === maxRetries) throw error
-				// eslint-disable-next-line no-await-in-loop
+				 
 				await sleep(delay)
 			}
 		}
