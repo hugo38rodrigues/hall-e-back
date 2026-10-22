@@ -22,28 +22,28 @@
         "fix-linter": "npx eslint --fix"
     },
     "dependencies": {
-        "@babel/core": "^8.0.1",
-        "@babel/preset-env": "^8.0.2",
+        "@babel/core": "^8.0.7",
+        "@babel/preset-env": "^8.0.7",
         "@hugo38rodrigues/bdd-service-hall-e": "^1.0.0",
         "axios": "^1.20.0",
         "bcryptjs": "^3.0.3",
         "cors": "^2.8.6",
-        "dotenv": "^17.4.2",
-        "express": "^5.2.1",
-        "globals": "^17.9.0",
+        "dotenv": "^18.0.9",
+        "express": "^5.3.0",
+        "globals": "^17.13.0",
         "jsonwebtoken": "^9.0.3",
-        "nodemailer": "^10.0.9",
+        "nodemailer": "^10.2.1",
         "nodemon": "^3.1.14",
-        "vitest": "^4.1.11",
+        "vitest": "^5.0.5",
         "winston": "^3.19.0",
         "winston-daily-rotate-file": "^5.0.0"
     },
     "devDependencies": {
-        "@vitest/coverage-v8": "^4.1.10",
+        "@vitest/coverage-v8": "^5.0.5",
         "eslint": "^8.57.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-import-resolver-typescript": "^4.4.5",
         "eslint-plugin-import": "^2.32.0",
-        "supertest": "^7.2.2"
+        "supertest": "^7.3.1"
     }
 }
