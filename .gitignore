@@ -25,3 +25,4 @@ logs
 *.sln
 *.sw?
 *.plantuml
+node_modules
